@@ -22,54 +22,57 @@ namespace TTS_Client {
 			InitializeComponent();
 			BuyTicketListView.ItemsSource = allBuyTicket;
 			TicketListView.ItemsSource = allTicketInfo;
+			QueryStartTime = DateTime.Now;
+			QueryEndTime = DateTime.Now.AddHours(12);
+			textBlock_Copy12.Text = QueryStartTime.ToString() + " - " + QueryEndTime.ToString();
 		}
 
 		public struct StationInfo {
-			int StationNumber;
-			string StationName;
-			string LineID;
-			string LineName;
+			public int StationNumber { get; set; } //车站编号
+			public string StationName { get; set; } //车站名称
+			public int Line { get; set; } //线路编号
+			public string LineName { get; set; } //线路名称
 		} //单个站点的相关信息
 
 		public struct TicketInfo {
-			int TicketNumber; //订单序号
-			int TicketPrice; //车票价格
-			int TicketLine; //所属路线序号
-			string LineName; //所属线路名称
-			int TrainID; //车次
-			string BuyTime; //购买时间
+			public int TicketNumber { get; set; } //订单序号
+			public int TicketPrice { get; set; } //车票价格
+			public int TicketLine { get; set; } //所属路线序号
+			public string LineName { get; set; } //所属线路名称
+			public int TrainID { get; set; } //车次
+			public string BuyTime { get; set; } //购买时间
 
-			int EnterStationNumber; //出发站点序号
-			string EnterStationName; //出发站点名称
-			string EnterStationTime;
-			string EnterStationTimeIn;
-			string EnterStationTimeOut;
+			public int EnterStationNumber { get; set; } //出发站点序号
+			public string EnterStationName { get; set; } //出发站点名称
+			public string EnterStationTime { get; set; }
+			public string EnterStationTimeIn { get; set; }
+			public string EnterStationTimeOut { get; set; }
 
-			int LeaveStationNumber; //到达站点序号
-			string LeaveStationName; //到达站点名称
-			string LeaveStationTime;
-			string LeaveStationTimeIn;
-			string LeaveStationTimeOut;
+			public int LeaveStationNumber; //到达站点序号
+			public string LeaveStationName { get; set; } //到达站点名称
+			public string LeaveStationTime { get; set; }
+			public string LeaveStationTimeIn { get; set; }
+			public string LeaveStationTimeOut { get; set; }
 		} //单个车票的相关信息
 
 		public struct BuyTicket {
-			int EnterStationNumber;
-			string EnterStationName;
-			string EnterStationTime;
-			string EnterStationTimeIn;
-			string EnterStationTimeOut;
+			public int EnterStationNumber { get; set; }
+			public string EnterStationName { get; set; }
+			public string EnterStationTime { get; set; }
+			public string EnterStationTimeIn { get; set; }
+			public string EnterStationTimeOut { get; set; }
 
-			int LeaveStationNumber;
-			string LeaveStationName;
-			string LeaveStationTime;
-			string LeaveStationTimeIn;
-			string LeaveStationTimeOut;
+			public int LeaveStationNumber { get; set; }
+			public string LeaveStationName { get; set; }
+			public string LeaveStationTime { get; set; }
+			public string LeaveStationTimeIn { get; set; }
+			public string LeaveStationTimeOut { get; set; }
 
-			int TicketPrice;
-			int TicketLine;
-			string LineName; //所属线路名称
-			int TrainID; //车次
-			int BuyNumber; //车票购买数量
+			public int TicketPrice { get; set; }
+			public int TicketLine { get; set; }
+			public string LineName { get; set; } //所属线路名称
+			public int TrainID { get; set; } //车次
+			public int BuyNumber { get; set; } //车票购买数量
 		} //单个车票购买记录的相关信息
 
 		public class AllStationInfo : ObservableCollection<StationInfo> { } //定义集合
@@ -78,6 +81,9 @@ namespace TTS_Client {
 		AllStationInfo allStationInfo = new AllStationInfo { };
 		AllTicketInfo allTicketInfo = new AllTicketInfo { };
 		AllBuyTicket allBuyTicket = new AllBuyTicket { };
+
+		public DateTime QueryStartTime { get; set; }
+		public DateTime QueryEndTime { get; set; }
 
 		private void button2_Click(object sender, RoutedEventArgs e) {
 			//
@@ -93,19 +99,31 @@ namespace TTS_Client {
 		}
 
 		private void button1_Click(object sender, RoutedEventArgs e) {
-			LocationSelect locationSelect = new LocationSelect("请选择到达地点");
+			LocationSelect locationSelect = new LocationSelect("请选择到达地点", allStationInfo);
 			locationSelect.ShowDialog();
-			textBlock_Copy7.Text = locationSelect.StationName;
+			if (locationSelect.StationName != null) {
+				textBlock_Copy7.Text = locationSelect.StationName + " (" + locationSelect.StationNumber.ToString() + ")";
+			}
 		} //选择到达地点
 
 		private void button_Click(object sender, RoutedEventArgs e) {
-			LocationSelect locationSelect = new LocationSelect("请选择出发地点");
+			LocationSelect locationSelect = new LocationSelect("请选择出发地点", allStationInfo);
 			locationSelect.ShowDialog();
-			textBlock_Copy2.Text = locationSelect.StationName;
+			if (locationSelect.StationName != null) {
+				textBlock_Copy2.Text = locationSelect.StationName + " (" + locationSelect.StationNumber.ToString() + ")";
+			}
 		} //选择出发地点
 
 		private void button3_Click(object sender, RoutedEventArgs e) {
-
+			TimeSelect timeSelect = new TimeSelect(QueryStartTime, QueryEndTime);
+			timeSelect.ShowDialog();
+			if (timeSelect.StartTime.Year != 1) {
+				QueryStartTime = timeSelect.QueryStartTime;
+			}
+			if (timeSelect.EndTime.Year != 1) {
+				QueryEndTime = timeSelect.QueryEndTime;
+			}
+			textBlock_Copy12.Text = QueryStartTime.ToString() + " - " + QueryEndTime.ToString();
 		} //选择出发时间
 
 		private void Button2_Copy_Click(object sender, RoutedEventArgs e) {
@@ -121,6 +139,26 @@ namespace TTS_Client {
 		}
 
 		private void LoadDefaultTestData() {
+
+			StationInfo stationInfo = new StationInfo();
+
+			stationInfo.Line = 3;
+			stationInfo.LineName = "三号线";
+			stationInfo.StationName = "五山";
+			stationInfo.StationNumber = 302;
+			allStationInfo.Add(stationInfo);
+
+			stationInfo.Line = 3;
+			stationInfo.LineName = "三号线";
+			stationInfo.StationName = "天河客运站";
+			stationInfo.StationNumber = 301;
+			allStationInfo.Add(stationInfo);
+
+			stationInfo.Line = 1;
+			stationInfo.LineName = "一号线";
+			stationInfo.StationName = "体育西路站";
+			stationInfo.StationNumber = 106;
+			allStationInfo.Add(stationInfo);
 
 		} //载入测试数据(仅用于调试)
 

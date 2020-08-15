@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,9 +28,11 @@ namespace TTS_Client
 
 		public string StationName { get; set; }
 
-		public LocationSelect(string title) {
+		public LocationSelect(string title, ClientWindow.AllStationInfo allStationInfo) {
 			InitializeComponent();
 			this.Title = title;
+			listView.ItemsSource = allStationInfo;
+			listView.Items.SortDescriptions.Add(new SortDescription("StationNumber", ListSortDirection.Ascending));
 		}
 
 		private void Button2_Click(object sender, RoutedEventArgs e) {
@@ -41,8 +44,14 @@ namespace TTS_Client
 		}
 
 		private void button_Click(object sender, RoutedEventArgs e) {
-			StationNumber = 123;
-			StationName = "哈哈哈";
+			if (listView.SelectedItems.Count == 0) {
+				MessageBox.Show("未选择地点！");
+				return;
+			}
+			ClientWindow.StationInfo info = new ClientWindow.StationInfo();
+			info = (ClientWindow.StationInfo)listView.SelectedItem;
+			StationNumber = info.StationNumber;
+			StationName = info.StationName;
 			Close();
 		}
 	}

@@ -40,6 +40,7 @@
                     <Button x:Name="button6" Content="购买已添加的所有车票" HorizontalAlignment="Left" Margin="485,423,0,0" VerticalAlignment="Top" Width="135"/>
                     <TextBlock x:Name="textBlock_Copy2" HorizontalAlignment="Left" Margin="267,30,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="146" TextAlignment="Center" />
                     <TextBlock x:Name="textBlock_Copy7" HorizontalAlignment="Left" Margin="267,55,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="146" TextAlignment="Center" />
+                    <TextBlock x:Name="textBlock_Copy12" HorizontalAlignment="Left" Margin="267,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="253" TextAlignment="Center" />
                 </Grid>
             </TabItem>
             <TabItem Header="订单查询">

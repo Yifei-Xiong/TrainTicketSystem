@@ -7,12 +7,12 @@
         mc:Ignorable="d"
         Title="地点选择" Height="342.713" Width="274.997" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
-        <ListView x:Name="listView" HorizontalAlignment="Left" Height="207" Margin="10,70,0,0" VerticalAlignment="Top" Width="249">
+        <ListView x:Name="listView" HorizontalAlignment="Left" Height="207" Margin="10,70,0,0" VerticalAlignment="Top" Width="249" SelectionMode="Single">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="车站编号" Width="80" DisplayMemberBinding="{Binding }"/>
-                    <GridViewColumn Header="车站名称" Width="80" DisplayMemberBinding="{Binding }"/>
-                    <GridViewColumn Header="所属线路" Width="80" DisplayMemberBinding="{Binding }"/>
+                    <GridViewColumn Header="车站编号" Width="80" DisplayMemberBinding="{Binding StationNumber}"/>
+                    <GridViewColumn Header="车站名称" Width="80" DisplayMemberBinding="{Binding StationName}"/>
+                    <GridViewColumn Header="所属线路" Width="80" DisplayMemberBinding="{Binding LineName}"/>
                 </GridView>
             </ListView.View>
         </ListView>
