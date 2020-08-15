@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTS_Client", "TTS_Client\TTS_Client.csproj", "{6ECC8C0B-5745-4C06-8795-B6DC543370DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTS_ClassLibrary", "TTS_ClassLibrary\TTS_ClassLibrary.csproj", "{02C73401-77B6-49EE-B7BD-70AB0AA61FDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TTS_Core", "TTS_ClassLibrary\TTS_Core.csproj", "{02C73401-77B6-49EE-B7BD-70AB0AA61FDE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTS_Server", "TTS_Server\TTS_Server.csproj", "{AB9C5307-DFEB-4A76-ACDC-CF59FD54E76B}"
 EndProject
