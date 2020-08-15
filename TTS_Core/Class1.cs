@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TTS_ClassLibrary {
+namespace TTS_Core {
 	public class Class1 {
 	}
 }
