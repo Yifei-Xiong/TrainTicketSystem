@@ -15,11 +15,23 @@ using System.Windows.Shapes;
 
 namespace TTS_Client {
 	/// <summary>
-	/// MainWindow.xaml 的交互逻辑
+	/// LoginWindow.xaml 的交互逻辑
 	/// </summary>
-	public partial class MainWindow : Window {
-		public MainWindow() {
+	public partial class LoginWindow : Window {
+		public LoginWindow() {
 			InitializeComponent();
+		}
+
+		private void button_register_Click(object sender, RoutedEventArgs e) {
+
+		}
+
+		private void button_login_Click(object sender, RoutedEventArgs e) {
+
+		}
+
+		private void button_about_Click(object sender, RoutedEventArgs e) {
+
 		}
 	}
 }

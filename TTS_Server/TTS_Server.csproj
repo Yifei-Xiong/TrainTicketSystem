@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6ECC8C0B-5745-4C06-8795-B6DC543370DC}</ProjectGuid>
+    <ProjectGuid>{AB9C5307-DFEB-4A76-ACDC-CF59FD54E76B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>TTS_Client</RootNamespace>
-    <AssemblyName>TTS_Client</AssemblyName>
+    <RootNamespace>TTS_Server</RootNamespace>
+    <AssemblyName>TTS_Server</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

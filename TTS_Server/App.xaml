@@ -1,7 +1,7 @@
-﻿<Application x:Class="TTS_Client.App"
+﻿<Application x:Class="TTS_Server.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:TTS_Client"
+             xmlns:local="clr-namespace:TTS_Server"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          
