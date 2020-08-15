@@ -104,6 +104,7 @@ namespace TTS_Client {
 			return bytes;
 		}
 
+		/*
 		//侦听线程执行的方法
 		private string ListenThreadMethod() {
 			//IPAddress ip = (IPAddress)Dns.GetHostAddresses(Dns.GetHostName()).GetValue(0);
@@ -113,8 +114,10 @@ namespace TTS_Client {
 			newClient.Close();
 			return messageClass.Message;
 		}
+		*/
 
 		private void button_register_Click(object sender, RoutedEventArgs e) {
+			/*
 			TcpClient tcpClient = null;
 			NetworkStream networkStream = null;
 			try {
@@ -146,9 +149,11 @@ namespace TTS_Client {
 			else {
 				MessageBox.Show("注册失败！");
 			}
+			*/
 		}
 
 		private void button_login_Click(object sender, RoutedEventArgs e) {
+			/*
 			TcpClient tcpClient;
 			IPAddress ServerIP;
 			string msg = string.Empty;
@@ -178,7 +183,12 @@ namespace TTS_Client {
 			else {
 				MessageBox.Show("登录失败！");
 			}
+			*/
+			ClientWindow clientWindow = new ClientWindow();
+			clientWindow.Show();
+			Close();
 		}
+
 
 		private void button_about_Click(object sender, RoutedEventArgs e) {
 			About about = new About();

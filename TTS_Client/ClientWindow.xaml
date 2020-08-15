@@ -5,31 +5,40 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TTS_Client"
         mc:Ignorable="d"
-        Title="火车订票系统 - 客户端" Height="509.475" Width="780.758">
+        Title="火车订票系统 - 客户端" Height="509.475" Width="780.758" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
         <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="480" VerticalAlignment="Top" Width="774">
             <TabItem Header="车票查询/购买">
                 <Grid Background="#FFE5E5E5">
                     <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="153,30,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="109" TextAlignment="Center" Text="已选择出发地点："/>
                     <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="153,55,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="109" TextAlignment="Center" Text="已选择到达地点："/>
-                    <Button x:Name="button" Content="选择出发地点" HorizontalAlignment="Left" Margin="35,29,0,0" VerticalAlignment="Top" Width="101"/>
-                    <Button x:Name="button1" Content="选择到达地点" HorizontalAlignment="Left" Margin="35,54,0,0" VerticalAlignment="Top" Width="101"/>
+                    <Button x:Name="button" Content="选择出发地点" HorizontalAlignment="Left" Margin="35,29,0,0" VerticalAlignment="Top" Width="101" Click="button_Click"/>
+                    <Button x:Name="button1" Content="选择到达地点" HorizontalAlignment="Left" Margin="35,54,0,0" VerticalAlignment="Top" Width="101" Click="button1_Click"/>
                     <Button x:Name="button2" Content="查询/购买" HorizontalAlignment="Left" Margin="35,111,0,0" VerticalAlignment="Top" Width="227" Click="button2_Click"/>
                     <Button x:Name="button3" Content="选择出发时间" HorizontalAlignment="Left" Margin="35,79
-                            ,0,0" VerticalAlignment="Top" Width="101"/>
+                            ,0,0" VerticalAlignment="Top" Width="101" Click="button3_Click"/>
                     <TextBlock x:Name="textBlock_Copy1" HorizontalAlignment="Left" Margin="153,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="109" TextAlignment="Center" Text="已选择出发时间："/>
                     <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="279,111,0,0" VerticalAlignment="Top" Width="241" Height="19"/>
                     <TextBlock x:Name="textBlock_Copy4" HorizontalAlignment="Left" Margin="35,145,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="109" TextAlignment="Center" Text="已添加车票信息："/>
                     <ListView x:Name="listView" HorizontalAlignment="Left" Height="253" Margin="36,165,0,0" VerticalAlignment="Top" Width="705">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn/>
+                                <GridViewColumn Header="上车站点" Width="80" DisplayMemberBinding="{Binding }"/>
+                                <GridViewColumn Header="上车时间" Width="120" DisplayMemberBinding="{Binding }"/>
+                                <GridViewColumn Header="到达站点" Width="80" DisplayMemberBinding="{Binding }"/>
+                                <GridViewColumn Header="到达时间" Width="80" DisplayMemberBinding="{Binding }"/>
+                                <GridViewColumn Header="车票价格" Width="80" DisplayMemberBinding="{Binding }"/>
+                                <GridViewColumn Header="所属线路" Width="80" DisplayMemberBinding="{Binding }"/>
+                                <GridViewColumn Header="车票价格" Width="80" DisplayMemberBinding="{Binding }"/>
+                                <GridViewColumn Header="购买数量" Width="80" DisplayMemberBinding="{Binding }"/>
                             </GridView>
                         </ListView.View>
                     </ListView>
                     <Button x:Name="button4" Content="购买选中的车票" HorizontalAlignment="Left" Margin="310,423,0,0" VerticalAlignment="Top" Width="115"/>
                     <Button x:Name="button5" Content="删除选中的车票" HorizontalAlignment="Left" Margin="173,423,0,0" VerticalAlignment="Top" Width="115"/>
-                    <Button x:Name="button6" Content="购买添加的所有车票" HorizontalAlignment="Left" Margin="442,423,0,0" VerticalAlignment="Top" Width="135"/>
+                    <Button x:Name="button6" Content="购买已添加的所有车票" HorizontalAlignment="Left" Margin="442,423,0,0" VerticalAlignment="Top" Width="135"/>
+                    <TextBlock x:Name="textBlock_Copy2" HorizontalAlignment="Left" Margin="267,30,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="146" TextAlignment="Center" />
+                    <TextBlock x:Name="textBlock_Copy7" HorizontalAlignment="Left" Margin="267,55,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="146" TextAlignment="Center" />
                 </Grid>
             </TabItem>
             <TabItem Header="订单查询">
@@ -52,7 +61,7 @@
                     <TextBlock x:Name="textBlock1_Copy" HorizontalAlignment="Left" Margin="108,10,0,0" TextWrapping="Wrap" Text="出发站点" VerticalAlignment="Top"/>
                     <TextBox x:Name="textBox_Copy" HorizontalAlignment="Left" Height="23" Margin="16,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="71"/>
                     <TextBox x:Name="textBox_Copy1" HorizontalAlignment="Left" Height="23" Margin="98,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
-                    <Button x:Name="button2_Copy" Content="筛选" HorizontalAlignment="Left" Margin="694,30,0,0" VerticalAlignment="Top" Width="48" Click="Button2_Click"/>
+                    <Button x:Name="button2_Copy" Content="筛选" HorizontalAlignment="Left" Margin="694,30,0,0" VerticalAlignment="Top" Width="48" Click="button2_Click"/>
                     <Button x:Name="button2_Copy1" Content="清空" HorizontalAlignment="Left" Margin="694,6,0,0" VerticalAlignment="Top" Width="48" Click="Button2_Copy_Click" />
                     <TextBox x:Name="textBox_Copy2" HorizontalAlignment="Left" Height="23" Margin="177,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="110"/>
                     <TextBlock x:Name="textBlock1_Copy1" HorizontalAlignment="Left" Margin="208,10,0,0" TextWrapping="Wrap" Text="上车时间" VerticalAlignment="Top"/>
