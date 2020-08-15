@@ -7,10 +7,10 @@
         mc:Ignorable="d"
         Title="时间选择" Height="202.58" Width="392.33" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
-        <DatePicker x:Name="DatePicker1" HorizontalAlignment="Left" Margin="149,34,0,0" VerticalAlignment="Top"/>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="48,38,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="请选择起始时间"/><Run Text="："/></TextBlock>
-        <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="48,90,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.521,5.288"><Run Text="请选择"/><Run Text="截至"/><Run Text="时间"/><Run Text="："/></TextBlock>
-        <DatePicker x:Name="DatePicker2" HorizontalAlignment="Left" Margin="149,86,0,0" VerticalAlignment="Top"/>
+        <DatePicker x:Name="DatePicker1" HorizontalAlignment="Left" Margin="136,34,0,0" VerticalAlignment="Top" Width="101"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="35,38,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="请选择起始时间"/><Run Text="："/></TextBlock>
+        <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="35,90,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.521,5.288"><Run Text="请选择"/><Run Text="截至"/><Run Text="时间"/><Run Text="："/></TextBlock>
+        <DatePicker x:Name="DatePicker2" HorizontalAlignment="Left" Margin="136,86,0,0" VerticalAlignment="Top" Width="101"/>
         <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="248,16,0,0" TextWrapping="Wrap" Text="小时" VerticalAlignment="Top"/>
         <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="297,16,0,0" TextWrapping="Wrap" Text="分钟" VerticalAlignment="Top"/>
         <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="242,34,0,0" TextWrapping="Wrap" Text="08" VerticalAlignment="Top" Width="36" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>

@@ -27,8 +27,8 @@ namespace TTS_Client
 			QueryStartTime = StartTime;
 			QueryEndTime = EndTime;
 			InitializeComponent();
-			DatePicker1.DisplayDate = StartTime;
-			DatePicker2.DisplayDate = EndTime;
+			DatePicker1.SelectedDate = StartTime.AddTicks(-StartTime.TimeOfDay.Ticks);
+			DatePicker2.SelectedDate = EndTime.AddTicks(-EndTime.TimeOfDay.Ticks); ;
 			textBox.Text = StartTime.Hour.ToString();
 			textBox1.Text = StartTime.Minute.ToString();
 			textBox_Copy.Text = EndTime.Hour.ToString();
@@ -41,8 +41,14 @@ namespace TTS_Client
 		public DateTime QueryEndTime { get; set; }
 
 		private void button_Click(object sender, RoutedEventArgs e) {
-			StartTime = DateTime.Parse(DatePicker1.Text + " " + textBox.Text + ":" + textBox1.Text + ":00");
-			EndTime = DateTime.Parse(DatePicker2.Text + " " + textBox_Copy.Text + ":" + textBox1_Copy.Text + ":00");
+			//StartTime = DateTime.Parse(DatePicker1.Text + " " + textBox.Text + ":" + textBox1.Text + ":00");
+			if (DatePicker1.SelectedDate == null || DatePicker2.SelectedDate == null) {
+				MessageBox.Show("请选择日期！");
+				return;
+			}
+			StartTime = DatePicker1.SelectedDate.Value.AddHours(int.Parse(textBox.Text)).AddMinutes(int.Parse(textBox1.Text));
+			//EndTime = DateTime.Parse(DatePicker2.Text + " " + textBox_Copy.Text + ":" + textBox1_Copy.Text + ":00");
+			EndTime = DatePicker2.SelectedDate.Value.AddHours(int.Parse(textBox_Copy.Text)).AddMinutes(int.Parse(textBox1_Copy.Text));
 			if (StartTime >= EndTime) {
 				MessageBox.Show("截止时间不能早于出发时间！");
 			}
