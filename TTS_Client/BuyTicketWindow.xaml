@@ -1,0 +1,19 @@
+﻿<Window x:Class="TTS_Client.BuyTicketWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TTS_Client"
+        mc:Ignorable="d"
+        Title="BuyTicketWindow" Height="450" Width="800">
+    <Grid>
+        <ListView x:Name="listView" HorizontalAlignment="Left" Height="185" Margin="49,73,0,0" VerticalAlignment="Top" Width="632">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+    </Grid>
+</Window>

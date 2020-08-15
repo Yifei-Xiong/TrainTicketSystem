@@ -25,6 +25,7 @@ namespace TTS_Client {
 			QueryStartTime = DateTime.Now;
 			QueryEndTime = DateTime.Now.AddHours(12);
 			textBlock_Copy12.Text = QueryStartTime.ToString() + " - " + QueryEndTime.ToString();
+			ticketQueryInfo = new TicketQueryInfo();
 		}
 
 		public struct StationInfo {
@@ -75,6 +76,20 @@ namespace TTS_Client {
 			public int BuyNumber { get; set; } //车票购买数量
 		} //单个车票购买记录的相关信息
 
+		public struct TicketQueryInfo {
+			public int EnterStationNumber { get; set; }
+			public string EnterStationName { get; set; }
+			public int LeaveStationNumber { get; set; }
+			public string LeaveStationName { get; set; }
+			public DateTime StartTime { get; set; }
+			public DateTime EndTime { get; set; }
+			public bool SameLine { get; set; } //是否在一条线路上
+			public int Line { get; set; } //若在一条线路上，则为线路编号
+			public string LineName { get; set; } //若在一条线路上，则为线路名称
+		}
+
+		TicketQueryInfo ticketQueryInfo;
+
 		public class AllStationInfo : ObservableCollection<StationInfo> { } //定义集合
 		public class AllTicketInfo : ObservableCollection<TicketInfo> { } //定义集合
 		public class AllBuyTicket : ObservableCollection<BuyTicket> { } //定义集合
@@ -86,11 +101,20 @@ namespace TTS_Client {
 		public DateTime QueryEndTime { get; set; }
 
 		private void button2_Click(object sender, RoutedEventArgs e) {
-			//
-			MessageBox.Show("查询成功！");
-
-			//
-			MessageBox.Show("查询成功！该方案需要换乘，请选择换乘方案！");
+			if (ticketQueryInfo.EnterStationNumber == 0 || ticketQueryInfo.LeaveStationNumber == 0
+				|| ticketQueryInfo.StartTime.Year <= 1 || ticketQueryInfo.EndTime.Year <= 1) {
+				MessageBox.Show("查询条件不完整，请重新输入！");
+				return;
+			} //查询未完成
+			bool NeedChangeLine = false; //是否需要换乘
+			if (NeedChangeLine) {
+				LineSelect lineSelect = new LineSelect(ticketQueryInfo);
+				lineSelect.ShowDialog();
+			} //需要换乘，进入换乘方案选择窗口
+			else {
+				BuyTicketWindow buyTicketWindow = new BuyTicketWindow(ticketQueryInfo);
+				buyTicketWindow.ShowDialog();
+			} //不需要换乘，进入购票窗口
 		}
 
 		private void button_about_Click(object sender, RoutedEventArgs e) {
@@ -103,6 +127,8 @@ namespace TTS_Client {
 			locationSelect.ShowDialog();
 			if (locationSelect.StationName != null) {
 				textBlock_Copy7.Text = locationSelect.StationName + " (" + locationSelect.StationNumber.ToString() + ")";
+				ticketQueryInfo.LeaveStationNumber = locationSelect.StationNumber;
+				ticketQueryInfo.LeaveStationName = locationSelect.StationName;
 			}
 		} //选择到达地点
 
@@ -111,6 +137,8 @@ namespace TTS_Client {
 			locationSelect.ShowDialog();
 			if (locationSelect.StationName != null) {
 				textBlock_Copy2.Text = locationSelect.StationName + " (" + locationSelect.StationNumber.ToString() + ")";
+				ticketQueryInfo.EnterStationNumber = locationSelect.StationNumber;
+				ticketQueryInfo.EnterStationName = locationSelect.StationName;
 			}
 		} //选择出发地点
 
@@ -119,9 +147,11 @@ namespace TTS_Client {
 			timeSelect.ShowDialog();
 			if (timeSelect.StartTime.Year != 1) {
 				QueryStartTime = timeSelect.QueryStartTime;
+				ticketQueryInfo.StartTime = timeSelect.QueryStartTime;
 			}
 			if (timeSelect.EndTime.Year != 1) {
 				QueryEndTime = timeSelect.QueryEndTime;
+				ticketQueryInfo.EndTime = timeSelect.QueryEndTime;
 			}
 			textBlock_Copy12.Text = QueryStartTime.ToString() + " - " + QueryEndTime.ToString();
 		} //选择出发时间
