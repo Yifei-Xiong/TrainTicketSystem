@@ -102,6 +102,10 @@
                     <Button x:Name="button8_Copy" Content="清空已有数据(仅用于调试)" HorizontalAlignment="Left" Margin="29,223,0,0" VerticalAlignment="Top" Width="163" Click="button8_Copy_Click"/>
                 </Grid>
             </TabItem>
+            <TabItem Header="系统管理">
+                <Grid Background="#FFE5E5E5">
+                    </Grid>
+            </TabItem>
         </TabControl>
 
     </Grid>
