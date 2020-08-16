@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TTS_Client"
         mc:Ignorable="d"
-        Title="车票购买" Height="450" Width="703.467">
+        Title="车票购买" Height="450" Width="703.467" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
         <ListView x:Name="listView" HorizontalAlignment="Left" Height="291" Margin="10,119,0,0" VerticalAlignment="Top" Width="677" SelectionMode="Single">
             <ListView.View>
@@ -21,7 +21,7 @@
         </ListView>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="511,12,0,0" TextWrapping="Wrap" Text="购买数量：" VerticalAlignment="Top"/>
         <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="15" Margin="573,12,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="31" Text="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-        <Button x:Name="button" Content="购买" HorizontalAlignment="Left" Margin="624,10,0,0" VerticalAlignment="Top" Width="63"/>
+        <Button x:Name="button" Content="购买" HorizontalAlignment="Left" Margin="624,10,0,0" VerticalAlignment="Top" Width="63" Click="button_Click"/>
         <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="21,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="18"><Run Text="当前出发地点："/><LineBreak/><Run/></TextBlock>
         <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="185,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="当前到达地点"/><Run Text="："/></TextBlock>
         <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="21,40,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="归属线路："/>

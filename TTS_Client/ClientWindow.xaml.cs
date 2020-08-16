@@ -25,14 +25,15 @@ namespace TTS_Client {
 			InitializeComponent();
 			BuyTicketListView.ItemsSource = allBuyTicket;
 			TicketListView.ItemsSource = allTicketInfo;
-			QueryStartTime = DateTime.Now;
-			QueryEndTime = DateTime.Now.AddHours(12);
-			textBlock_Copy12.Text = QueryStartTime.ToString() + " - " + QueryEndTime.ToString();
 			ticketQueryInfo = new TicketQueryInfo();
+			ticketQueryInfo.StartTime = DateTime.Now;
+			ticketQueryInfo.EndTime = DateTime.Now.AddHours(12);
+			textBlock_Copy12.Text = ticketQueryInfo.StartTime.ToString() + " - " + ticketQueryInfo.EndTime.ToString();
 
-			ListenerThread = new Thread(new ThreadStart(ListenerthreadMethod));
-			ListenerThread.IsBackground = true; //主线程结束后，该线程自动结束
-			ListenerThread.Start(); //启动线程
+
+			//ListenerThread = new Thread(new ThreadStart(ListenerthreadMethod));
+			//ListenerThread.IsBackground = true; //主线程结束后，该线程自动结束
+			//ListenerThread.Start(); //启动线程
 		}
 
 		public struct StationInfo {
@@ -76,7 +77,7 @@ namespace TTS_Client {
 			public string LeaveStationTimeIn { get; set; }
 			public string LeaveStationTimeOut { get; set; }
 
-			public int TicketPrice { get; set; }
+			public double TicketPrice { get; set; }
 			public int TicketLine { get; set; }
 			public string LineName { get; set; } //所属线路名称
 			public int TrainID { get; set; } //车次
@@ -168,17 +169,15 @@ namespace TTS_Client {
 		} //选择出发地点
 
 		private void button3_Click(object sender, RoutedEventArgs e) {
-			TimeSelect timeSelect = new TimeSelect(QueryStartTime, QueryEndTime);
+			TimeSelect timeSelect = new TimeSelect(ticketQueryInfo.StartTime, ticketQueryInfo.EndTime);
 			timeSelect.ShowDialog();
 			if (timeSelect.StartTime.Year != 1) {
-				QueryStartTime = timeSelect.QueryStartTime;
 				ticketQueryInfo.StartTime = timeSelect.QueryStartTime;
 			}
 			if (timeSelect.EndTime.Year != 1) {
-				QueryEndTime = timeSelect.QueryEndTime;
 				ticketQueryInfo.EndTime = timeSelect.QueryEndTime;
 			}
-			textBlock_Copy12.Text = QueryStartTime.ToString() + " - " + QueryEndTime.ToString();
+			textBlock_Copy12.Text = ticketQueryInfo.StartTime.ToString() + " - " + ticketQueryInfo.EndTime.ToString();
 		} //选择出发时间
 
 		private void Button2_Copy_Click(object sender, RoutedEventArgs e) {
