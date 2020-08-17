@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TTS_Core
 {
-	//数据包类
+	//数据包类，Type=0
 	[Serializable]
 	public abstract class DataPackage {
 		public DataPackage() {
@@ -33,7 +33,7 @@ namespace TTS_Core
 		public int MessageType = 0; //数据包类Type为0
 	}
 
-	//登入数据包类
+	//登入数据包类，Type=1
 	[Serializable]
 	public class LoginDataPackage : DataPackage {
 		public LoginDataPackage(byte[] Bytes) {
@@ -59,141 +59,56 @@ namespace TTS_Core
 		public string Password { get; set; } //登录密码
 	}
 
-	//登出数据包类
+	//注册数据包类，Type=2
 	[Serializable]
-	public class LogoutDataPackage : DataPackage {
-		public LogoutDataPackage(byte[] Bytes) {
+	public class RegisterDataPackage : DataPackage {
+		public RegisterDataPackage(byte[] Bytes) {
 			using (MemoryStream ms = new MemoryStream(Bytes)) {
 				IFormatter formatter = new BinaryFormatter();
-				LogoutDataPackage logoutDataPackage = formatter.Deserialize(ms) as LogoutDataPackage;
-				if (logoutDataPackage != null) {
-					this.UserID = logoutDataPackage.UserID;
-					this.UserID = logoutDataPackage.UserID;
-					this.Sender = logoutDataPackage.Sender;
-					this.Receiver = logoutDataPackage.Receiver;
-					this.sendTime = logoutDataPackage.sendTime;
-					this.MessageType = logoutDataPackage.MessageType;
+				RegisterDataPackage registerPackage = formatter.Deserialize(ms) as RegisterDataPackage;
+				if (registerPackage != null) {
+					this.Password = registerPackage.Password;
+					this.UserID = registerPackage.UserID;
+					this.Sender = registerPackage.Sender;
+					this.Receiver = registerPackage.Receiver;
+					this.sendTime = registerPackage.sendTime;
+					this.MessageType = registerPackage.MessageType;
 				}
 			}
 		} //构造函数 字节数组转化为数据包
-		public LogoutDataPackage(string sender, string receiver, string userID) : base(sender, receiver) {
+		public RegisterDataPackage(string sender, string receiver, string userID, string password) : base(sender, receiver) {
 			MessageType = 2;
 			this.UserID = userID;
-		} //构造函数 接受发送者,接收者字符串,登出用户名
-		public string UserID { get; set; } //登出用户名
+			this.Password = password;
+		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
+		public string UserID { get; set; } //注册用户名
+		public string Password { get; set; } //注册密码
 	}
 
-	//聊天数据包类
+	//查询数据包基类，Type=11
 	[Serializable]
-	public class ChatDataPackage : DataPackage {
-		public ChatDataPackage () { }
-		public ChatDataPackage (byte[] Bytes) {
+	public class QueryDataPackage : DataPackage {
+		public QueryDataPackage(byte[] Bytes) {
 			using (MemoryStream ms = new MemoryStream(Bytes)) {
 				IFormatter formatter = new BinaryFormatter();
-				ms.Position = 0;
-				ChatDataPackage chatDataPackage = formatter.Deserialize(ms) as ChatDataPackage;
-				if (chatDataPackage != null) {
-					this.Message = chatDataPackage.Message;
-					this.Sender = chatDataPackage.Sender;
-					this.Receiver = chatDataPackage.Receiver;
-					this.sendTime = chatDataPackage.sendTime;
-					this.MessageType = chatDataPackage.MessageType;
-					this.SenderID = chatDataPackage.SenderID;
+				QueryDataPackage queryPackage = formatter.Deserialize(ms) as QueryDataPackage;
+				if (queryPackage != null) {
+					this.Sender = queryPackage.Sender;
+					this.Receiver = queryPackage.Receiver;
+					this.sendTime = queryPackage.sendTime;
+					this.MessageType = queryPackage.MessageType;
+					this.QueryType = queryPackage.QueryType;
 				}
 			}
 		} //构造函数 字节数组转化为数据包
-		public ChatDataPackage(string sender, string receiver, string message) : base(sender, receiver) {
-			MessageType = 3;
-			this.Message = message;
-		} //构造函数 接受发送者,接收者字符串,发送的消息
-		public string Message { get; set; } //发送的消息
-		public string SenderID { get; set; } //发送者的ID
-	}
-
-	//单人聊天数据包类
-	[Serializable]
-	public class SingleChatDataPackage : ChatDataPackage {
-		public SingleChatDataPackage(byte[] Bytes) : base(Bytes) {
-		} //构造函数 字节数组转化为数据包
-		public SingleChatDataPackage(string sender, string receiver, string message) : base(sender,receiver,message) {
-			MessageType = 4;
-		} //构造函数 接受发送者,接收者字符串,发送的消息
-		public static string operator +(string str, SingleChatDataPackage data) {
-			return str+data.Message;
-		}
-	}
-
-	//添加好友数据包类
-	[Serializable]
-	public class AddFriendChatDataPackage : ChatDataPackage {
-		public AddFriendChatDataPackage(byte[] Bytes) : base(Bytes) {
-		} //构造函数 字节数组转化为数据包
-		public AddFriendChatDataPackage(string sender, string receiver, string message) : base(sender, receiver, message) {
-			MessageType = 8;
-		} //构造函数 接受发送者,接收者字符串,发送的消息
-		public static string operator +(string str, AddFriendChatDataPackage data) {
-			return str + data.Message;
-		}
-	}
-
-	//多人聊天数据包类
-	[Serializable]
-	public class MultiChatDataPackage : ChatDataPackage {
-		public MultiChatDataPackage (byte[] Bytes) : base(Bytes) {
-		} //构造函数 字节数组转化为数据包
-		public MultiChatDataPackage(string sender, string receiver, string message) : base(sender, receiver, message) {
-			MessageType = 5;
-		} //构造函数 接受发送者,接收者字符串,发送的消息
-		public static string operator +(string str, MultiChatDataPackage data) {
-			return str + data.Message;
-		}
-	}
-
-	//更改名称数据包类
-	[Serializable]
-	public class ChangeNameDataPackage : DataPackage {
-		public ChangeNameDataPackage(byte[] Bytes) {
-			using (MemoryStream ms = new MemoryStream(Bytes)) {
-				IFormatter formatter = new BinaryFormatter();
-				if (formatter.Deserialize(ms) is ChangeNameDataPackage changeNameDataPackage) {
-					this.Name = changeNameDataPackage.Name;
-				}
-			}
-		} //构造函数 字节数组转化为数据包
-		public ChangeNameDataPackage(string sender, string receiver, string name) : base(sender, receiver) {
-			MessageType = 6;
-			this.Name = name;
-		} //构造函数 接受发送者,接收者字符串,用户名称
-		public string Name { get; set; } //用户名称
-	}
-
-	//文件数据包类
-	[Serializable]
-	public class FileDataPackage : ChatDataPackage {
-		public FileDataPackage(string sender, string receiver, string message, byte[] file,string ext) : base(sender, receiver, message) {
-			this.file = file;
-			FileExtension = ext;
-			MessageType = 7;
-		} //构造函数
-		public FileDataPackage(byte[] Bytes) {
-			using (MemoryStream ms = new MemoryStream(Bytes)) {
-				IFormatter formatter = new BinaryFormatter();
-				ms.Position = 0;
-				FileDataPackage fileDataPackage = formatter.Deserialize(ms) as FileDataPackage;
-				if (fileDataPackage != null) {
-					this.Message = fileDataPackage.Message;
-					this.Sender = fileDataPackage.Sender;
-					this.Receiver = fileDataPackage.Receiver;
-					this.sendTime = fileDataPackage.sendTime;
-					this.MessageType = fileDataPackage.MessageType;
-					this.SenderID = fileDataPackage.SenderID;
-					this.file = fileDataPackage.file;
-					this.FileExtension = fileDataPackage.FileExtension;
-				}
-			}
-		} //构造函数 字节数组转化为数据包
-		public byte[] file; //文件流
-		public string FileExtension { get; set; } //文件后缀
+		public QueryDataPackage(string sender, string receiver, int QueryType) : base(sender, receiver) {
+			MessageType = 11;
+			this.QueryType = QueryType;
+		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
+		public int QueryType { get; set; } //查询类别
+		// 1为出发站点查询，2为到达站点查询，3为用户订单查询
+		// 11为线路查询，12为列车查询，13为车站查询，14为车站-线路查询，15为列车-车站查询
+		// 16为列车乘客查询，17为车票价格查询
 	}
 
 }
