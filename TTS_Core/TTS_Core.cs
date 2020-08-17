@@ -85,7 +85,7 @@ namespace TTS_Core
 		public string Password { get; set; } //注册密码
 	}
 
-	//查询数据包基类，Type=11
+	//查询数据包类，Type=11
 	[Serializable]
 	public class QueryDataPackage : DataPackage {
 		public QueryDataPackage(byte[] Bytes) {
@@ -111,4 +111,36 @@ namespace TTS_Core
 		// 16为列车乘客查询，17为车票价格查询
 	}
 
+	//客户端向服务端发送的查询条件类，Type=12
+	[Serializable]
+	public class TicketQueryDataPackage : DataPackage {
+		public TicketQueryDataPackage(byte[] Bytes) {
+			using (MemoryStream ms = new MemoryStream(Bytes)) {
+				IFormatter formatter = new BinaryFormatter();
+				TicketQueryDataPackage queryPackage = formatter.Deserialize(ms) as TicketQueryDataPackage;
+				if (queryPackage != null) {
+					this.Sender = queryPackage.Sender;
+					this.Receiver = queryPackage.Receiver;
+					this.sendTime = queryPackage.sendTime;
+					this.MessageType = queryPackage.MessageType;
+					this.EnterStationNumber = queryPackage.EnterStationNumber;
+					this.LeaveStationNumber = queryPackage.LeaveStationNumber;
+					this.StartTime = queryPackage.StartTime;
+					this.EndTime = queryPackage.EndTime;
+				}
+			}
+		} //构造函数 字节数组转化为数据包
+		public TicketQueryDataPackage(string sender, string receiver, int EnterStationNumber,
+			int LeaveStationNumber, DateTime StartTime, DateTime EndTime) : base(sender, receiver) {
+			MessageType = 12;
+			this.EnterStationNumber = EnterStationNumber;
+			this.LeaveStationNumber = LeaveStationNumber;
+			this.StartTime = StartTime;
+			this.EndTime = EndTime;
+		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
+		public int EnterStationNumber { get; set; }
+		public int LeaveStationNumber { get; set; }
+		public DateTime StartTime { get; set; }
+		public DateTime EndTime { get; set; }
+	}
 }
