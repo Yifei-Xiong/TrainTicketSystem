@@ -17,12 +17,25 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+
 namespace TTS_Client {
 	/// <summary>
 	/// LoginWindow.xaml 的交互逻辑
 	/// </summary>
 	public partial class LoginWindow : Window {
-		public LoginWindow() {
+
+        //委托
+        private delegate void ReadDataF(TcpClient tcpClient);
+
+        //变量定义
+        private Thread Listenerthread;  //线程
+        TcpListener tcpListener = null;
+        IPAddress myIPAddress = null;
+        static int MyPort = 37529;
+
+
+        //构造函数重载
+        public LoginWindow() {
 			InitializeComponent();
 			myIPAddress = IPAddress.Parse("127.0.0.1");
 			for (int i = 0; i <= 100; i++) {
@@ -39,9 +52,12 @@ namespace TTS_Client {
 					this.Close();
 				}
 			}
-		}
+            Listenerthread = new Thread(new ThreadStart(ListenThreadMethod));
+            Listenerthread.IsBackground = true;
+            Listenerthread.Start();
+        }
 
-		public LoginWindow(string UserID, string IP) {
+        /*public LoginWindow(string UserID, string IP) {
 			InitializeComponent();
 			textBox_id.Text = UserID;
 			textBox_ip.Text = IP;
@@ -60,14 +76,14 @@ namespace TTS_Client {
 					this.Close();
 				}
 			}
-		}
+            Listenerthread = new Thread(new ThreadStart(ListenThreadMethod));
+            Listenerthread.IsBackground = true;
+            Listenerthread.Start();
+        }
+        */
 
-		//Thread thread; //侦听的线程类变量
-		TcpListener tcpListener = null;
-		IPAddress myIPAddress = null;
-		static int MyPort = 37529;
-
-		public byte[] ReadFromTcpClient(TcpClient tcpClient) {
+        //从TcpClient对象中读出未知长度的字节数组
+        public byte[] ReadFromTcpClient(TcpClient tcpClient) {
 			List<byte> data = new List<byte>();
 			NetworkStream netStream = null;
 			byte[] bytes = new byte[tcpClient.ReceiveBufferSize]; //字节数组保存接收到的数据
@@ -104,18 +120,26 @@ namespace TTS_Client {
 			return bytes;
 		}
 
-		/*
+		
 		//侦听线程执行的方法
-		private string ListenThreadMethod() {
-			//IPAddress ip = (IPAddress)Dns.GetHostAddresses(Dns.GetHostName()).GetValue(0);
-			var newClient = tcpListener.AcceptTcpClient();
-			var receiveByte = ReadFromTcpClient(newClient);
-			var messageClass = new IMClassLibrary.SingleChatDataPackage(receiveByte);
-			newClient.Close();
-			return messageClass.Message;
-		}
-		*/
+		private void ListenThreadMethod() {
+            TcpClient tcpClient = null;
+            ReadDataF readDataF = new ReadDataF(readRevMsg);
+            while (true)
+            {
+                try
+                {
+                    //同步阻塞
+                    tcpClient = tcpListener.AcceptTcpClient();
+                    //异步调用
+                    readDataF.BeginInvoke(tcpClient, null, null);
+                }
+                catch { }
+            }
+        }
 
+		
+        //点击注册按钮
 		private void button_register_Click(object sender, RoutedEventArgs e) {
 			/*
 			TcpClient tcpClient = null;
@@ -152,6 +176,8 @@ namespace TTS_Client {
 			*/
 		}
 
+
+        //点击登录按钮
 		private void button_login_Click(object sender, RoutedEventArgs e) {
 			/*
 			TcpClient tcpClient;
@@ -184,17 +210,20 @@ namespace TTS_Client {
 				MessageBox.Show("登录失败！");
 			}
 			*/
-			ClientWindow clientWindow = new ClientWindow();
+			ClientWindow clientWindow = new ClientWindow(textBox_id.Text, tcpListener, MyPort, textBox_ip.Text.Split(':')[1]);
 			clientWindow.Show();
 			Close();
 		}
 
 
+        //点击关于按钮
 		private void button_about_Click(object sender, RoutedEventArgs e) {
 			About about = new About();
 			about.ShowDialog();
 		}
 
+
+        //加密数据
 		public string sha256(string data) {
 			byte[] bytes = Encoding.UTF8.GetBytes(data);
 			byte[] hash = SHA256Managed.Create().ComputeHash(bytes);
@@ -204,5 +233,22 @@ namespace TTS_Client {
 			}
 			return builder.ToString();
 		}
-	}
+
+
+        //接收到信息后的操作
+        public void readRevMsg(TcpClient tcpClient)
+        {
+            byte[] bytes = ReadFromTcpClient(tcpClient); //获取数据
+            TTS_Core.QueryDataPackage queryData = new TTS_Core.QueryDataPackage(bytes);
+            string message = string.Empty;
+            //数据包分类操作
+            switch (queryData.MessageType)
+            {
+                
+                default:
+                    Console.WriteLine("聊天数据包读取失败");
+                    return;
+            }
+        }
+    }
 }
