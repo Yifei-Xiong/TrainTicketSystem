@@ -21,7 +21,133 @@ namespace TTS_Client {
 	/// ClientWindow.xaml 的交互逻辑
 	/// </summary>
 	public partial class ClientWindow : Window {
-		public ClientWindow() {
+
+        //委托
+        private delegate void ReadDataF(TcpClient tcpClient); //代表无返回值 Tcpclient参数方法
+
+
+        //结构体定义
+        public struct StationInfo
+        {
+            public int StationNumber { get; set; } //车站编号
+            public string StationName { get; set; } //车站名称
+            public int Line { get; set; } //线路编号
+            public string LineName { get; set; } //线路名称
+        } //单个站点的相关信息
+
+        public struct TicketInfo
+        {
+            public int TicketNumber { get; set; } //订单序号
+            public int TicketPrice { get; set; } //车票价格
+            public int TicketLine { get; set; } //所属路线序号
+            public string LineName { get; set; } //所属线路名称
+            public int TrainID { get; set; } //车次
+            public string BuyTime { get; set; } //购买时间
+
+            public int EnterStationNumber { get; set; } //出发站点序号
+            public string EnterStationName { get; set; } //出发站点名称
+            public string EnterStationTime { get; set; }
+            public string EnterStationTimeIn { get; set; }
+            public string EnterStationTimeOut { get; set; }
+
+            public int LeaveStationNumber; //到达站点序号
+            public string LeaveStationName { get; set; } //到达站点名称
+            public string LeaveStationTime { get; set; }
+            public string LeaveStationTimeIn { get; set; }
+            public string LeaveStationTimeOut { get; set; }
+        } //单个车票的相关信息
+
+        public struct BuyTicket
+        {
+            public int EnterStationNumber { get; set; }
+            public string EnterStationName { get; set; }
+            public string EnterStationTime { get; set; }
+            public string EnterStationTimeIn { get; set; }
+            public string EnterStationTimeOut { get; set; }
+
+            public int LeaveStationNumber { get; set; }
+            public string LeaveStationName { get; set; }
+            public string LeaveStationTime { get; set; }
+            public string LeaveStationTimeIn { get; set; }
+            public string LeaveStationTimeOut { get; set; }
+
+            public double TicketPrice { get; set; }
+            public int TicketLine { get; set; }
+            public string LineName { get; set; } //所属线路名称
+            public int TrainID { get; set; } //车次
+            public int BuyNumber { get; set; } //车票购买数量
+        } //单个车票购买记录的相关信息
+
+        public struct TicketQueryInfo
+        {
+            public int EnterStationNumber { get; set; }
+            public string EnterStationName { get; set; }
+            public int LeaveStationNumber { get; set; }
+            public string LeaveStationName { get; set; }
+            public DateTime StartTime { get; set; }
+            public DateTime EndTime { get; set; }
+            public bool SameLine { get; set; } //是否在一条线路上
+            public int Line { get; set; } //若在一条线路上，则为线路编号
+            public string LineName { get; set; } //若在一条线路上，则为线路名称
+        }
+
+
+        //集合定义
+        public class AllStationInfo : ObservableCollection<StationInfo> { } //定义集合
+        public class AllTicketInfo : ObservableCollection<TicketInfo> { } //定义集合
+        public class AllBuyTicket : ObservableCollection<BuyTicket> { } //定义集合
+        AllStationInfo allStationInfo = new AllStationInfo { };
+        AllTicketInfo allTicketInfo = new AllTicketInfo { };
+        AllBuyTicket allBuyTicket = new AllBuyTicket { };
+
+
+        //类定义
+        public class StateObject
+        {
+            public TcpClient tcpClient = null;
+            public NetworkStream netstream = null;
+            public byte[] buffer;
+        }
+
+
+        //属性变量定义
+        string UserID; //用户ID
+        int MyPort; //本程序侦听准备使用的端口号
+        string LoginPort; //登录端口，也即是服务器的端口
+        IPAddress myIPAddress = null; //本程序侦听使用的IP地址
+        TcpListener tcpListener = null; //接收信息的侦听类对象,检查是否有信息
+        string IPAndPort; //记录本地IP和端口号
+        string dbpw; //数据库访问密钥
+
+        TicketQueryInfo ticketQueryInfo;
+        private Thread ListenerThread; //接收信息的侦听线程类变量
+        public DateTime QueryStartTime { get; set; }
+        public DateTime QueryEndTime { get; set; }
+
+
+        //构造函数重载
+        public ClientWindow(string ID, TcpListener tcpListener, int MyPort, string LoginPort)
+        {
+            InitializeComponent();
+            BuyTicketListView.ItemsSource = allBuyTicket;
+            TicketListView.ItemsSource = allTicketInfo;
+            ticketQueryInfo = new TicketQueryInfo();
+            ticketQueryInfo.StartTime = DateTime.Now;
+            ticketQueryInfo.EndTime = DateTime.Now.AddHours(12);
+            textBlock_Copy12.Text = ticketQueryInfo.StartTime.ToString() + " - " + ticketQueryInfo.EndTime.ToString();
+
+            myIPAddress = IPAddress.Parse("127.0.0.1");
+            IPAndPort = myIPAddress.ToString() + ":" + MyPort.ToString();
+            ListenerThread = new Thread(new ThreadStart(ListenerthreadMethod));
+            ListenerThread.IsBackground = true; //主线程结束后，该线程自动结束
+            ListenerThread.Start(); //启动线程
+            UserID = ID; //设置用户名
+            this.MyPort = MyPort;
+            this.tcpListener = tcpListener;
+            this.LoginPort = LoginPort;
+        }//构造函数，将登录页面的某些数据传过来
+
+        public ClientWindow() {
 			InitializeComponent();
 			BuyTicketListView.ItemsSource = allBuyTicket;
 			TicketListView.ItemsSource = allTicketInfo;
@@ -30,102 +156,13 @@ namespace TTS_Client {
 			ticketQueryInfo.EndTime = DateTime.Now.AddHours(12);
 			textBlock_Copy12.Text = ticketQueryInfo.StartTime.ToString() + " - " + ticketQueryInfo.EndTime.ToString();
 
-
-			//ListenerThread = new Thread(new ThreadStart(ListenerthreadMethod));
-			//ListenerThread.IsBackground = true; //主线程结束后，该线程自动结束
-			//ListenerThread.Start(); //启动线程
+			ListenerThread = new Thread(new ThreadStart(ListenerthreadMethod));
+			ListenerThread.IsBackground = true; //主线程结束后，该线程自动结束
+			ListenerThread.Start(); //启动线程
 		}
 
-		public struct StationInfo {
-			public int StationNumber { get; set; } //车站编号
-			public string StationName { get; set; } //车站名称
-			public int Line { get; set; } //线路编号
-			public string LineName { get; set; } //线路名称
-		} //单个站点的相关信息
-
-		public struct TicketInfo {
-			public int TicketNumber { get; set; } //订单序号
-			public int TicketPrice { get; set; } //车票价格
-			public int TicketLine { get; set; } //所属路线序号
-			public string LineName { get; set; } //所属线路名称
-			public int TrainID { get; set; } //车次
-			public string BuyTime { get; set; } //购买时间
-
-			public int EnterStationNumber { get; set; } //出发站点序号
-			public string EnterStationName { get; set; } //出发站点名称
-			public string EnterStationTime { get; set; }
-			public string EnterStationTimeIn { get; set; }
-			public string EnterStationTimeOut { get; set; }
-
-			public int LeaveStationNumber; //到达站点序号
-			public string LeaveStationName { get; set; } //到达站点名称
-			public string LeaveStationTime { get; set; }
-			public string LeaveStationTimeIn { get; set; }
-			public string LeaveStationTimeOut { get; set; }
-		} //单个车票的相关信息
-
-		public struct BuyTicket {
-			public int EnterStationNumber { get; set; }
-			public string EnterStationName { get; set; }
-			public string EnterStationTime { get; set; }
-			public string EnterStationTimeIn { get; set; }
-			public string EnterStationTimeOut { get; set; }
-
-			public int LeaveStationNumber { get; set; }
-			public string LeaveStationName { get; set; }
-			public string LeaveStationTime { get; set; }
-			public string LeaveStationTimeIn { get; set; }
-			public string LeaveStationTimeOut { get; set; }
-
-			public double TicketPrice { get; set; }
-			public int TicketLine { get; set; }
-			public string LineName { get; set; } //所属线路名称
-			public int TrainID { get; set; } //车次
-			public int BuyNumber { get; set; } //车票购买数量
-		} //单个车票购买记录的相关信息
-
-		public struct TicketQueryInfo {
-			public int EnterStationNumber { get; set; }
-			public string EnterStationName { get; set; }
-			public int LeaveStationNumber { get; set; }
-			public string LeaveStationName { get; set; }
-			public DateTime StartTime { get; set; }
-			public DateTime EndTime { get; set; }
-			public bool SameLine { get; set; } //是否在一条线路上
-			public int Line { get; set; } //若在一条线路上，则为线路编号
-			public string LineName { get; set; } //若在一条线路上，则为线路名称
-		}
-
-		public class StateObject {
-			public TcpClient tcpClient = null;
-			public NetworkStream netstream = null;
-			public byte[] buffer;
-		}
-
-		TicketQueryInfo ticketQueryInfo;
-
-		public class AllStationInfo : ObservableCollection<StationInfo> { } //定义集合
-		public class AllTicketInfo : ObservableCollection<TicketInfo> { } //定义集合
-		public class AllBuyTicket : ObservableCollection<BuyTicket> { } //定义集合
-		AllStationInfo allStationInfo = new AllStationInfo { };
-		AllTicketInfo allTicketInfo = new AllTicketInfo { };
-		AllBuyTicket allBuyTicket = new AllBuyTicket { };
-
-		public DateTime QueryStartTime { get; set; }
-		public DateTime QueryEndTime { get; set; }
-
-		private Thread ListenerThread; //接收信息的侦听线程类变量
-		public delegate void ReadDataF(TcpClient tcpClient); //代表无返回值 Tcpclient参数方法
-
-		string UserID; //用户ID
-		int MyPort; //本程序侦听准备使用的端口号
-		string LoginPort; //登录端口
-		IPAddress myIPAddress = null; //本程序侦听使用的IP地址
-		TcpListener tcpListener = null; //接收信息的侦听类对象,检查是否有信息
-		string IPAndPort; //记录本地IP和端口号
-		string dbpw; //数据库访问密钥
-
-
+        
+        //点击查询/购买按钮
 		private void button2_Click(object sender, RoutedEventArgs e) {
 			if (ticketQueryInfo.EnterStationNumber == 0 || ticketQueryInfo.LeaveStationNumber == 0
 				|| ticketQueryInfo.StartTime.Year <= 1 || ticketQueryInfo.EndTime.Year <= 1) {
@@ -143,13 +180,33 @@ namespace TTS_Client {
 			} //不需要换乘，进入购票窗口
 		}
 
+
+        //点击关于按钮
 		private void button_about_Click(object sender, RoutedEventArgs e) {
 			About about = new About();
 			about.ShowDialog();
 		}
 
-		private void button1_Click(object sender, RoutedEventArgs e) {
-			LocationSelect locationSelect = new LocationSelect("请选择到达地点", allStationInfo);
+
+        //点击选择到达地点按钮
+        private void button1_Click(object sender, RoutedEventArgs e) {
+            //向服务器发送异步请求
+            TcpClient tcpClient;
+            StateObject stateObject;
+            TTS_Core.QueryDataPackage queryData;
+            tcpClient = new TcpClient();
+            stateObject = new StateObject();
+            stateObject.tcpClient = tcpClient;
+            queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_ARRIVAL_STATION);  //到达站点查询
+            stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+            tcpClient.BeginConnect(myIPAddress, int.Parse(LoginPort), new AsyncCallback(SentCallBackF), stateObject); //异步连接
+
+            //弹出地点信息窗口
+            allStationInfo.Clear();  //清空信息
+            StationInfo stationInfo = new StationInfo();
+            stationInfo.StationName = "加载中...";
+            allStationInfo.Add(stationInfo);
+            LocationSelect locationSelect = new LocationSelect("请选择到达地点", allStationInfo);
 			locationSelect.ShowDialog();
 			if (locationSelect.StationName != null) {
 				textBlock_Copy7.Text = locationSelect.StationName + " (" + locationSelect.StationNumber.ToString() + ")";
@@ -158,8 +215,26 @@ namespace TTS_Client {
 			}
 		} //选择到达地点
 
+
+        //出发站点以及到达站点选择的按钮点击事件实际上是相同的
 		private void button_Click(object sender, RoutedEventArgs e) {
-			LocationSelect locationSelect = new LocationSelect("请选择出发地点", allStationInfo);
+            //向服务器发送异步请求
+            TcpClient tcpClient;
+            StateObject stateObject;
+            TTS_Core.QueryDataPackage queryData;
+            tcpClient = new TcpClient();
+            stateObject = new StateObject();
+            stateObject.tcpClient = tcpClient;
+            queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_DEPARTURE_STATION);  //出发站点查询
+            stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+            tcpClient.BeginConnect(myIPAddress, int.Parse(LoginPort), new AsyncCallback(SentCallBackF), stateObject); //异步连接
+
+            //弹出地点信息窗口
+            allStationInfo.Clear();  //清空信息
+            StationInfo stationInfo = new StationInfo();
+            stationInfo.StationName = "加载中...";
+            allStationInfo.Add(stationInfo);
+            LocationSelect locationSelect = new LocationSelect("请选择出发地点", allStationInfo);
 			locationSelect.ShowDialog();
 			if (locationSelect.StationName != null) {
 				textBlock_Copy2.Text = locationSelect.StationName + " (" + locationSelect.StationNumber.ToString() + ")";
@@ -168,7 +243,9 @@ namespace TTS_Client {
 			}
 		} //选择出发地点
 
-		private void button3_Click(object sender, RoutedEventArgs e) {
+
+        //点击选择出发时间按钮
+        private void button3_Click(object sender, RoutedEventArgs e) {
 			TimeSelect timeSelect = new TimeSelect(ticketQueryInfo.StartTime, ticketQueryInfo.EndTime);
 			timeSelect.ShowDialog();
 			if (timeSelect.StartTime.Year != 1) {
@@ -179,6 +256,7 @@ namespace TTS_Client {
 			}
 			textBlock_Copy12.Text = ticketQueryInfo.StartTime.ToString() + " - " + ticketQueryInfo.EndTime.ToString();
 		} //选择出发时间
+
 
 		private void Button2_Copy_Click(object sender, RoutedEventArgs e) {
 
@@ -220,52 +298,29 @@ namespace TTS_Client {
 
 		} //清空已有数据(仅用于调试)
 
-		public byte[] ReadFromTcpClient(TcpClient tcpClient) {
-			List<byte> data = new List<byte>();
-			NetworkStream netStream = null;
-			byte[] bytes = new byte[tcpClient.ReceiveBufferSize]; //字节数组保存接收到的数据
-			int n = 0;
-			try {
-				netStream = tcpClient.GetStream();
-				if (netStream.CanRead) {
-					do { //文件大小未知
-						n = netStream.Read(bytes, 0, (int)tcpClient.ReceiveBufferSize);
-						if (n == (int)tcpClient.ReceiveBufferSize) {
-							data.AddRange(bytes);
-						} //如果bytes被读入数据填满
-						else if (n != 0) {
-							byte[] bytes1 = new byte[n];
-							for (int i = 0; i < n; i++) {
-								bytes1[i] = bytes[i];
-							}
-							data.AddRange(bytes1);
-						} //读入的字节数不为0
-					} while (netStream.DataAvailable); //是否还有数据
-				} //判断数据是否可读
-				bytes = data.ToArray();
-			}
-			catch {
-				MessageBox.Show("读数据失败");
-				bytes = null;
-			}
-			finally {
-				if (netStream != null) {
-					netStream.Close();
-				}
-				tcpClient.Close();
-			}
-			return bytes;
-		}
 
+
+        //解拆服务器发回的数据包
 		public void readRevMsg(TcpClient tcpClient) {
-			/*
 			byte[] bytes = ReadFromTcpClient(tcpClient); //获取数据
-			FriendIPAndPort friendIPAndPort = new FriendIPAndPort();
-			IMClassLibrary.ChatDataPackage chatData = new IMClassLibrary.ChatDataPackage(bytes);
+			TTS_Core.QueryDataPackage queryData = new TTS_Core.QueryDataPackage(bytes);
 			string message = string.Empty;
-			switch (chatData.MessageType) {
-				case 4: //单人聊天数据包
-					IMClassLibrary.SingleChatDataPackage chatData1 = new IMClassLibrary.SingleChatDataPackage(bytes);
+            //数据包分类操作
+			switch (queryData.MessageType) {
+				case TTS_Core.MESSAGETYPE.K_QUERY_DATA_PACKAGE: //查询数据包类
+                    //查询数据包分类操作
+                    switch (queryData.QueryType)
+                    {
+                        case TTS_Core.QUERYTYPE.K_DEPARTURE_STATION:  //出发站点查询
+                        case TTS_Core.QUERYTYPE.K_ARRIVAL_STATION:  //到达站点查询
+                            //填充站点信息查询list view
+
+                            break;
+                    }
+
+
+                    /*
+                    IMClassLibrary.SingleChatDataPackage chatData1 = new IMClassLibrary.SingleChatDataPackage(bytes);
 					if (chatData1.Message == "添加您为好友") {
 						TcpClient tcpClient1;
 						StateObject stateObject;
@@ -339,11 +394,13 @@ namespace TTS_Client {
 					msg3.Type = chatData.MessageType;
 					this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new SetMsg(SetMsgViewSource), msg3);
 					//allMsg.Add(msg3);
+                    */
 					break;
 				default:
 					MessageBox.Show("聊天数据包读取失败");
 					return;
 			}
+            /*
 			int i;
 			for (i = 0; i < myFriendIPAndPorts.Count; i++) {
 				if (friendIPAndPort.friendPort == myFriendIPAndPorts[i].friendPort && friendIPAndPort.friendIP == myFriendIPAndPorts[i].friendIP ||
@@ -359,9 +416,9 @@ namespace TTS_Client {
 			if (message != string.Empty) {
 				//FriendListBox.Items.Add(message);
 				this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new OneArgDelegate(SetFriendListBox), message); //接受信息在FriendListBox显示
-			}
-			*/
+			}*/
 		} //被异步调用的方法
+
 
 		private void ListenerthreadMethod() {
 			TcpClient tcpClient = null; //服务器和客户机连接的 TcpClient类对象
@@ -377,6 +434,47 @@ namespace TTS_Client {
 			}
 		} //侦听线程执行的方法
 
+
+        //从TcpClient对象中读出未知长度的字节数组
+        public byte[] ReadFromTcpClient(TcpClient tcpClient) {
+			List<byte> data = new List<byte>();
+			NetworkStream netStream = null;
+			byte[] bytes = new byte[tcpClient.ReceiveBufferSize]; //字节数组保存接收到的数据
+			int n = 0;
+			try {
+				netStream = tcpClient.GetStream();
+				if (netStream.CanRead) {
+					do { //文件大小未知
+						n = netStream.Read(bytes, 0, (int)tcpClient.ReceiveBufferSize);
+						if (n == (int)tcpClient.ReceiveBufferSize) {
+							data.AddRange(bytes);
+						} //如果bytes被读入数据填满
+						else if (n != 0) {
+							byte[] bytes1 = new byte[n];
+							for (int i = 0; i < n; i++) {
+								bytes1[i] = bytes[i];
+							}
+							data.AddRange(bytes1);
+						} //读入的字节数不为0
+					} while (netStream.DataAvailable); //是否还有数据
+				} //判断数据是否可读
+				bytes = data.ToArray();
+			}
+			catch {
+				MessageBox.Show("读数据失败");
+				bytes = null;
+			}
+			finally {
+				if (netStream != null) {
+					netStream.Close();
+				}
+				tcpClient.Close();
+			}
+			return bytes;
+		}
+
+
+        //回调函数
 		private void SentCallBackF(IAsyncResult ar) {
 			StateObject stateObject = (StateObject)ar.AsyncState;
 			TcpClient tcpClient = stateObject.tcpClient; //得到下载使用的类对象
@@ -403,6 +501,53 @@ namespace TTS_Client {
 		} //不在主线程执行
 
 
+        //选项卡切换函数
+        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //切换到订单查询选项
+            if(OrderItem.IsSelected)
+            {
+                OrderItem_Selected();
+            }
+            //切换到车票查询/购买选项
+            else if(TicketItem.IsSelected)
+            {
+                //
+            }
+            //切换到用户信息选项卡
+            else if(UserItem.IsSelected)
+            {
+                UserItem_Selected();
+            }
+        }
 
-	}
+        //切换到订单查询选项事件
+        public void OrderItem_Selected()
+        {
+            //向服务器发送异步请求
+            TcpClient tcpClient;
+            StateObject stateObject;
+            TTS_Core.QueryDataPackage queryData;
+            tcpClient = new TcpClient();
+            stateObject = new StateObject();
+            stateObject.tcpClient = tcpClient;
+            queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_USER_ORDER);  //用户订单查询
+            stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+            tcpClient.BeginConnect(myIPAddress, int.Parse(LoginPort), new AsyncCallback(SentCallBackF), stateObject); //异步连接
+
+            //加载数据完成前
+            allBuyTicket.Clear();  //清空信息
+            BuyTicket buyTicket = new BuyTicket();
+            buyTicket.EnterStationTime = "加";
+            buyTicket.LeaveStationName = "载";
+            buyTicket.LeaveStationTimeIn = "中...";
+            allBuyTicket.Add(buyTicket);
+        }
+
+        //切换到用户信息选项卡事件
+        void UserItem_Selected()
+        {
+            //
+        }
+    }
 }
