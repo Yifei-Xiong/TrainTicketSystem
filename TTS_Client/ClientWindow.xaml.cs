@@ -211,6 +211,9 @@ namespace TTS_Client {
             LocationSelect locationSelect = new LocationSelect("请选择到达地点", allStationInfo);
 			locationSelect.ShowDialog();
 			if (locationSelect.StationName != null) {
+				if (locationSelect.StationName == "加载中...") {
+					return;
+				}
 				textBlock_Copy7.Text = locationSelect.StationName + " (" + locationSelect.StationNumber.ToString() + ")";
 				ticketQueryInfo.LeaveStationNumber = locationSelect.StationNumber;
 				ticketQueryInfo.LeaveStationName = locationSelect.StationName;
