@@ -27,6 +27,14 @@ namespace TTS_Client {
         //委托
         private delegate void ReadDataF(TcpClient tcpClient);
 
+        //类定义
+        public class StateObject
+        {
+            public TcpClient tcpClient = null;
+            public NetworkStream netstream = null;
+            public byte[] buffer;
+        }
+
         //变量定义
         private Thread Listenerthread;  //线程
         TcpListener tcpListener = null;
@@ -141,76 +149,33 @@ namespace TTS_Client {
 		
         //点击注册按钮
 		private void button_register_Click(object sender, RoutedEventArgs e) {
-			/*
-			TcpClient tcpClient = null;
-			NetworkStream networkStream = null;
-			try {
-				string[] ip = textBox_ip.Text.Split(':');
-				tcpClient = new TcpClient();
-				IPAddress ServerIP = IPAddress.Parse(ip[0]);
-				tcpClient.Connect(ServerIP, int.Parse(ip[1])); //建立与服务器的连接
-				networkStream = tcpClient.GetStream();
-				if (networkStream.CanWrite) {
-					IMClassLibrary.LoginDataPackage loginDataPackage = new IMClassLibrary.LoginDataPackage("127.0.0.1:" + MyPort.ToString(), "Server_Reg", textBox_id.Text, sha256(passwordBox.Password)); //初始化登录数据包
-					byte[] sendBytes = loginDataPackage.DataPackageToBytes(); //注册数据包转化为字节数组
-					networkStream.Write(sendBytes, 0, sendBytes.Length);
-				}
-			}
-			catch {
-				MessageBox.Show("无法连接到服务器!");
-				return;
-			}
-			finally {
-				if (networkStream != null) {
-					networkStream.Close();
-				}
-				tcpClient.Close();
-			}
-			string msg = ListenThreadMethod();
-			if (msg == "注册成功") {
-				MessageBox.Show("注册成功！");
-			}
-			else {
-				MessageBox.Show("注册失败！");
-			}
-			*/
-		}
+            //向服务器发送异步请求
+            TcpClient tcpClient;
+            StateObject stateObject;
+            TTS_Core.RegisterDataPackage registerData;
+            tcpClient = new TcpClient();
+            stateObject = new StateObject();
+            stateObject.tcpClient = tcpClient;
+            registerData = new TTS_Core.RegisterDataPackage(myIPAddress + MyPort.ToString(), textBox_ip.Text, textBox_id.Text, sha256(passwordBox.Password));  
+            stateObject.buffer = registerData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+            tcpClient.BeginConnect(myIPAddress, int.Parse(textBox_ip.Text.Split(':')[1]), new AsyncCallback(SentCallBackF), stateObject); //异步连接
+        }
 
 
         //点击登录按钮
 		private void button_login_Click(object sender, RoutedEventArgs e) {
-			/*
-			TcpClient tcpClient;
-			IPAddress ServerIP;
-			string msg = string.Empty;
-			try {
-				string[] ip = textBox_ip.Text.Split(':');
-				tcpClient = new TcpClient();
-				ServerIP = IPAddress.Parse(ip[0]);
-				tcpClient.Connect(ServerIP, int.Parse(ip[1])); //建立与服务器的连接
+            //向服务器发送异步请求
+            TcpClient tcpClient;
+            StateObject stateObject;
+            TTS_Core.LoginDataPackage loginData;
+            tcpClient = new TcpClient();
+            stateObject = new StateObject();
+            stateObject.tcpClient = tcpClient;
+            loginData = new TTS_Core.LoginDataPackage(myIPAddress + MyPort.ToString(), textBox_ip.Text, textBox_id.Text, sha256(passwordBox.Password));
+            stateObject.buffer = loginData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+            tcpClient.BeginConnect(myIPAddress, int.Parse(textBox_ip.Text.Split(':')[1]), new AsyncCallback(SentCallBackF), stateObject); //异步连接
 
-				NetworkStream networkStream = tcpClient.GetStream();
-				if (networkStream.CanWrite) {
-					IMClassLibrary.LoginDataPackage loginDataPackage = new IMClassLibrary.LoginDataPackage("127.0.0.1:" + MyPort.ToString(), "Server_Login", textBox_id.Text, sha256(passwordBox.Password)); //初始化登录数据包
-					Byte[] sendBytes = loginDataPackage.DataPackageToBytes(); //登录数据包转化为字节数组
-					networkStream.Write(sendBytes, 0, sendBytes.Length);
-				}
-
-				msg = ListenThreadMethod();
-			}
-			catch {
-				MessageBox.Show("与服务器连接失败！");
-			}
-			if (msg == "登录成功") {
-				P2PClient client = new P2PClient(textBox_id.Text, tcpListener, MyPort, textBox_ip.Text.Split(':')[1], passwordBox_Copy.Password); //传入用户名&登录端口
-				client.Show();
-				Close();
-			}
-			else {
-				MessageBox.Show("登录失败！");
-			}
-			*/
-			ClientWindow clientWindow = new ClientWindow(textBox_id.Text, tcpListener, MyPort, textBox_ip.Text.Split(':')[1]);
+            ClientWindow clientWindow = new ClientWindow(textBox_id.Text, tcpListener, MyPort, textBox_ip.Text.Split(':')[1]);
 			clientWindow.Show();
 			Close();
 		}
@@ -250,5 +215,40 @@ namespace TTS_Client {
                     return;
             }
         }
+
+
+        //回调函数
+        private void SentCallBackF(IAsyncResult ar)
+        {
+            StateObject stateObject = (StateObject)ar.AsyncState;
+            TcpClient tcpClient = stateObject.tcpClient; //得到下载使用的类对象
+            NetworkStream netStream = null; //下载使用的流对象
+            try
+            {
+                tcpClient.EndConnect(ar); //结束和下载服务器的连接，如下载错误将产生异常
+                netStream = tcpClient.GetStream();
+                if (netStream.CanWrite)
+                {
+                    netStream.Write(stateObject.buffer, 0, stateObject.buffer.Length); //传入要发送的内容
+                }
+                else
+                {
+                    MessageBox.Show("暂时无法与服务端通讯");
+                }
+            }
+            catch
+            {
+                MessageBox.Show("暂时无法与服务端通讯");
+            }
+            finally
+            {
+                if (netStream != null)
+                {
+                    netStream.Close();
+                }
+                tcpClient.Close();
+            }
+        } //不在主线程执行
+
     }
 }
