@@ -82,16 +82,25 @@ namespace TTS_server_test
         public void readRevMsg(TcpClient tcpClient)
         {
             byte[] bytes = ReadFromTcpClient(tcpClient); //获取数据
-            TTS_Core.QueryDataPackage queryData = new TTS_Core.QueryDataPackage(bytes);
+            TTS_Core.DataPackage dataPackage = new TTS_Core.DataPackage(bytes);  //第一次解包
             string message = string.Empty;
-            //数据包分类操作
-            switch (queryData.MessageType)
+            //数据包分类操作，第二次解包
+            switch (dataPackage.MessageType)
             {
                 case TTS_Core.MESSAGETYPE.K_QUERY_DATA_PACKAGE: //查询数据包类
+                    TTS_Core.QueryDataPackage queryData = new TTS_Core.QueryDataPackage(bytes);
                     Console.WriteLine("Get the DataPackage of {0}!", queryData.QueryType.ToString());
                     break;
+                case TTS_Core.MESSAGETYPE.K_LOGIN_DATA_PACKAGE:
+                    TTS_Core.LoginDataPackage loginData = new TTS_Core.LoginDataPackage(bytes);
+                    Console.WriteLine("Get the DataPackage of {0}!", loginData.MessageType.ToString());
+                    break;
+                case TTS_Core.MESSAGETYPE.K_REGISTER_DATA_PACKAGE:
+                    TTS_Core.RegisterDataPackage registerData = new TTS_Core.RegisterDataPackage(bytes);
+                    Console.WriteLine("Get the DataPackage of {0}!", registerData.MessageType.ToString());
+                    break;
                 default:
-                    Console.WriteLine("Get the DataPackage of {0}!", queryData.MessageType.ToString());
+                    Console.WriteLine("Get the DataPackage of {0}!", dataPackage.MessageType.ToString());
                     return;
             }
         }
