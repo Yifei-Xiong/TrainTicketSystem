@@ -145,6 +145,8 @@ namespace TTS_Client {
             this.MyPort = MyPort;
             this.tcpListener = tcpListener;
             this.LoginPort = LoginPort;
+
+            ProgramItem_Data();
         }//构造函数，将登录页面的某些数据传过来
 
         public ClientWindow() {
@@ -548,6 +550,13 @@ namespace TTS_Client {
         void UserItem_Selected()
         {
             //
+        }
+
+
+        //程序信息选项卡信息载入
+        void ProgramItem_Data()
+        {
+
         }
     }
 }
