@@ -37,7 +37,7 @@ namespace TTS_Core
 
     //数据包类，Type=0
     [Serializable]
-	public abstract class DataPackage {
+	public class DataPackage {
 		public DataPackage() {
 			sendTime = DateTime.Now;
 		}
@@ -53,7 +53,20 @@ namespace TTS_Core
 			this.Receiver = receiver;
 			sendTime = DateTime.Now;
 		} //构造函数 接受发送者与接收者字符串
-		public DateTime sendTime { get; set; } //消息的发送时间
+        public DataPackage(byte[] Bytes)
+        {
+            using (MemoryStream ms = new MemoryStream(Bytes))
+            {
+                IFormatter formatter = new BinaryFormatter();
+                DataPackage dataPackage = formatter.Deserialize(ms) as DataPackage;
+                if (dataPackage != null)
+                {
+                    this.MessageType = dataPackage.MessageType;
+                }
+            }
+        } //构造函数 字节数组转化为数据包
+
+        public DateTime sendTime { get; set; } //消息的发送时间
 		public string Sender { get; set; }
 		public string Receiver { get; set; }
 		public MESSAGETYPE MessageType = MESSAGETYPE.K_DATA_PACKAGE; //数据包类Type为0
