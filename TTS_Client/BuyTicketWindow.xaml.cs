@@ -59,11 +59,11 @@ namespace TTS_Client
 
 		private void Button2_Copy_Click(object sender, RoutedEventArgs e) {
 
-		}
+		} //清空
 
 		private void button2_Click(object sender, RoutedEventArgs e) {
 
-		}
+		} //筛选
 
 		private AllBuyTicketExtend SubmitTicketQuery(ClientWindow.TicketQueryInfo ticketQueryInfo) {
 			AllBuyTicketExtend buyTickets = new AllBuyTicketExtend();

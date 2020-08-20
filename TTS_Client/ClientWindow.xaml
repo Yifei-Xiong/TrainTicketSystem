@@ -64,7 +64,7 @@
                     <TextBlock x:Name="textBlock1_Copy" HorizontalAlignment="Left" Margin="188,10,0,0" TextWrapping="Wrap" Text="出发站点" VerticalAlignment="Top"/>
                     <TextBox x:Name="textBox_Copy" HorizontalAlignment="Left" Height="23" Margin="16,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="71"/>
                     <TextBox x:Name="textBox_Copy1" HorizontalAlignment="Left" Height="23" Margin="178,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
-                    <Button x:Name="button2_Copy" Content="筛选" HorizontalAlignment="Left" Margin="731,67,0,0" VerticalAlignment="Top" Width="63" Click="button2_Click"/>
+                    <Button x:Name="button2_Copy" Content="筛选" HorizontalAlignment="Left" Margin="731,67,0,0" VerticalAlignment="Top" Width="63" Click="button2_Copy_Click_1"/>
                     <Button x:Name="button2_Copy1" Content="清空" HorizontalAlignment="Left" Margin="655,67,0,0" VerticalAlignment="Top" Width="63" Click="Button2_Copy_Click" />
                     <TextBox x:Name="textBox_Copy2" HorizontalAlignment="Left" Height="23" Margin="257,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="110"/>
                     <TextBlock x:Name="textBlock1_Copy1" HorizontalAlignment="Left" Margin="288,10,0,0" TextWrapping="Wrap" Text="上车时间" VerticalAlignment="Top"/>

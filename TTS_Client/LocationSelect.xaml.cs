@@ -28,20 +28,89 @@ namespace TTS_Client
 
 		public string StationName { get; set; }
 
-		public LocationSelect(string title, ClientWindow.AllStationInfo allStationInfo) {
+		public ClientWindow.AllStationInfo allStation;
+		public ClientWindow.AllStationInfo searchStation;
+
+		public LocationSelect(string title, ClientWindow.AllStationInfo source) {
 			InitializeComponent();
 			this.Title = title;
-			listView.ItemsSource = allStationInfo;
+			this.allStation = new ClientWindow.AllStationInfo();
+			for (int i = 0; i < source.Count; i++) {
+				allStation.Add(source[i]);
+			} //Copy
+			listView.ItemsSource = this.allStation;
 			listView.Items.SortDescriptions.Add(new SortDescription("StationNumber", ListSortDirection.Ascending));
 		}
 
 		private void Button2_Click(object sender, RoutedEventArgs e) {
+			searchStation = new ClientWindow.AllStationInfo();
+			for (int i = 0; i < allStation.Count; i++) {
+				searchStation.Add(allStation[i]);
+			} //Copy
 
-		}
+			if (precision.IsChecked == true) {
+				if (textBox.Text != string.Empty) {
+					for (int i = 0; i < searchStation.Count; i++) {
+						if (searchStation[i].StationNumber.ToString() != textBox.Text) {
+							searchStation.Remove(searchStation[i]);
+							i--;
+						}
+					}
+				} //StationNumber
+				if (textBox_Copy1.Text != string.Empty) {
+					for (int i = 0; i < searchStation.Count; i++) {
+						if (searchStation[i].StationName != textBox_Copy1.Text) {
+							searchStation.Remove(searchStation[i]);
+							i--;
+						}
+					}
+				} //StationName
+				if (textBox_Copy.Text != string.Empty) {
+					for (int i = 0; i < searchStation.Count; i++) {
+						if (searchStation[i].LineName != textBox_Copy.Text) {
+							searchStation.Remove(searchStation[i]);
+							i--;
+						}
+					}
+				} //LineName
+			} //精确搜索
+
+			else {
+				if (textBox.Text != string.Empty) {
+					for (int i = 0; i < searchStation.Count; i++) {
+						if (searchStation[i].StationNumber.ToString().IndexOf(textBox.Text) == -1) {
+							searchStation.Remove(searchStation[i]);
+							i--;
+						}
+					}
+				} //StationNumber
+				if (textBox_Copy1.Text != string.Empty) {
+					for (int i = 0; i < searchStation.Count; i++) {
+						if (searchStation[i].StationName.IndexOf(textBox_Copy1.Text) == -1) {
+							searchStation.Remove(searchStation[i]);
+							i--;
+						}
+					}
+				} //StationName
+				if (textBox_Copy.Text != string.Empty) {
+					for (int i = 0; i < searchStation.Count; i++) {
+						if (searchStation[i].LineName.IndexOf(textBox_Copy.Text) == -1) {
+							searchStation.Remove(searchStation[i]);
+							i--;
+						}
+					}
+				} //LineName
+			} //模糊搜索
+
+			listView.ItemsSource = searchStation;
+		} //筛选
 
 		private void Button2_Copy_Click(object sender, RoutedEventArgs e) {
-
-		}
+			textBox.Clear();
+			textBox_Copy1.Clear();
+			textBox_Copy.Clear();
+			listView.ItemsSource = allStation;
+		} //清空
 
 		private void button_Click(object sender, RoutedEventArgs e) {
 			if (listView.SelectedItems.Count == 0) {

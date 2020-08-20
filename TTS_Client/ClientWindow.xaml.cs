@@ -265,7 +265,11 @@ namespace TTS_Client {
 
 		private void Button2_Copy_Click(object sender, RoutedEventArgs e) {
 
-		}
+		} //清空
+
+		private void button2_Copy_Click_1(object sender, RoutedEventArgs e) {
+
+		} //筛选
 
 		private void button8_Click(object sender, RoutedEventArgs e) {
 			this.LoadDefaultTestData();
@@ -561,5 +565,6 @@ namespace TTS_Client {
         {
 
         }
-    }
+
+	}
 }

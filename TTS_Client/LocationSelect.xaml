@@ -25,7 +25,7 @@
         <TextBox x:Name="textBox_Copy1" HorizontalAlignment="Left" Height="17" Margin="94,25,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="77" TextAlignment="Center"/>
         <Button x:Name="button2_Copy" Content="筛选" HorizontalAlignment="Left" Margin="204,47,0,0" VerticalAlignment="Top" Width="48" Click="Button2_Click"/>
         <Button x:Name="button2_Copy1" Content="清空" HorizontalAlignment="Left" Margin="151,47,0,0" VerticalAlignment="Top" Width="48" Click="Button2_Copy_Click" />
-        <CheckBox x:Name="checkBox2" Content="精确搜索" HorizontalAlignment="Left" Margin="77,50,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="precision" Content="精确搜索" HorizontalAlignment="Left" Margin="77,50,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>
