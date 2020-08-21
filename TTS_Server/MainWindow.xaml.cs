@@ -45,7 +45,7 @@ namespace TTS_Server {
 		public class AllUser : ObservableCollection<UserInfo> { }
 
 		public void InitSQLDocker() {
-			connection = new MySqlConnection("server=" + dbipTextBox.Text + ";user=root;password=" + dbpw + ";database=tts_serverdb;");
+			connection = new MySqlConnection("server=" + dbipTextBox.Text + ";Port=3306;user=root;password=" + dbpw + ";database=tts_serverdb;");
 			try {
 				connection.Open();
 			}
