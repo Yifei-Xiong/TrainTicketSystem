@@ -54,15 +54,148 @@ namespace TTS_Client
 
 		public class AllBuyTicketExtend : ObservableCollection<BuyTicketExtend> { } //定义集合
 		public ClientWindow.TicketQueryInfo ticketQueryInfo;
-		public AllBuyTicketExtend allBuyTicket;
+		public AllBuyTicketExtend searchBuyTicket;
 		public AllBuyTicketExtend canBuyTicket;
 
 		private void Button2_Copy_Click(object sender, RoutedEventArgs e) {
-
+			textBox_tic1.Clear();
+			textBox_tic2.Clear();
+			textBox_tic3.Clear();
+			textBox_tic4.Clear();
+			textBox_tic5.Clear();
+			textBox_tic6.Clear();
+			textBox_tic7.Clear();
+			checkBox_remain.IsChecked = true;
+			precision.IsChecked = true;
+			textBox.Text = "1";
+			listView.ItemsSource = canBuyTicket;
 		} //清空
 
 		private void button2_Click(object sender, RoutedEventArgs e) {
+			searchBuyTicket = new AllBuyTicketExtend();
+			for (int i = 0; i < canBuyTicket.Count; i++) {
+				searchBuyTicket.Add(canBuyTicket[i]);
+			} //Copy
 
+			if (precision.IsChecked == true) {
+				if (textBox_tic1.Text != string.Empty) {
+					for (int i = 0; i < searchBuyTicket.Count; i++) {
+						if (searchBuyTicket[i].TrainID.ToString() != textBox_tic1.Text) {
+							searchBuyTicket.Remove(searchBuyTicket[i]);
+							i--;
+						}
+					}
+				} //TrainID
+				if (textBox_tic2.Text != string.Empty) {
+					for (int i = 0; i < searchBuyTicket.Count; i++) {
+						if (searchBuyTicket[i].EnterStationTime.ToString() != textBox_tic2.Text) {
+							searchBuyTicket.Remove(searchBuyTicket[i]);
+							i--;
+						}
+					}
+				} //EnterStationTime
+				if (textBox_tic3.Text != string.Empty) {
+					for (int i = 0; i < searchBuyTicket.Count; i++) {
+						if (searchBuyTicket[i].LeaveStationTimeIn.ToString() != textBox_tic3.Text) {
+							searchBuyTicket.Remove(searchBuyTicket[i]);
+							i--;
+						}
+					}
+				} //LeaveStationTimeIn
+				if (textBox_tic4.Text != string.Empty) {
+					for (int i = 0; i < searchBuyTicket.Count; i++) {
+						if (searchBuyTicket[i].TimeTake.ToString() != textBox_tic4.Text) {
+							searchBuyTicket.Remove(searchBuyTicket[i]);
+							i--;
+						}
+					}
+				} //TimeTake
+			} //精确搜索
+
+			else {
+				if (textBox_tic1.Text != string.Empty) {
+					for (int i = 0; i < searchBuyTicket.Count; i++) {
+						if (searchBuyTicket[i].TrainID.ToString().IndexOf(textBox_tic1.Text) == -1) {
+							searchBuyTicket.Remove(searchBuyTicket[i]);
+							i--;
+						}
+					}
+				} //TrainID
+				if (textBox_tic2.Text != string.Empty) {
+					for (int i = 0; i < searchBuyTicket.Count; i++) {
+						if (searchBuyTicket[i].EnterStationTime.ToString().IndexOf(textBox_tic2.Text) == -1) {
+							searchBuyTicket.Remove(searchBuyTicket[i]);
+							i--;
+						}
+					}
+				} //EnterStationTime
+				if (textBox_tic3.Text != string.Empty) {
+					for (int i = 0; i < searchBuyTicket.Count; i++) {
+						if (searchBuyTicket[i].LeaveStationTimeIn.ToString().IndexOf(textBox_tic3.Text) == -1) {
+							searchBuyTicket.Remove(searchBuyTicket[i]);
+							i--;
+						}
+					}
+				} //LeaveStationTimeIn
+				if (textBox_tic4.Text != string.Empty) {
+					for (int i = 0; i < searchBuyTicket.Count; i++) {
+						if (searchBuyTicket[i].TimeTake.ToString().IndexOf(textBox_tic4.Text) == -1) {
+							searchBuyTicket.Remove(searchBuyTicket[i]);
+							i--;
+						}
+					}
+				} //TimeTake
+			} //模糊搜索
+
+			if (textBox_tic5.Text != string.Empty) {
+				int BuyNumber = -1;
+				if (int.TryParse(textBox_tic5.Text, out BuyNumber) == false || BuyNumber < 0) {
+					MessageBox.Show("请输入正确的余票筛选数量！");
+					return;
+				}
+				for (int i = 0; i < searchBuyTicket.Count; i++) {
+					if (searchBuyTicket[i].TicketRemain < BuyNumber) {
+						searchBuyTicket.Remove(searchBuyTicket[i]);
+						i--;
+					}
+				}
+			} //TicketRemain
+			if (textBox_tic6.Text != string.Empty) {
+				int PriceUpper = -1;
+				if (int.TryParse(textBox_tic6.Text, out PriceUpper) == false || PriceUpper <= 0) {
+					MessageBox.Show("请输入正确的价格筛选数量！");
+					return;
+				}
+				for (int i = 0; i < searchBuyTicket.Count; i++) {
+					if (searchBuyTicket[i].TicketPrice > PriceUpper) {
+						searchBuyTicket.Remove(searchBuyTicket[i]);
+						i--;
+					}
+				}
+			} //TicketPriceUpper
+			if (textBox_tic7.Text != string.Empty) {
+				int PriceLower = -1;
+				if (int.TryParse(textBox_tic7.Text, out PriceLower) == false || PriceLower < 0) {
+					MessageBox.Show("请输入正确的价格筛选数量！");
+					return;
+				}
+				for (int i = 0; i < searchBuyTicket.Count; i++) {
+					if (searchBuyTicket[i].TicketPrice < PriceLower) {
+						searchBuyTicket.Remove(searchBuyTicket[i]);
+						i--;
+					}
+				}
+			} //TicketPriceLower
+			if (checkBox_remain.IsChecked == true) {
+				for (int i = 0; i < searchBuyTicket.Count; i++) {
+					if (searchBuyTicket[i].TicketRemain <= 0) {
+						searchBuyTicket.Remove(searchBuyTicket[i]);
+						i--;
+					}
+				}
+			} //仅看有余票
+
+			listView.ItemsSource = searchBuyTicket;
 		} //筛选
 
 		private AllBuyTicketExtend SubmitTicketQuery(ClientWindow.TicketQueryInfo ticketQueryInfo) {

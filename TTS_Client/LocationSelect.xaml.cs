@@ -119,6 +119,9 @@ namespace TTS_Client
 			}
 			ClientWindow.StationInfo info = new ClientWindow.StationInfo();
 			info = (ClientWindow.StationInfo)listView.SelectedItem;
+			if (info.StationName == "加载中...") {
+				return;
+			}
 			StationNumber = info.StationNumber;
 			StationName = info.StationName;
 			Close();
