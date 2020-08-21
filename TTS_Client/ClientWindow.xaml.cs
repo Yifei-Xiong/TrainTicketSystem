@@ -76,7 +76,9 @@ namespace TTS_Client {
             public string LineName { get; set; } //所属线路名称
             public int TrainID { get; set; } //车次
             public int BuyNumber { get; set; } //车票购买数量
-        } //单个车票购买记录的相关信息
+			public int TicketRemain { get; set; } //车票剩余数量
+			public string TimeTake { get; set; } //花费时间
+		} //单个车票购买记录的相关信息
 
         public struct TicketQueryInfo
         {
@@ -119,6 +121,7 @@ namespace TTS_Client {
         TcpListener tcpListener = null; //接收信息的侦听类对象,检查是否有信息
         string IPAndPort; //记录本地IP和端口号
         string dbpw; //数据库访问密钥
+		double RemainMoney; //剩余金额
 
         TicketQueryInfo ticketQueryInfo;
         private Thread ListenerThread; //接收信息的侦听线程类变量
@@ -184,6 +187,7 @@ namespace TTS_Client {
 			else {
 				BuyTicketWindow buyTicketWindow = new BuyTicketWindow(ticketQueryInfo);
 				buyTicketWindow.ShowDialog();
+				allBuyTicket.Add(buyTicketWindow.selectTicket);
 			} //不需要换乘，进入购票窗口
 		}
 
@@ -735,5 +739,70 @@ namespace TTS_Client {
 
         }
 
+		private void button5_Click(object sender, RoutedEventArgs e) {
+			if (BuyTicketListView.SelectedItems.Count == 0) {
+				MessageBox.Show("未选择需要删除的车票");
+				return;
+			}
+			BuyTicket[] buyTicket = new BuyTicket[BuyTicketListView.SelectedItems.Count];
+			for (int i = 0; i < buyTicket.Length; i++) {
+				buyTicket[i] = (BuyTicket)BuyTicketListView.SelectedItems[i];
+			}
+			for (int i = 0; i < buyTicket.Length; i++) {
+				allBuyTicket.Remove(buyTicket[i]);
+			}
+		} //删除所选车票
+
+		private void button4_Click(object sender, RoutedEventArgs e) {
+			if (allBuyTicket.Count == 0) {
+				MessageBox.Show("您还未添加车票");
+			}
+			if (BuyTicketListView.SelectedItems.Count == 0) {
+				MessageBox.Show("未选择需要购买的车票");
+				return;
+			}
+			BuyTicket[] buyTicket = new BuyTicket[BuyTicketListView.SelectedItems.Count];
+			for (int i = 0; i < buyTicket.Length; i++) {
+				buyTicket[i] = (BuyTicket)BuyTicketListView.SelectedItems[i];
+			}
+			SendBuyTicketToServer(buyTicket);
+		} //购买选中的车票
+
+		private void button6_Click(object sender, RoutedEventArgs e) {
+			if (allBuyTicket.Count == 0) {
+				MessageBox.Show("您还未添加车票");
+				return;
+			}
+			BuyTicket[] buyTicket = new BuyTicket[allBuyTicket.Count];
+			for (int i = 0; i < buyTicket.Length; i++) {
+				buyTicket[i] = allBuyTicket[i];
+			}
+			SendBuyTicketToServer(buyTicket);
+		} //添加购买的所有车票
+
+		private void SendBuyTicketToServer (BuyTicket[] buyTicket) {
+			double totalCost = 0;
+			for (int i = 0; i < buyTicket.Length; i++) {
+				totalCost += allBuyTicket[i].TicketPrice;
+			}
+			if (totalCost > RemainMoney) {
+				MessageBox.Show("余额不足，总共需要" + totalCost.ToString() + "元，当前用于余额为" + 
+					RemainMoney.ToString() + "元，还需" + (totalCost - RemainMoney).ToString() + "元。");
+				return;
+			}
+			int ByFlag = 1; //1 购买成功, 2 余票不足, 3 车站或线路管制中。
+			if (ByFlag == 1) {
+				MessageBox.Show("购买成功，您可以在订单查询选项卡查看详细信息！");
+				for (int i = 0; i < buyTicket.Length; i++) {
+					allBuyTicket.Remove(buyTicket[i]);
+				}
+			}
+			else if (ByFlag == 2) {
+				MessageBox.Show("购买失败，余额不足！");
+			}
+			else if (ByFlag == 3) {
+				MessageBox.Show("购买失败，部分车站或线路管制中！");
+			}
+		}
 	}
 }

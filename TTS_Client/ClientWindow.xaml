@@ -35,9 +35,9 @@
                             </GridView>
                         </ListView.View>
                     </ListView>
-                    <Button x:Name="button4" Content="购买选中的车票" HorizontalAlignment="Left" Margin="353,423,0,0" VerticalAlignment="Top" Width="115"/>
-                    <Button x:Name="button5" Content="删除选中的车票" HorizontalAlignment="Left" Margin="216,423,0,0" VerticalAlignment="Top" Width="115"/>
-                    <Button x:Name="button6" Content="购买已添加的所有车票" HorizontalAlignment="Left" Margin="485,423,0,0" VerticalAlignment="Top" Width="135"/>
+                    <Button x:Name="button4" Content="购买选中的车票" HorizontalAlignment="Left" Margin="353,423,0,0" VerticalAlignment="Top" Width="115" Click="button4_Click"/>
+                    <Button x:Name="button5" Content="删除选中的车票" HorizontalAlignment="Left" Margin="216,423,0,0" VerticalAlignment="Top" Width="115" Click="button5_Click"/>
+                    <Button x:Name="button6" Content="购买已添加的所有车票" HorizontalAlignment="Left" Margin="485,423,0,0" VerticalAlignment="Top" Width="135" Click="button6_Click"/>
                     <TextBlock x:Name="textBlock_Copy2" HorizontalAlignment="Left" Margin="267,30,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="146" TextAlignment="Center" />
                     <TextBlock x:Name="textBlock_Copy7" HorizontalAlignment="Left" Margin="267,55,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="146" TextAlignment="Center" />
                     <TextBlock x:Name="textBlock_Copy12" HorizontalAlignment="Left" Margin="267,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="253" TextAlignment="Center" />
@@ -86,8 +86,12 @@
             </TabItem>
             <TabItem Header="用户信息" x:Name="UserItem">
                 <Grid Background="#FFE5E5E5">
-                    <TextBlock x:Name="textBlock_Copy20" HorizontalAlignment="Left" Margin="29,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113"><Run Text="当前登录用户ID"/><Run Text="："/></TextBlock>
-                    <TextBlock x:Name="textBlock_Copy21" HorizontalAlignment="Left" Margin="29,31,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113"><Run Text="用户账户余额"/><Run Text="："/></TextBlock>
+                    <TextBlock x:Name="textBlock_Copy20" HorizontalAlignment="Left" Margin="29,19,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113"><Run Text="当前登录用户ID"/><Run Text="："/></TextBlock>
+                    <TextBlock x:Name="textBlock_Copy21" HorizontalAlignment="Left" Margin="29,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113"><Run Text="用户账户余额"/><Run Text="："/></TextBlock>
+                    <TextBlock x:Name="textBlock_Copy13" HorizontalAlignment="Left" Margin="142,19,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="76" Text="ID"/>
+                    <TextBlock x:Name="textBlock_Copy14" HorizontalAlignment="Left" Margin="142,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="76" Text="0"/>
+                    <Button x:Name="button9" Content="充值" HorizontalAlignment="Left" Margin="55,81,0,0" VerticalAlignment="Top" Width="125"/>
+                    <Button x:Name="button10" Content="退出登录" HorizontalAlignment="Left" Margin="55,115,0,0" VerticalAlignment="Top" Width="125"/>
                 </Grid>
             </TabItem>
             <TabItem Header="程序信息" x:Name="ProgramItem">
@@ -96,7 +100,7 @@
                     <TextBlock x:Name="textBlock_Copy9" HorizontalAlignment="Left" Margin="29,60,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="147"><Run Text="当前登录用户"/><Run Text="端口号"/><Run Text="："/></TextBlock>
                     <TextBlock x:Name="textBlock_Copy10" HorizontalAlignment="Left" Margin="29,85,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113"><Run Text="当前"/><Run Text="连接服务器"/><Run Text="I"/><Run Text="P"/><Run Text="："/></TextBlock>
                     <TextBlock x:Name="textBlock_Copy11" HorizontalAlignment="Left" Margin="29,110,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="176"><Run Text="当前"/><Run Text="连接服务器"/><Run Text="端口号"/><Run Text="："/></TextBlock>
-                    <TextBlock x:Name="textBlock_Copy3" HorizontalAlignment="Left" Margin="29,135,0,0" TextWrapping="Wrap" Text="程序版本：1.1.0" VerticalAlignment="Top" Width="126" TextAlignment="Center"/>
+                    <TextBlock x:Name="textBlock_Copy3" HorizontalAlignment="Left" Margin="29,135,0,0" TextWrapping="Wrap" Text="程序版本：1.2.1" VerticalAlignment="Top" Width="126" TextAlignment="Center"/>
                     <Button x:Name="button_about" Content="关于" HorizontalAlignment="Left" Margin="29,162,0,0" VerticalAlignment="Top" Width="163" Click="button_about_Click"/>
                     <Button x:Name="button8" Content="载入测试数据(仅用于调试)" HorizontalAlignment="Left" Margin="29,192,0,0" VerticalAlignment="Top" Width="163" Click="button8_Click"/>
                     <Button x:Name="button8_Copy" Content="清空已有数据(仅用于调试)" HorizontalAlignment="Left" Margin="29,223,0,0" VerticalAlignment="Top" Width="163" Click="button8_Copy_Click"/>
@@ -104,9 +108,10 @@
             </TabItem>
             <TabItem Header="系统管理" x:Name="SystemItem">
                 <Grid Background="#FFE5E5E5">
-                    </Grid>
+                </Grid>
             </TabItem>
         </TabControl>
+        <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="141,33,0,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>
