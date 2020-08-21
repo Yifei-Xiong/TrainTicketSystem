@@ -42,6 +42,12 @@ namespace TTS_Server {
 			public int AccontType { get; set; } //用户身份，1为普通用户，2为管理员
 		} //用户信息
 
+		public class StateObject {
+			public TcpClient tcpClient = null;
+			public NetworkStream netstream = null;
+			public byte[] buffer;
+		} //类定义
+
 		public class AllUser : ObservableCollection<UserInfo> { }
 
 		public void InitSQLDocker() {
@@ -148,24 +154,81 @@ namespace TTS_Server {
 				}
 
 				try {
-					var IP = newClient.Client.RemoteEndPoint.ToString();
+					var IP = newClient.Client.RemoteEndPoint.ToString(); //发送方的IP和端口号
 					byte[] receiveBytes = ReadFromTcpClient(newClient);
-					int type = 0;
+					string IPandPort = ip.ToString() + ":" + nowEnterPort.ToString();
+					TTS_Core.MESSAGETYPE type;
 					using (MemoryStream ms = new MemoryStream(receiveBytes)) {
 						IFormatter formatter = new BinaryFormatter();
-						var DataPackage = formatter.Deserialize(ms) as TTS_Core.DataPackage;
-						if (DataPackage == null) {
+						var dataPackage = formatter.Deserialize(ms) as TTS_Core.DataPackage;
+						if (dataPackage == null) {
 							MessageBox.Show("接收数据非数据包");
 							continue;
 						}
-						//type = DataPackage.MessageType;
+						type = dataPackage.MessageType;
 					}
-					if (type == 0) {
+					if (type == TTS_Core.MESSAGETYPE.K_DATA_PACKAGE) {
 						MessageBox.Show("数据包非法");
 						continue;
 					}
 					switch (type) {
-						case 1: {}
+						case TTS_Core.MESSAGETYPE.K_LOGIN_DATA_PACKAGE: {
+								var package = new TTS_Core.LoginDataPackage(receiveBytes);
+								UserInfo serverData = UserInfoSearch(package.Sender);
+								string SendMessage;
+								if (serverData.Password == package.Password) {
+									SendMessage = "用户登录成功！";
+									if (serverData.AccontType == 2) {
+										SendMessage = "管理员登录成功！";
+									}
+								}
+								else {
+									SendMessage = "账号或密码错误！";
+								}
+								TcpClient tcpClient;
+								StateObject stateObject;
+								tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+								stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+								stateObject.tcpClient = tcpClient;
+								var data = new TTS_Core.DataPackage(SendMessage, IPandPort, package.Sender);
+								stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+								tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+									new AsyncCallback(SentCallBackF), stateObject);
+							} //login
+							break;
+						case TTS_Core.MESSAGETYPE.K_REGISTER_DATA_PACKAGE: {
+								var package = new TTS_Core.RegisterDataPackage(receiveBytes);
+								UserInfo serverData = UserInfoSearch(package.Sender);
+								string SendMessage;
+								if (serverData.UserID == null) {
+									UserInfo user = new UserInfo();
+									user.UserID = package.UserID;
+									user.Password = package.Password;
+									user.AccontType = 1;
+									UserInfoAdd(user);
+									SendMessage = "注册成功！";
+								}
+								else {
+									SendMessage = "注册失败，该账号已存在！";
+								}
+								TcpClient tcpClient;
+								StateObject stateObject;
+								tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+								stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+								stateObject.tcpClient = tcpClient;
+								var data = new TTS_Core.DataPackage(SendMessage, IPandPort, package.Sender);
+								stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+								tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+									new AsyncCallback(SentCallBackF), stateObject);
+							} //register
+							break;
+						case TTS_Core.MESSAGETYPE.K_TICKETQUERY_DATA_PACKAGE: {
+								var package = new TTS_Core.TicketQueryDataPackage(receiveBytes);
+							} //车票查询
+							break;
+						case TTS_Core.MESSAGETYPE.K_QUERY_DATA_PACKAGE: {
+								var package = new TTS_Core.QueryDataPackage(receiveBytes);
+							} //特定查询
 							break;
 
 					}
@@ -214,6 +277,32 @@ namespace TTS_Server {
 			return bytes;
 		}
 
+		//回调函数
+		private void SentCallBackF(IAsyncResult ar) {
+			StateObject stateObject = (StateObject)ar.AsyncState;
+			TcpClient tcpClient = stateObject.tcpClient; //得到下载使用的类对象
+			NetworkStream netStream = null; //下载使用的流对象
+			try {
+				tcpClient.EndConnect(ar); //结束和下载服务器的连接，如下载错误将产生异常
+				netStream = tcpClient.GetStream();
+				if (netStream.CanWrite) {
+					netStream.Write(stateObject.buffer, 0, stateObject.buffer.Length); //传入要发送的内容
+				}
+				else {
+					MessageBox.Show("暂时无法与服务端通讯");
+				}
+			}
+			catch {
+				MessageBox.Show("暂时无法与服务端通讯");
+			}
+			finally {
+				if (netStream != null) {
+					netStream.Close();
+				}
+				tcpClient.Close();
+			}
+		} //不在主线程执行
+
 		AllUser SQLDocker_user
 		{
 			get {
@@ -256,7 +345,7 @@ namespace TTS_Server {
 				+ "WHERE UserID=\"" + newInfo.UserID + "\"", connection );
 			query.ExecuteNonQuery();
 			// UPDATE alluser SET Password="Password", AccontType=AccontType WHERE UserID="UserID"
-		} //实现单条内容修改，也即某一用户的用户密码、权限修改
+		} //实现单条用户信息内容修改，也即某一用户的用户密码、权限修改
 
 		private void UserInfoDelete (string UserID) {
 			if (connection == null || connection.State != System.Data.ConnectionState.Open) {
@@ -265,7 +354,7 @@ namespace TTS_Server {
 			MySqlCommand query = new MySqlCommand("DELETE FROM alluser WHERE UserID=\"" + UserID + "\"", connection);
 			query.ExecuteNonQuery();
 			// DELETE FROM alluser WHERE UserID="UserID"
-		} //实现单条删除
+		} //实现单条用户信息删除
 
 		private void UserInfoAdd(UserInfo userinfo) {
 			if (connection == null || connection.State != System.Data.ConnectionState.Open) {
@@ -274,7 +363,22 @@ namespace TTS_Server {
 			MySqlCommand sql = new MySqlCommand("INSERT INTO alluser(UserID, Password, AccontType) "
 						+ "VALUES(\"" + userinfo.UserID + "\", \"" + userinfo.Password + "\", " + userinfo.AccontType + ")", connection);
 			sql.ExecuteNonQuery();
-			// DELETE FROM alluser WHERE UserID="UserID"
-		} //实现单条增加
+		} //实现单条用户信息增加
+
+		private UserInfo UserInfoSearch(string userID) {
+			if (connection == null || connection.State != System.Data.ConnectionState.Open) {
+				InitSQLDocker();
+			} //若不曾连接到数据库，则进行连接
+			MySqlCommand sql = new MySqlCommand("SELECT UserID, Password, AccontType FROM alluser WHERE UserID=\"" + userID + "\"", connection);
+			MySqlDataReader reader = sql.ExecuteReader();
+			UserInfo info = new UserInfo();
+			while (reader.Read()) {
+				info.UserID = reader[0].ToString();
+				info.Password = reader[1].ToString();
+				info.AccontType = int.Parse(reader[2].ToString());
+			}
+			reader.Close();
+			return info;
+		} //实现单条用户信息查询
 	}
 }

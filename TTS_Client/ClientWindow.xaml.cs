@@ -120,7 +120,6 @@ namespace TTS_Client {
         IPAddress myIPAddress = null; //本程序侦听使用的IP地址
         TcpListener tcpListener = null; //接收信息的侦听类对象,检查是否有信息
         string IPAndPort; //记录本地IP和端口号
-        string dbpw; //数据库访问密钥
 		double RemainMoney; //剩余金额
 
         TicketQueryInfo ticketQueryInfo;
@@ -130,7 +129,7 @@ namespace TTS_Client {
 
 
         //构造函数重载
-        public ClientWindow(string ID, TcpListener tcpListener, int MyPort, string LoginPort)
+        public ClientWindow(string ID, TcpListener tcpListener, int MyPort, string LoginPort, bool IsAdmin)
         {
             InitializeComponent();
 			allStationInfo = new AllStationInfo { };
@@ -143,18 +142,26 @@ namespace TTS_Client {
             ticketQueryInfo.StartTime = DateTime.Now;
             ticketQueryInfo.EndTime = DateTime.Now.AddHours(12);
             textBlock_Copy12.Text = ticketQueryInfo.StartTime.ToString() + " - " + ticketQueryInfo.EndTime.ToString();
+			textBlock_Copy13.Text = ID;
 
-            myIPAddress = IPAddress.Parse("127.0.0.1");
+			myIPAddress = IPAddress.Parse("127.0.0.1");
             IPAndPort = myIPAddress.ToString() + ":" + MyPort.ToString();
             ListenerThread = new Thread(new ThreadStart(ListenerthreadMethod));
             ListenerThread.IsBackground = true; //主线程结束后，该线程自动结束
             ListenerThread.Start(); //启动线程
             UserID = ID; //设置用户名
-            this.MyPort = MyPort;
+            this.MyPort = MyPort; //本机Listener监听的端口
             this.tcpListener = tcpListener;
-            this.LoginPort = LoginPort;
+            this.LoginPort = LoginPort; //服务器的端口
 
             ProgramItem_Data();
+
+			if (IsAdmin == true) {
+
+			} //是管理员
+			else {
+
+			} //是普通用户
         }//构造函数，将登录页面的某些数据传过来
 
         public ClientWindow() {
@@ -208,8 +215,8 @@ namespace TTS_Client {
             tcpClient = new TcpClient();
             stateObject = new StateObject();
             stateObject.tcpClient = tcpClient;
-            queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_ARRIVAL_STATION);  //到达站点查询
-            stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+            //queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_ARRIVAL_STATION);  //到达站点查询
+            //stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
             tcpClient.BeginConnect(myIPAddress, int.Parse(LoginPort), new AsyncCallback(SentCallBackF), stateObject); //异步连接
 
             //弹出地点信息窗口
@@ -239,8 +246,8 @@ namespace TTS_Client {
             tcpClient = new TcpClient();
             stateObject = new StateObject();
             stateObject.tcpClient = tcpClient;
-            queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_DEPARTURE_STATION);  //出发站点查询
-            stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+            //queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_DEPARTURE_STATION);  //出发站点查询
+            //stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
             tcpClient.BeginConnect(myIPAddress, int.Parse(LoginPort), new AsyncCallback(SentCallBackF), stateObject); //异步连接
 
             //弹出地点信息窗口
@@ -713,8 +720,8 @@ namespace TTS_Client {
             tcpClient = new TcpClient();
             stateObject = new StateObject();
             stateObject.tcpClient = tcpClient;
-            queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_USER_ORDER);  //用户订单查询
-            stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+            //queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_USER_ORDER);  //用户订单查询
+            //stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
             tcpClient.BeginConnect(myIPAddress, int.Parse(LoginPort), new AsyncCallback(SentCallBackF), stateObject); //异步连接
 
             //加载数据完成前

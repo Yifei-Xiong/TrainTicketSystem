@@ -35,8 +35,8 @@ namespace TTS_Core
     }
 
 
-    //数据包类，Type=0
-    [Serializable]
+	//数据包类，Type=K_DATA_PACKAGE
+	[Serializable]
 	public class DataPackage {
 		public DataPackage() {
 			sendTime = DateTime.Now;
@@ -48,9 +48,10 @@ namespace TTS_Core
 				return ms.GetBuffer();
 			}
 		} //数据包转化为字节数组
-		public DataPackage(string sender, string receiver) {
+		public DataPackage(string sender, string IPandPort, string receiver) {
 			this.Sender = sender;
 			this.Receiver = receiver;
+			this.IPandPort = IPandPort;
 			sendTime = DateTime.Now;
 		} //构造函数 接受发送者与接收者字符串
         public DataPackage(byte[] Bytes)
@@ -62,17 +63,22 @@ namespace TTS_Core
                 if (dataPackage != null)
                 {
                     this.MessageType = dataPackage.MessageType;
-                }
+					this.IPandPort = dataPackage.IPandPort;
+					this.Sender = dataPackage.Sender;
+					this.Receiver = dataPackage.Receiver;
+					this.sendTime = dataPackage.sendTime;
+				}
             }
         } //构造函数 字节数组转化为数据包
 
         public DateTime sendTime { get; set; } //消息的发送时间
-		public string Sender { get; set; }
-		public string Receiver { get; set; }
+		public string Sender { get; set; } //发送者的ID
+		public string IPandPort { get; set; } //发送者的IP和端口
+		public string Receiver { get; set; } //接收者的ID
 		public MESSAGETYPE MessageType = MESSAGETYPE.K_DATA_PACKAGE; //数据包类Type为0
 	}
 
-	//登入数据包类，Type=1
+	//登入数据包类，Type=K_LOGIN_DATA_PACKAGE
 	[Serializable]
 	public class LoginDataPackage : DataPackage {
 		public LoginDataPackage(byte[] Bytes) {
@@ -85,11 +91,13 @@ namespace TTS_Core
 					this.Sender = loginDataPackage.Sender;
 					this.Receiver = loginDataPackage.Receiver;
 					this.sendTime = loginDataPackage.sendTime;
+					this.IPandPort = loginDataPackage.IPandPort;
 					this.MessageType = loginDataPackage.MessageType;
 				}
 			}
 		} //构造函数 字节数组转化为数据包
-		public LoginDataPackage(string sender, string receiver, string userID, string password) : base(sender,receiver) {
+		public LoginDataPackage(string sender, string IPandPort, string receiver, string userID, 
+			string password) : base(sender, IPandPort, receiver) {
 			MessageType = MESSAGETYPE.K_LOGIN_DATA_PACKAGE;
 			this.UserID = userID;
 			this.Password = password;
@@ -98,7 +106,7 @@ namespace TTS_Core
 		public string Password { get; set; } //登录密码
 	}
 
-	//注册数据包类，Type=2
+	//注册数据包类，Type=K_REGISTER_DATA_PACKAGE
 	[Serializable]
 	public class RegisterDataPackage : DataPackage {
 		public RegisterDataPackage(byte[] Bytes) {
@@ -111,11 +119,13 @@ namespace TTS_Core
 					this.Sender = registerPackage.Sender;
 					this.Receiver = registerPackage.Receiver;
 					this.sendTime = registerPackage.sendTime;
+					this.IPandPort = registerPackage.IPandPort;
 					this.MessageType = registerPackage.MessageType;
 				}
 			}
 		} //构造函数 字节数组转化为数据包
-		public RegisterDataPackage(string sender, string receiver, string userID, string password) : base(sender, receiver) {
+		public RegisterDataPackage(string sender, string IPandPort, string receiver, string userID,
+			string password) : base(sender, IPandPort, receiver) {
 			MessageType = MESSAGETYPE.K_REGISTER_DATA_PACKAGE;
 			this.UserID = userID;
 			this.Password = password;
@@ -124,7 +134,7 @@ namespace TTS_Core
 		public string Password { get; set; } //注册密码
 	}
 
-	//查询数据包类，Type=11
+	//查询数据包类，Type=K_QUERY_DATA_PACKAGE
 	[Serializable]
 	public class QueryDataPackage : DataPackage {
 		public QueryDataPackage(byte[] Bytes) {
@@ -136,11 +146,12 @@ namespace TTS_Core
 					this.Receiver = queryPackage.Receiver;
 					this.sendTime = queryPackage.sendTime;
 					this.MessageType = queryPackage.MessageType;
+					this.IPandPort = queryPackage.IPandPort;
 					this.QueryType = queryPackage.QueryType;
 				}
 			}
 		} //构造函数 字节数组转化为数据包
-		public QueryDataPackage(string sender, string receiver, QUERYTYPE QueryType) : base(sender, receiver) {
+		public QueryDataPackage(string sender, string IPandPort, string receiver, QUERYTYPE QueryType) : base(sender, IPandPort, receiver) {
 			MessageType = MESSAGETYPE.K_QUERY_DATA_PACKAGE;
 			this.QueryType = QueryType;
 		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
@@ -150,7 +161,7 @@ namespace TTS_Core
 		// 16为列车乘客查询，17为车票价格查询
 	}
 
-	//客户端向服务端发送的查询条件类，Type=12
+	//客户端向服务端发送的查询条件类，Type=K_TICKETQUERY_DATA_PACKAGE
 	[Serializable]
 	public class TicketQueryDataPackage : DataPackage {
 		public TicketQueryDataPackage(byte[] Bytes) {
@@ -166,11 +177,12 @@ namespace TTS_Core
 					this.LeaveStationNumber = queryPackage.LeaveStationNumber;
 					this.StartTime = queryPackage.StartTime;
 					this.EndTime = queryPackage.EndTime;
+					this.IPandPort = queryPackage.IPandPort;
 				}
 			}
 		} //构造函数 字节数组转化为数据包
-		public TicketQueryDataPackage(string sender, string receiver, int EnterStationNumber,
-			int LeaveStationNumber, DateTime StartTime, DateTime EndTime) : base(sender, receiver) {
+		public TicketQueryDataPackage(string sender, string IPandPort, string receiver, int EnterStationNumber,
+			int LeaveStationNumber, DateTime StartTime, DateTime EndTime) : base(sender, IPandPort, receiver) {
 			MessageType = MESSAGETYPE.K_TICKETQUERY_DATA_PACKAGE;
 			this.EnterStationNumber = EnterStationNumber;
 			this.LeaveStationNumber = LeaveStationNumber;

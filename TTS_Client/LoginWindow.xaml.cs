@@ -36,7 +36,7 @@ namespace TTS_Client {
         }
 
         //变量定义
-        private Thread Listenerthread;  //线程
+        //private Thread Listenerthread;  //线程
         TcpListener tcpListener = null;
         IPAddress myIPAddress = null;
         static int MyPort = 37529;
@@ -60,15 +60,15 @@ namespace TTS_Client {
 					this.Close();
 				}
 			}
-            Listenerthread = new Thread(new ThreadStart(ListenThreadMethod));
-            Listenerthread.IsBackground = true;
-            Listenerthread.Start();
+            //Listenerthread = new Thread(new ThreadStart(ListenThreadMethod));
+            //Listenerthread.IsBackground = true;
+            //Listenerthread.Start();
         }
 
-        /*public LoginWindow(string UserID, string IP) {
+		public LoginWindow(string UserID, string IPandPort) {
 			InitializeComponent();
 			textBox_id.Text = UserID;
-			textBox_ip.Text = IP;
+			textBox_ip.Text = IPandPort;
 			myIPAddress = IPAddress.Parse("127.0.0.1");
 			for (int i = 0; i <= 100; i++) {
 				try {
@@ -80,18 +80,14 @@ namespace TTS_Client {
 					MyPort++; //已被使用,端口号加1
 				}
 				if (i == 100) {
-					MessageBox.Show("无法与服务器建立通信 (Error 02)");
+					MessageBox.Show("无法与服务器建立通信 (Error 01)");
 					this.Close();
 				}
 			}
-            Listenerthread = new Thread(new ThreadStart(ListenThreadMethod));
-            Listenerthread.IsBackground = true;
-            Listenerthread.Start();
         }
-        */
 
-        //从TcpClient对象中读出未知长度的字节数组
-        public byte[] ReadFromTcpClient(TcpClient tcpClient) {
+		//从TcpClient对象中读出未知长度的字节数组
+		public byte[] ReadFromTcpClient(TcpClient tcpClient) {
 			List<byte> data = new List<byte>();
 			NetworkStream netStream = null;
 			byte[] bytes = new byte[tcpClient.ReceiveBufferSize]; //字节数组保存接收到的数据
@@ -127,9 +123,9 @@ namespace TTS_Client {
 			}
 			return bytes;
 		}
-
 		
 		//侦听线程执行的方法
+		/*
 		private void ListenThreadMethod() {
             TcpClient tcpClient = null;
             ReadDataF readDataF = new ReadDataF(readRevMsg);
@@ -145,39 +141,70 @@ namespace TTS_Client {
                 catch { }
             }
         }
-
+		*/
 		
         //点击注册按钮
 		private void button_register_Click(object sender, RoutedEventArgs e) {
-            //向服务器发送异步请求
-            TcpClient tcpClient;
-            StateObject stateObject;
-            TTS_Core.RegisterDataPackage registerData;
-            tcpClient = new TcpClient();
-            stateObject = new StateObject();
-            stateObject.tcpClient = tcpClient;
-            registerData = new TTS_Core.RegisterDataPackage(myIPAddress + MyPort.ToString(), textBox_ip.Text, textBox_id.Text, sha256(passwordBox.Password));  
-            stateObject.buffer = registerData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
-            tcpClient.BeginConnect(myIPAddress, int.Parse(textBox_ip.Text.Split(':')[1]), new AsyncCallback(SentCallBackF), stateObject); //异步连接
-        }
+            //向服务器发送请求
+			TcpClient tcpClient = null;
+			NetworkStream networkStream = null;
+			try {
+				string[] ip = textBox_ip.Text.Split(':');
+				tcpClient = new TcpClient();
+				IPAddress ServerIP = IPAddress.Parse(ip[0]);
+				tcpClient.Connect(ServerIP, int.Parse(ip[1])); //建立与服务器的连接
+				networkStream = tcpClient.GetStream();
+				if (networkStream.CanWrite) {
+					TTS_Core.RegisterDataPackage registerData = new TTS_Core.RegisterDataPackage(textBox_id.Text, myIPAddress + ":" + 
+						MyPort.ToString(), "Server", textBox_id.Text, sha256(passwordBox.Password));
+					byte[] sendBytes = registerData.DataPackageToBytes(); //注册数据包转化为字节数组
+					networkStream.Write(sendBytes, 0, sendBytes.Length);
+				}
+				readRevMsg();
+			}
+			catch {
+				MessageBox.Show("无法连接到服务器!");
+				return;
+			}
+			finally {
+				if (networkStream != null) {
+					networkStream.Close();
+				}
+				tcpClient.Close();
+			}
+
+		}
 
 
         //点击登录按钮
 		private void button_login_Click(object sender, RoutedEventArgs e) {
-            //向服务器发送异步请求
-            TcpClient tcpClient;
-            StateObject stateObject;
-            TTS_Core.LoginDataPackage loginData;
-            tcpClient = new TcpClient();
-            stateObject = new StateObject();
-            stateObject.tcpClient = tcpClient;
-            loginData = new TTS_Core.LoginDataPackage(myIPAddress + MyPort.ToString(), textBox_ip.Text, textBox_id.Text, sha256(passwordBox.Password));
-            stateObject.buffer = loginData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
-            tcpClient.BeginConnect(myIPAddress, int.Parse(textBox_ip.Text.Split(':')[1]), new AsyncCallback(SentCallBackF), stateObject); //异步连接
-
-            ClientWindow clientWindow = new ClientWindow(textBox_id.Text, tcpListener, MyPort, textBox_ip.Text.Split(':')[1]);
-			clientWindow.Show();
-			Close();
+			//向服务器发送请求
+			TcpClient tcpClient = null;
+			NetworkStream networkStream = null;
+			try {
+				string[] ip = textBox_ip.Text.Split(':');
+				tcpClient = new TcpClient();
+				IPAddress ServerIP = IPAddress.Parse(ip[0]);
+				tcpClient.Connect(ServerIP, int.Parse(ip[1])); //建立与服务器的连接
+				networkStream = tcpClient.GetStream();
+				if (networkStream.CanWrite) {
+					TTS_Core.LoginDataPackage loginData = new TTS_Core.LoginDataPackage(textBox_id.Text, myIPAddress + ":" +
+						MyPort.ToString(), "Server", textBox_id.Text, sha256(passwordBox.Password));
+					byte[] sendBytes = loginData.DataPackageToBytes(); //注册数据包转化为字节数组
+					networkStream.Write(sendBytes, 0, sendBytes.Length);
+				}
+				readRevMsg();
+			}
+			catch {
+				MessageBox.Show("无法连接到服务器!");
+				return;
+			}
+			finally {
+				if (networkStream != null) {
+					networkStream.Close();
+				}
+				tcpClient.Close();
+			}
 		}
 
 
@@ -201,20 +228,24 @@ namespace TTS_Client {
 
 
         //接收到信息后的操作
-        public void readRevMsg(TcpClient tcpClient)
+        public void readRevMsg()
         {
-            byte[] bytes = ReadFromTcpClient(tcpClient); //获取数据
-            TTS_Core.QueryDataPackage queryData = new TTS_Core.QueryDataPackage(bytes);
-            string message = string.Empty;
-            //数据包分类操作
-            switch (queryData.MessageType)
-            {
-                
-                default:
-                    Console.WriteLine("聊天数据包读取失败");
-                    return;
-            }
-        }
+			var newClient = tcpListener.AcceptTcpClient();
+			var bytes = ReadFromTcpClient(newClient); //获取数据
+			var package = new TTS_Core.DataPackage(bytes);
+			string message = package.Sender;
+			MessageBox.Show(message);
+			if (message == "用户登录成功！") {
+				ClientWindow clientWindow = new ClientWindow(textBox_id.Text, tcpListener, MyPort, textBox_ip.Text.Split(':')[1], false);
+				clientWindow.Show();
+				Close();
+			}
+			if (message == "管理员登录成功！") {
+				ClientWindow clientWindow = new ClientWindow(textBox_id.Text, tcpListener, MyPort, textBox_ip.Text.Split(':')[1], true);
+				clientWindow.Show();
+				Close();
+			}
+		}
 
 
         //回调函数
@@ -250,5 +281,6 @@ namespace TTS_Client {
             }
         } //不在主线程执行
 
-    }
+
+	}
 }
