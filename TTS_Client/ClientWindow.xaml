@@ -18,7 +18,6 @@
                     <Button x:Name="button3" Content="选择出发时间" HorizontalAlignment="Left" Margin="35,79
                             ,0,0" VerticalAlignment="Top" Width="101" Click="button3_Click"/>
                     <TextBlock x:Name="textBlock_Copy1" HorizontalAlignment="Left" Margin="153,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="109" TextAlignment="Center" Text="已选择出发时间："/>
-                    <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="279,111,0,0" VerticalAlignment="Top" Width="241" Height="19"/>
                     <TextBlock x:Name="textBlock_Copy4" HorizontalAlignment="Left" Margin="35,145,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="109" TextAlignment="Center" Text="已添加车票信息："/>
                     <ListView x:Name="BuyTicketListView" HorizontalAlignment="Left" Height="253" Margin="36,165,0,0" VerticalAlignment="Top" Width="758">
                         <ListView.View>

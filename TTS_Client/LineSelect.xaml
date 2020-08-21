@@ -5,8 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TTS_Client"
         mc:Ignorable="d"
-        Title="LineSelect" Height="450" Width="800">
+        Title="换乘方案选择" Height="264.675" Width="375.691" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
-        
+        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="256,20,0,0" VerticalAlignment="Top" Width="69" SelectionChanged="comboBox_SelectionChanged">
+            <ComboBoxItem HorizontalAlignment="Center">时间最短</ComboBoxItem>
+            <ComboBoxItem HorizontalAlignment="Center">耗费最短</ComboBoxItem>
+            <ComboBoxItem HorizontalAlignment="Center">站数最短</ComboBoxItem>
+        </ComboBox>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="35,22,0,0" TextWrapping="Wrap" Text="该路线需要进行换乘，请选择换乘方案：" VerticalAlignment="Top"/>
+        <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="35,75,0,0" TextWrapping="Wrap" Text="路径详情：" VerticalAlignment="Top"/>
+        <TextBlock x:Name="detail" HorizontalAlignment="Left" Margin="112,75,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+        <TextBlock x:Name="textBlock1_Copy" HorizontalAlignment="Left" Margin="35,105,0,0" TextWrapping="Wrap" Text="乘车耗时：" VerticalAlignment="Top"/>
+        <TextBlock x:Name="detail_Copy" HorizontalAlignment="Left" Margin="112,105,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+        <TextBlock x:Name="textBlock1_Copy1" HorizontalAlignment="Left" Margin="35,135,0,0" TextWrapping="Wrap" Text="乘车总价：" VerticalAlignment="Top"/>
+        <TextBlock x:Name="detail_Copy1" HorizontalAlignment="Left" Margin="112,135,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+        <TextBlock x:Name="textBlock1_Copy2" HorizontalAlignment="Left" Margin="35,165,0,0" TextWrapping="Wrap" Text="总经站数：" VerticalAlignment="Top"/>
+        <TextBlock x:Name="detail_Copy2" HorizontalAlignment="Left" Margin="112,165,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+        <Button x:Name="button" Content="确定选择" HorizontalAlignment="Left" Margin="147,206,0,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
+        <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="35,48,0,0" TextWrapping="Wrap" Text="当前选择目标：" VerticalAlignment="Top"/>
+        <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="132,48,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
     </Grid>
 </Window>

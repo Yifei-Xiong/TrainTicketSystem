@@ -29,5 +29,22 @@ namespace TTS_Client
 		}
 
 		public ClientWindow.TicketQueryInfo ticketQueryInfo;
+
+		private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+			string selectType = comboBox.SelectedItem.ToString();
+			if (selectType == "时间最短") {
+				textBlock3.Text = selectType;
+			}
+			else if (selectType == "耗费最短") {
+				textBlock3.Text = selectType;
+			}
+			else if (selectType == "站数最短") {
+				textBlock3.Text = selectType;
+			}
+		}
+
+		private void button_Click(object sender, RoutedEventArgs e) {
+
+		} //确认线路
 	}
 }
