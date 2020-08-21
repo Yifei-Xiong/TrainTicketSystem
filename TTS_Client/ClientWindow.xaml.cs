@@ -96,9 +96,10 @@ namespace TTS_Client {
         public class AllStationInfo : ObservableCollection<StationInfo> { } //定义集合
         public class AllTicketInfo : ObservableCollection<TicketInfo> { } //定义集合
         public class AllBuyTicket : ObservableCollection<BuyTicket> { } //定义集合
-        AllStationInfo allStationInfo = new AllStationInfo { };
-        AllTicketInfo allTicketInfo = new AllTicketInfo { };
-        AllBuyTicket allBuyTicket = new AllBuyTicket { };
+		public AllStationInfo allStationInfo;
+		public AllTicketInfo allTicketInfo;
+		public AllTicketInfo searchTicketInfo;
+		public AllBuyTicket allBuyTicket;
 
 
         //类定义
@@ -129,7 +130,11 @@ namespace TTS_Client {
         public ClientWindow(string ID, TcpListener tcpListener, int MyPort, string LoginPort)
         {
             InitializeComponent();
-            BuyTicketListView.ItemsSource = allBuyTicket;
+			allStationInfo = new AllStationInfo { };
+			allTicketInfo = new AllTicketInfo { };
+			allBuyTicket = new AllBuyTicket { };
+
+			BuyTicketListView.ItemsSource = allBuyTicket;
             TicketListView.ItemsSource = allTicketInfo;
             ticketQueryInfo = new TicketQueryInfo();
             ticketQueryInfo.StartTime = DateTime.Now;
@@ -264,11 +269,175 @@ namespace TTS_Client {
 
 
 		private void Button2_Copy_Click(object sender, RoutedEventArgs e) {
-
+			textBox_tic1.Clear();
+			textBox_tic2.Clear();
+			textBox_tic3.Clear();
+			textBox_tic4.Clear();
+			textBox_tic5.Clear();
+			textBox_tic6.Clear();
+			textBox_tic7.Clear();
+			textBox_tic8.Clear();
+			textBox_tic9.Clear();
+			TicketListView.ItemsSource = allTicketInfo;
 		} //清空
 
 		private void button2_Copy_Click_1(object sender, RoutedEventArgs e) {
+			searchTicketInfo = new AllTicketInfo();
+			for (int i = 0; i < allTicketInfo.Count; i++) {
+				searchTicketInfo.Add(allTicketInfo[i]);
+			} //Copy
 
+			if (precision.IsChecked == true) {
+				if (textBox_tic1.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].TicketNumber.ToString() != textBox_tic1.Text) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //TicketNumber
+				if (textBox_tic2.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].TrainID.ToString() != textBox_tic2.Text) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //TrainID
+				if (textBox_tic3.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].EnterStationName.ToString() != textBox_tic3.Text) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //EnterStationName
+				if (textBox_tic4.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].EnterStationTime.ToString() != textBox_tic4.Text) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //EnterStationTime
+				if (textBox_tic5.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].LeaveStationName.ToString() != textBox_tic5.Text) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //LeaveStationName
+				if (textBox_tic6.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].LeaveStationTimeIn.ToString() != textBox_tic6.Text) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //LeaveStationTimeIn
+				if (textBox_tic7.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].TicketPrice.ToString() != textBox_tic7.Text) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //TicketPrice
+				if (textBox_tic8.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].LineName.ToString() != textBox_tic8.Text) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //LineName
+				if (textBox_tic9.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].BuyTime.ToString() != textBox_tic9.Text) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //BuyTime
+			} //精确搜索
+
+			else {
+				if (textBox_tic1.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].TicketNumber.ToString().IndexOf(textBox_tic1.Text) == -1) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //TicketNumber
+				if (textBox_tic2.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].TrainID.ToString().IndexOf(textBox_tic2.Text) == -1) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //TrainID
+				if (textBox_tic3.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].EnterStationName.ToString().IndexOf(textBox_tic3.Text) == -1) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //EnterStationName
+				if (textBox_tic4.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].EnterStationTime.ToString().IndexOf(textBox_tic4.Text) == -1) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //EnterStationTime
+				if (textBox_tic5.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].LeaveStationName.ToString().IndexOf(textBox_tic5.Text) == -1) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //LeaveStationName
+				if (textBox_tic6.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].LeaveStationTimeIn.ToString().IndexOf(textBox_tic6.Text) == -1) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //LeaveStationTimeIn
+				if (textBox_tic7.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].TicketPrice.ToString().IndexOf(textBox_tic7.Text) == -1) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //TicketPrice
+				if (textBox_tic8.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].LineName.ToString().IndexOf(textBox_tic8.Text) == -1) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //LineName
+				if (textBox_tic9.Text != string.Empty) {
+					for (int i = 0; i < searchTicketInfo.Count; i++) {
+						if (searchTicketInfo[i].BuyTime.ToString().IndexOf(textBox_tic9.Text) == -1) {
+							searchTicketInfo.Remove(searchTicketInfo[i]);
+							i--;
+						}
+					}
+				} //BuyTime
+			} //模糊搜索
+
+			TicketListView.ItemsSource = searchTicketInfo;
 		} //筛选
 
 		private void button8_Click(object sender, RoutedEventArgs e) {

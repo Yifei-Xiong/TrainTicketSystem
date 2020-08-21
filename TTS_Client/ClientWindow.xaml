@@ -62,25 +62,25 @@
                     </ListView>
                     <TextBlock x:Name="textBlock_Copy5" HorizontalAlignment="Left" Margin="29,10,0,0" TextWrapping="Wrap" Text="订单编号" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662"/>
                     <TextBlock x:Name="textBlock1_Copy" HorizontalAlignment="Left" Margin="188,10,0,0" TextWrapping="Wrap" Text="出发站点" VerticalAlignment="Top"/>
-                    <TextBox x:Name="textBox_Copy" HorizontalAlignment="Left" Height="23" Margin="16,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="71"/>
-                    <TextBox x:Name="textBox_Copy1" HorizontalAlignment="Left" Height="23" Margin="178,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
+                    <TextBox x:Name="textBox_tic1" HorizontalAlignment="Left" Height="23" Margin="16,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="71"/>
+                    <TextBox x:Name="textBox_tic3" HorizontalAlignment="Left" Height="23" Margin="178,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
                     <Button x:Name="button2_Copy" Content="筛选" HorizontalAlignment="Left" Margin="731,67,0,0" VerticalAlignment="Top" Width="63" Click="button2_Copy_Click_1"/>
                     <Button x:Name="button2_Copy1" Content="清空" HorizontalAlignment="Left" Margin="655,67,0,0" VerticalAlignment="Top" Width="63" Click="Button2_Copy_Click" />
-                    <TextBox x:Name="textBox_Copy2" HorizontalAlignment="Left" Height="23" Margin="257,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="110"/>
+                    <TextBox x:Name="textBox_tic4" HorizontalAlignment="Left" Height="23" Margin="257,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="110"/>
                     <TextBlock x:Name="textBlock1_Copy1" HorizontalAlignment="Left" Margin="288,10,0,0" TextWrapping="Wrap" Text="上车时间" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="checkBox2" Content="精确搜索" HorizontalAlignment="Left" Margin="566,69,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="precision" Content="精确搜索" HorizontalAlignment="Left" Margin="566,69,0,0" VerticalAlignment="Top"/>
                     <TextBlock x:Name="textBlock_Copy6" HorizontalAlignment="Left" Margin="388,10,0,0" TextWrapping="Wrap" Text="到达站点" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662"/>
                     <TextBlock x:Name="textBlock1_Copy2" HorizontalAlignment="Left" Margin="469,10,0,0" TextWrapping="Wrap" Text="到达时间" VerticalAlignment="Top"/>
-                    <TextBox x:Name="textBox_Copy3" HorizontalAlignment="Left" Height="23" Margin="377,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
-                    <TextBox x:Name="textBox_Copy4" HorizontalAlignment="Left" Height="23" Margin="457,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="71"/>
-                    <TextBox x:Name="textBox_Copy5" HorizontalAlignment="Left" Height="23" Margin="538,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
+                    <TextBox x:Name="textBox_tic5" HorizontalAlignment="Left" Height="23" Margin="377,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
+                    <TextBox x:Name="textBox_tic6" HorizontalAlignment="Left" Height="23" Margin="457,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="71"/>
+                    <TextBox x:Name="textBox_tic7" HorizontalAlignment="Left" Height="23" Margin="538,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
                     <TextBlock x:Name="textBlock1_Copy3" HorizontalAlignment="Left" Margin="549,10,0,0" TextWrapping="Wrap" Text="车票价格" VerticalAlignment="Top"/>
-                    <TextBox x:Name="textBox_Copy6" HorizontalAlignment="Left" Height="23" Margin="617,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="72"/>
+                    <TextBox x:Name="textBox_tic8" HorizontalAlignment="Left" Height="23" Margin="617,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="72"/>
                     <TextBlock x:Name="textBlock1_Copy4" HorizontalAlignment="Left" Margin="629,10,0,0" TextWrapping="Wrap" Text="所属线路" VerticalAlignment="Top"/>
                     <Button x:Name="button7" Content="取消所选订单" HorizontalAlignment="Left" Margin="700,423,0,0" VerticalAlignment="Top" Width="94"/>
                     <TextBlock x:Name="textBlock1_Copy5" HorizontalAlignment="Left" Margin="120,10,0,0" TextWrapping="Wrap" Text="车次" VerticalAlignment="Top"/>
-                    <TextBox x:Name="textBox_Copy7" HorizontalAlignment="Left" Height="23" Margin="97,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
-                    <TextBox x:Name="textBox_Copy8" HorizontalAlignment="Left" Height="23" Margin="698,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="89"/>
+                    <TextBox x:Name="textBox_tic2" HorizontalAlignment="Left" Height="23" Margin="97,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
+                    <TextBox x:Name="textBox_tic9" HorizontalAlignment="Left" Height="23" Margin="698,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="89"/>
                     <TextBlock x:Name="textBlock1_Copy6" HorizontalAlignment="Left" Margin="718,10,0,0" TextWrapping="Wrap" Text="购买时间" VerticalAlignment="Top"/>
                 </Grid>
             </TabItem>
