@@ -45,12 +45,15 @@ namespace TTS_Server {
 		public class AllUser : ObservableCollection<UserInfo> { }
 
 		public void InitSQLDocker() {
-			connection = new MySqlConnection("server=222.16.54.158;user=root;password=" + dbpw + ";database=tts_serverdb;");
+			connection = new MySqlConnection("server=" + dbipTextBox.Text + ";user=root;password=" + dbpw + ";database=tts_serverdb;");
 			try {
 				connection.Open();
 			}
 			catch {
 				MessageBox.Show("与远程数据库的通讯失败！");
+			}
+			finally {
+
 			}
 		}
 
@@ -61,7 +64,11 @@ namespace TTS_Server {
 
 		private void button2_Click(object sender, RoutedEventArgs e) {
 			this.dbpw = passwordBox.Password;
+			InitSQLDocker();
 			passwordBox.Clear();
+			if (connection != null && connection.State == System.Data.ConnectionState.Open) {
+				MessageBox.Show("远程数据库连接成功！");
+			}
 		} //连接数据库
 
 		private void button_StartServer_Click(object sender, RoutedEventArgs e) {
