@@ -5,8 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TTS_Server"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="火车订票系统 - 服务端" Height="267.867" Width="370.133" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
-        
+        <Button x:Name="button_StartServer" Content="开启服务器" HorizontalAlignment="Left" Margin="155,60,0,0" VerticalAlignment="Top" Width="75" Click="button_StartServer_Click" />
+        <!--<Button x:Name="button_StopServer" Content="关闭" HorizontalAlignment="Left" Margin="216,146,0,0" VerticalAlignment="Top" Width="75" Click="button_StopServer_Click" />-->
+        <TextBlock x:Name="port" HorizontalAlignment="Left" Margin="88,21,0,0" TextWrapping="Wrap" Text="请输入用于用户登录的端口号(1024-65535)：" VerticalAlignment="Top" Width="126"/>
+        <TextBox x:Name="portText" HorizontalAlignment="Left" Height="23" Margin="228,25,0,0" TextWrapping="Wrap" Text="1500" VerticalAlignment="Top" Width="55" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+        <Button x:Name="button2" Content="连接数据库" HorizontalAlignment="Left" Margin="155,155,0,0" VerticalAlignment="Top" Width="75" Click="button2_Click"/>
+        <TextBlock x:Name="port_Copy" HorizontalAlignment="Left" Margin="61,101,0,0" TextWrapping="Wrap" Text="请输入数据库IP地址：" VerticalAlignment="Top" Width="126"/>
+        <TextBlock x:Name="port_Copy1" HorizontalAlignment="Left" Margin="61,127,0,0" TextWrapping="Wrap" Text="请输入数据库连接密码：" VerticalAlignment="Top" Width="141"/>
+        <TextBox x:Name="dbipTextBox" HorizontalAlignment="Left" Height="19" Margin="202,99,0,0" TextWrapping="Wrap" Text="222.16.54.158" VerticalAlignment="Top" Width="107" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+        <Button x:Name="button" Content="关于" HorizontalAlignment="Left" Margin="234,188,0,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="61,191,0,0" TextWrapping="Wrap" Text="本机IP:" VerticalAlignment="Top"/>
+        <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="110,191,0,0" TextWrapping="Wrap" Text="127.0.0.1" VerticalAlignment="Top"/>
+        <PasswordBox x:Name="passwordBox" HorizontalAlignment="Left" Height="19" Margin="202,127,0,0" VerticalAlignment="Top" Width="107" Password="" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+
     </Grid>
 </Window>
