@@ -195,6 +195,39 @@ namespace TTS_Client {
 				MessageBox.Show("查询条件不完整，请重新输入！");
 				return;
 			} //查询未完成
+
+
+			TcpClient tcpClient = null;
+			NetworkStream networkStream = null;
+			string ExtraMsg = ticketQueryInfo.EnterStationNumber.ToString() + "\n" + ticketQueryInfo.LeaveStationNumber.ToString();
+			try {
+				tcpClient = new TcpClient();
+				tcpClient.Connect(myIPAddress, LoginPort); //建立与服务器的连接
+				networkStream = tcpClient.GetStream();
+				if (networkStream.CanWrite) {
+					TTS_Core.QueryDataPackage info = new TTS_Core.QueryDataPackage(UserID, myIPAddress + ":" +
+						MyPort.ToString(), "server", TTS_Core.QUERYTYPE.K_BUYTICKET_QUERY, ExtraMsg);
+					byte[] sendBytes = info.DataPackageToBytes(); //注册数据包转化为字节数组
+					networkStream.Write(sendBytes, 0, sendBytes.Length);
+				}
+				var newClient = tcpListener.AcceptTcpClient();
+				var bytes = ReadFromTcpClient(newClient); //获取数据
+				var package = new TTS_Core.QueryDataPackage(bytes);
+				string message = package.ExtraMsg;
+
+			}
+			catch {
+				MessageBox.Show("无法连接到服务器!");
+				return;
+			}
+			finally {
+				if (networkStream != null) {
+					networkStream.Close();
+				}
+				tcpClient.Close();
+			}
+
+
 			bool NeedChangeLine = false; //是否需要换乘
 			if (NeedChangeLine) {
 				LineSelect lineSelect = new LineSelect(ticketQueryInfo);

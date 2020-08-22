@@ -33,6 +33,7 @@ namespace TTS_Core
         K_TRAIN_STATION,  //列车-车站查询
         K_TRAIN_PASSENGERS, //列车乘客查询
         K_TICKET_PRICE,  //车票价格查询
+		K_BUYTICKET_QUERY, // //购买车票查询
 		K_USER_INFO //用户详情信息
     }
 
@@ -177,14 +178,17 @@ namespace TTS_Core
 					this.MessageType = queryPackage.MessageType;
 					this.IPandPort = queryPackage.IPandPort;
 					this.QueryType = queryPackage.QueryType;
+					this.ExtraMsg = ExtraMsg;
 				}
 			}
 		} //构造函数 字节数组转化为数据包
-		public QueryDataPackage(string sender, string IPandPort, string receiver, QUERYTYPE QueryType) : base(sender, IPandPort, receiver) {
+		public QueryDataPackage(string sender, string IPandPort, string receiver, QUERYTYPE QueryType, string ExtraMsg) : base(sender, IPandPort, receiver) {
 			MessageType = MESSAGETYPE.K_QUERY_DATA_PACKAGE;
 			this.QueryType = QueryType;
+			this.ExtraMsg = ExtraMsg;
 		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
 		public QUERYTYPE QueryType { get; set; } //查询类别
+		public string ExtraMsg { get; set; } //额外信息
 		// 1为出发站点查询，2为到达站点查询，3为用户订单查询
 		// 11为线路查询，12为列车查询，13为车站查询，14为车站-线路查询，15为列车-车站查询
 		// 16为列车乘客查询，17为车票价格查询

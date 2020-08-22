@@ -242,6 +242,11 @@ namespace TTS_Server {
 							break;
 						case TTS_Core.MESSAGETYPE.K_QUERY_DATA_PACKAGE: {
 								var package = new TTS_Core.QueryDataPackage(receiveBytes);
+								switch (package.QueryType) {
+									case TTS_Core.QUERYTYPE.K_BUYTICKET_QUERY: {
+											buy_ticket_query(package.IPandPort, package.ExtraMsg.Split('\n')[0], package.ExtraMsg.Split('\n')[1]);
+										} break;
+								}
 							} //特定查询
 							break;
 						case TTS_Core.MESSAGETYPE.K_USER_INFO_CHANGE: {
@@ -459,5 +464,48 @@ namespace TTS_Server {
 			catch { }
 			return info;
 		} //实现单条用户信息查询
+
+		private void buy_ticket_query(string ip, string EnterID, string LeaveID) {
+			if (connection == null || connection.State != System.Data.ConnectionState.Open) {
+				InitSQLDocker();
+			} //若不曾连接到数据库，则进行连接
+			MySqlCommand sql = new MySqlCommand("SELECT A.lineid FROM stationline A, stationline B WHERE A.stationid=" +
+				EnterID + " AND A.lineid=B.lineid AND A.stationid<>B.stationid AND B.stationid=" + LeaveID, connection);
+			// SELECT A.lineid FROM stationline A, stationline B WHERE A.stationid=出发站ID AND A.lineid=B.lineid AND A.stationid<>B.stationid AND B.stationid=到达站ID
+			List<string> OutList = new List<string>();
+			try {
+				MySqlDataReader reader = sql.ExecuteReader();
+				while (reader.Read()) {
+					OutList.Add(reader[0].ToString());
+				}
+				reader.Close();
+			}
+			catch { }
+			if (OutList.Count == 1) {
+				string ExtraMsg = "1" + "\n" + OutList[0];
+				TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+				StateObject stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+				stateObject.tcpClient = tcpClient;
+				var data = new TTS_Core.QueryDataPackage("Server", ip, "", TTS_Core.QUERYTYPE.K_BUYTICKET_QUERY, ExtraMsg);
+				stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+				tcpClient.BeginConnect(ip.Split(':')[0], int.Parse(ip.Split(':')[1]), new AsyncCallback(SentCallBackF), stateObject);
+			}
+			else if (OutList.Count >= 1) {
+				string ExtraMsg = OutList.Count.ToString() + "\n";
+				for (int i = 0; i < OutList.Count; i++) {
+					ExtraMsg = ExtraMsg + OutList[i] + "\n";
+				}
+				TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+				StateObject stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+				stateObject.tcpClient = tcpClient;
+				var data = new TTS_Core.QueryDataPackage("Server", ip, "", TTS_Core.QUERYTYPE.K_BUYTICKET_QUERY, ExtraMsg);
+				stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+				tcpClient.BeginConnect(ip.Split(':')[0], int.Parse(ip.Split(':')[1]), new AsyncCallback(SentCallBackF), stateObject);
+			}
+			else {
+
+			} //需要换乘至少一次
+
+		} //实现线路的查询
 	}
 }
