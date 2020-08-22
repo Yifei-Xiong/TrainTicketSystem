@@ -29,6 +29,7 @@ namespace TTS_Server {
 
 		public MainWindow() {
 			InitializeComponent();
+			dbpw = string.Empty;
 		}
 
 		private MySqlConnection connection;
@@ -39,7 +40,10 @@ namespace TTS_Server {
 		public struct UserInfo {
 			public string UserID { get; set; } //用户登录ID
 			public string Password { get; set; } //用户密码
-			public int AccontType { get; set; } //用户身份，1为普通用户，2为管理员
+			public int AccountType { get; set; } //用户身份，1为普通用户，2为管理员
+			public string Phone { get; set; } //用户手机号码
+			public string UserName { get; set; } //用户昵称
+			public double Balance { get; set; } //用户余额
 		} //用户信息
 
 		public class StateObject {
@@ -51,6 +55,7 @@ namespace TTS_Server {
 		public class AllUser : ObservableCollection<UserInfo> { }
 
 		public void InitSQLDocker() {
+			string debug = "server=" + dbipTextBox.Text + ";Port=3306;user=root;password=" + dbpw + ";database=tts_serverdb;";
 			connection = new MySqlConnection("server=" + dbipTextBox.Text + ";Port=3306;user=root;password=" + dbpw + ";database=tts_serverdb;");
 			try {
 				connection.Open();
@@ -78,6 +83,10 @@ namespace TTS_Server {
 		} //连接数据库
 
 		private void button_StartServer_Click(object sender, RoutedEventArgs e) {
+			if (connection == null || connection.State != System.Data.ConnectionState.Open) {
+				MessageBox.Show("请先连接远程数据库！");
+				return;
+			}
 			if ((string)button_StartServer.Content == "关闭服务器") {
 				this.Close();
 			}
@@ -173,12 +182,14 @@ namespace TTS_Server {
 					}
 					switch (type) {
 						case TTS_Core.MESSAGETYPE.K_LOGIN_DATA_PACKAGE: {
+								string SendMessage = "消息异常";
 								var package = new TTS_Core.LoginDataPackage(receiveBytes);
 								UserInfo serverData = UserInfoSearch(package.Sender);
-								string SendMessage;
 								if (serverData.Password == package.Password) {
 									SendMessage = "用户登录成功！";
-									if (serverData.AccontType == 2) {
+									package.Sender = serverData.Phone + "\n"
+										+ serverData.UserName + "\n" + serverData.Balance.ToString() + "\n";
+									if (serverData.AccountType == 2) {
 										SendMessage = "管理员登录成功！";
 									}
 								}
@@ -204,7 +215,10 @@ namespace TTS_Server {
 									UserInfo user = new UserInfo();
 									user.UserID = package.UserID;
 									user.Password = package.Password;
-									user.AccontType = 1;
+									user.AccountType = 1;
+									user.Phone = "未指定";
+									user.UserName = package.UserID; 
+									user.Balance = 0;
 									UserInfoAdd(user);
 									SendMessage = "注册成功！";
 								}
@@ -309,14 +323,17 @@ namespace TTS_Server {
 				if (connection == null || connection.State != System.Data.ConnectionState.Open) {
 					InitSQLDocker();
 				} //若不曾连接到数据库，则进行连接
-				MySqlCommand sql = new MySqlCommand("SELECT UserID, Password, AccontType FROM alluser", connection);
+				MySqlCommand sql = new MySqlCommand("SELECT UserID, Password, AccountType, phone, username, balance FROM alluser", connection);
 				MySqlDataReader reader = sql.ExecuteReader();
 				AllUser result = new AllUser();
 				while (reader.Read()) {
 					UserInfo userinfo = new UserInfo();
 					userinfo.UserID = reader[0].ToString();
 					userinfo.Password = reader[1].ToString();
-					userinfo.AccontType = int.Parse(reader[2].ToString());
+					userinfo.AccountType = int.Parse(reader[2].ToString());
+					userinfo.Phone = reader[3].ToString();
+					userinfo.UserName = reader[4].ToString();
+					userinfo.Balance = double.Parse(reader[5].ToString());
 					result.Add(userinfo);
 				}
 				reader.Close();
@@ -329,10 +346,11 @@ namespace TTS_Server {
 				var query = new MySqlCommand("DELETE FROM alluser", connection);
 				query.ExecuteNonQuery();
 				foreach (UserInfo userinfo in value) {
-					MySqlCommand sql = new MySqlCommand("INSERT INTO alluser(UserID, Password, AccontType) "
-						+ "VALUES(\"" + userinfo.UserID + "\", \"" + userinfo.Password + "\", " + userinfo.AccontType + ")", connection);
+					MySqlCommand sql = new MySqlCommand("INSERT INTO alluser(UserID, Password, AccountType, phone, username, balance) "
+						+ "VALUES(\"" + userinfo.UserID + "\", \"" + userinfo.Password + "\", " + userinfo.AccountType.ToString() 
+						+ ", \"" + userinfo.Phone + "\", \"" + userinfo.UserName + "\", " + userinfo.Balance.ToString() + ")", connection);
 					sql.ExecuteNonQuery();
-					// VALUES (\"UserID\", \"Password\", AccontType) <->  VALUES ("UserID", "Password", AccontType)
+					// VALUES (\"UserID\", \"Password\", AccountType, \"phone\", \"username\", balance) <->  VALUES ("UserID", "Password", AccountType)
 				}
 			}
 		} //用户信息抽象成Docker，实现内容获取和内容覆盖
@@ -341,10 +359,15 @@ namespace TTS_Server {
 			if (connection == null || connection.State != System.Data.ConnectionState.Open) {
 				InitSQLDocker();
 			} //若不曾连接到数据库，则进行连接
-			MySqlCommand query = new MySqlCommand("UPDATE alluser SET Password=\"" + newInfo.Password + "\", AccontType=" + newInfo.AccontType 
-				+ "WHERE UserID=\"" + newInfo.UserID + "\"", connection );
-			query.ExecuteNonQuery();
-			// UPDATE alluser SET Password="Password", AccontType=AccontType WHERE UserID="UserID"
+			MySqlCommand query = new MySqlCommand("UPDATE alluser SET Password=\"" + newInfo.Password + "\", AccountType=" + newInfo.AccountType .ToString()
+				+ ", phone=\"" + newInfo.Phone + "\", username = \"" + newInfo.UserName + "\", balance=" + newInfo.Balance.ToString()
+				+ " WHERE UserID=\"" + newInfo.UserID + "\"", connection );
+			try {
+				query.ExecuteNonQuery();
+			}
+			catch { }
+			// UPDATE alluser SET Password="Password", AccountType=AccountType ,
+			// phone="phone", username="username", balance=balance WHERE UserID="UserID"
 		} //实现单条用户信息内容修改，也即某一用户的用户密码、权限修改
 
 		private void UserInfoDelete (string UserID) {
@@ -352,7 +375,10 @@ namespace TTS_Server {
 				InitSQLDocker();
 			} //若不曾连接到数据库，则进行连接
 			MySqlCommand query = new MySqlCommand("DELETE FROM alluser WHERE UserID=\"" + UserID + "\"", connection);
-			query.ExecuteNonQuery();
+			try {
+				query.ExecuteNonQuery();
+			}
+            catch { }
 			// DELETE FROM alluser WHERE UserID="UserID"
 		} //实现单条用户信息删除
 
@@ -360,24 +386,34 @@ namespace TTS_Server {
 			if (connection == null || connection.State != System.Data.ConnectionState.Open) {
 				InitSQLDocker();
 			} //若不曾连接到数据库，则进行连接
-			MySqlCommand sql = new MySqlCommand("INSERT INTO alluser(UserID, Password, AccontType) "
-						+ "VALUES(\"" + userinfo.UserID + "\", \"" + userinfo.Password + "\", " + userinfo.AccontType + ")", connection);
-			sql.ExecuteNonQuery();
+			MySqlCommand sql = new MySqlCommand("INSERT INTO alluser(UserID, Password, AccountType, phone, username, balance) "
+						+ "VALUES(\"" + userinfo.UserID + "\", \"" + userinfo.Password + "\", " + userinfo.AccountType.ToString()
+						+ ", \"" + userinfo.Phone + "\", \"" + userinfo.UserName + "\", " + userinfo.Balance.ToString() + ")", connection);
+			try {
+				sql.ExecuteNonQuery();
+			}
+			catch { }
 		} //实现单条用户信息增加
 
 		private UserInfo UserInfoSearch(string userID) {
 			if (connection == null || connection.State != System.Data.ConnectionState.Open) {
 				InitSQLDocker();
 			} //若不曾连接到数据库，则进行连接
-			MySqlCommand sql = new MySqlCommand("SELECT UserID, Password, AccontType FROM alluser WHERE UserID=\"" + userID + "\"", connection);
-			MySqlDataReader reader = sql.ExecuteReader();
+			MySqlCommand sql = new MySqlCommand("SELECT UserID, Password, AccountType, phone, username, balance FROM alluser WHERE UserID=\"" + userID + "\"", connection);
 			UserInfo info = new UserInfo();
-			while (reader.Read()) {
-				info.UserID = reader[0].ToString();
-				info.Password = reader[1].ToString();
-				info.AccontType = int.Parse(reader[2].ToString());
+			try {
+				MySqlDataReader reader = sql.ExecuteReader();
+				while (reader.Read()) {
+					info.UserID = reader[0].ToString();
+					info.Password = reader[1].ToString();
+					info.AccountType = int.Parse(reader[2].ToString());
+					info.Phone = reader[3].ToString();
+					info.UserName = reader[4].ToString();
+					info.Balance = double.Parse(reader[5].ToString());
+				}
+				reader.Close();
 			}
-			reader.Close();
+			catch { }
 			return info;
 		} //实现单条用户信息查询
 	}

@@ -234,14 +234,15 @@ namespace TTS_Client {
 			var bytes = ReadFromTcpClient(newClient); //获取数据
 			var package = new TTS_Core.DataPackage(bytes);
 			string message = package.Sender;
+			string info = package.Receiver;
 			MessageBox.Show(message);
 			if (message == "用户登录成功！") {
-				ClientWindow clientWindow = new ClientWindow(textBox_id.Text, tcpListener, MyPort, textBox_ip.Text.Split(':')[1], false);
+				ClientWindow clientWindow = new ClientWindow(textBox_id.Text, tcpListener, MyPort, textBox_ip.Text.Split(':')[1], false, info);
 				clientWindow.Show();
 				Close();
 			}
 			if (message == "管理员登录成功！") {
-				ClientWindow clientWindow = new ClientWindow(textBox_id.Text, tcpListener, MyPort, textBox_ip.Text.Split(':')[1], true);
+				ClientWindow clientWindow = new ClientWindow(textBox_id.Text, tcpListener, MyPort, textBox_ip.Text.Split(':')[1], true, info);
 				clientWindow.Show();
 				Close();
 			}

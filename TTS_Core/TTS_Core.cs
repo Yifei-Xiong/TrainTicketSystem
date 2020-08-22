@@ -31,9 +31,9 @@ namespace TTS_Core
         K_STATION_LINE,  //车站-线路查询
         K_TRAIN_STATION,  //列车-车站查询
         K_TRAIN_PASSENGERS, //列车乘客查询
-        K_TICKET_PRICE  //车票价格查询
+        K_TICKET_PRICE,  //车票价格查询
+		K_USER_INFO //用户详情信息
     }
-
 
 	//数据包类，Type=K_DATA_PACKAGE
 	[Serializable]

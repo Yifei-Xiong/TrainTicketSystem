@@ -25,7 +25,6 @@ namespace TTS_Client {
         //委托
         private delegate void ReadDataF(TcpClient tcpClient); //代表无返回值 Tcpclient参数方法
 
-
         //结构体定义
         public struct StationInfo
         {
@@ -121,6 +120,8 @@ namespace TTS_Client {
         TcpListener tcpListener = null; //接收信息的侦听类对象,检查是否有信息
         string IPAndPort; //记录本地IP和端口号
 		double RemainMoney; //剩余金额
+		string UserName { get; set; }
+		string Phone { get; set; }
 
         TicketQueryInfo ticketQueryInfo;
         private Thread ListenerThread; //接收信息的侦听线程类变量
@@ -129,7 +130,7 @@ namespace TTS_Client {
 
 
         //构造函数重载
-        public ClientWindow(string ID, TcpListener tcpListener, int MyPort, string LoginPort, bool IsAdmin)
+        public ClientWindow(string ID, TcpListener tcpListener, int MyPort, string LoginPort, bool IsAdmin, string info)
         {
             InitializeComponent();
 			allStationInfo = new AllStationInfo { };
@@ -154,10 +155,18 @@ namespace TTS_Client {
             this.tcpListener = tcpListener;
             this.LoginPort = LoginPort; //服务器的端口
 
-            ProgramItem_Data();
+			string[] infostr = info.Split('\n');
+			this.Phone = infostr[0];
+			this.UserName = infostr[1];
+			this.RemainMoney = double.Parse(infostr[2]);
+			textBlock_Copy18.Text = infostr[0];
+			textBlock_Copy22.Text = infostr[1];
+			textBlock_Copy14.Text = infostr[2];
+
+			ProgramItem_Data();
 
 			if (IsAdmin == true) {
-
+				textBlock_Copy16.Text = "管理员";
 			} //是管理员
 			else {
 
