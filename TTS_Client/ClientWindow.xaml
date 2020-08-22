@@ -44,7 +44,7 @@
                     <TextBlock x:Name="textBlock_Copy14" HorizontalAlignment="Left" Margin="702,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="64" Text="0"/>
                     <Button x:Name="button9" Content="充值" HorizontalAlignment="Left" Margin="717,111,0,0" VerticalAlignment="Top" Width="65" Click="button9_Click"/>
                     <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="572,114,0,0" TextWrapping="Wrap" Text="充值金额：" VerticalAlignment="Top"/>
-                    <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="18" Margin="640,112,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="65"/>
+                    <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="18" Margin="640,112,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="65"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                 </Grid>
             </TabItem>
             <TabItem Header="订单查询" x:Name="OrderItem">
