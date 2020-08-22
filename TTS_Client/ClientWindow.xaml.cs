@@ -115,7 +115,7 @@ namespace TTS_Client {
         //属性变量定义
         string UserID; //用户ID
         int MyPort; //本程序侦听准备使用的端口号
-        string LoginPort; //登录端口，也即是服务器的端口
+        int LoginPort; //登录端口，也即是服务器的端口
         IPAddress myIPAddress = null; //本程序侦听使用的IP地址
         TcpListener tcpListener = null; //接收信息的侦听类对象,检查是否有信息
         string IPAndPort; //记录本地IP和端口号
@@ -147,13 +147,13 @@ namespace TTS_Client {
 
 			myIPAddress = IPAddress.Parse("127.0.0.1");
             IPAndPort = myIPAddress.ToString() + ":" + MyPort.ToString();
-            ListenerThread = new Thread(new ThreadStart(ListenerthreadMethod));
-            ListenerThread.IsBackground = true; //主线程结束后，该线程自动结束
-            ListenerThread.Start(); //启动线程
+            //ListenerThread = new Thread(new ThreadStart(ListenerthreadMethod));
+            //ListenerThread.IsBackground = true; //主线程结束后，该线程自动结束
+            //ListenerThread.Start(); //启动线程
             UserID = ID; //设置用户名
             this.MyPort = MyPort; //本机Listener监听的端口
             this.tcpListener = tcpListener;
-            this.LoginPort = LoginPort; //服务器的端口
+            this.LoginPort = int.Parse(LoginPort); //服务器的端口
 
 			string[] infostr = info.Split('\n');
 			this.Phone = infostr[0];
@@ -226,7 +226,7 @@ namespace TTS_Client {
             stateObject.tcpClient = tcpClient;
             //queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_ARRIVAL_STATION);  //到达站点查询
             //stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
-            tcpClient.BeginConnect(myIPAddress, int.Parse(LoginPort), new AsyncCallback(SentCallBackF), stateObject); //异步连接
+            tcpClient.BeginConnect(myIPAddress, LoginPort, new AsyncCallback(SentCallBackF), stateObject); //异步连接
 
             //弹出地点信息窗口
             allStationInfo.Clear();  //清空信息
@@ -257,7 +257,7 @@ namespace TTS_Client {
             stateObject.tcpClient = tcpClient;
             //queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_DEPARTURE_STATION);  //出发站点查询
             //stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
-            tcpClient.BeginConnect(myIPAddress, int.Parse(LoginPort), new AsyncCallback(SentCallBackF), stateObject); //异步连接
+            tcpClient.BeginConnect(myIPAddress, LoginPort, new AsyncCallback(SentCallBackF), stateObject); //异步连接
 
             //弹出地点信息窗口
             allStationInfo.Clear();  //清空信息
@@ -731,7 +731,7 @@ namespace TTS_Client {
             stateObject.tcpClient = tcpClient;
             //queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_USER_ORDER);  //用户订单查询
             //stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
-            tcpClient.BeginConnect(myIPAddress, int.Parse(LoginPort), new AsyncCallback(SentCallBackF), stateObject); //异步连接
+            tcpClient.BeginConnect(myIPAddress, LoginPort, new AsyncCallback(SentCallBackF), stateObject); //异步连接
 
             //加载数据完成前
             allBuyTicket.Clear();  //清空信息
@@ -820,5 +820,153 @@ namespace TTS_Client {
 				MessageBox.Show("购买失败，部分车站或线路管制中！");
 			}
 		}
+
+		private void Button_Click_1(object sender, RoutedEventArgs e) {
+			ChangeUserInfo changeUserInfo = new ChangeUserInfo("更改手机号码", "请输入新的手机号码：");
+			changeUserInfo.ShowDialog();
+			if (changeUserInfo.value == string.Empty) {
+				return;
+			}
+			TcpClient tcpClient = null;
+			NetworkStream networkStream = null;
+			try {
+				tcpClient = new TcpClient();
+				tcpClient.Connect(myIPAddress, LoginPort); //建立与服务器的连接
+				networkStream = tcpClient.GetStream();
+				if (networkStream.CanWrite) {
+					TTS_Core.InfoChangeDataPackage info = new TTS_Core.InfoChangeDataPackage(UserID, myIPAddress + ":" +
+						MyPort.ToString(), "server", 2, changeUserInfo.value);
+					byte[] sendBytes = info.DataPackageToBytes(); //注册数据包转化为字节数组
+					networkStream.Write(sendBytes, 0, sendBytes.Length);
+				}
+				button11_Click(sender, e);
+			}
+			catch {
+				MessageBox.Show("无法连接到服务器!");
+				return;
+			}
+			finally {
+				if (networkStream != null) {
+					networkStream.Close();
+				}
+				tcpClient.Close();
+			}
+		} //更改手机号码
+
+		private void Button_Click_2(object sender, RoutedEventArgs e) {
+			ChangeUserInfo changeUserInfo = new ChangeUserInfo("更改用户昵称", "请输入新的用户昵称：");
+			changeUserInfo.ShowDialog();
+			if (changeUserInfo.value == string.Empty) {
+				return;
+			}
+			TcpClient tcpClient = null;
+			NetworkStream networkStream = null;
+			try {
+				tcpClient = new TcpClient();
+				tcpClient.Connect(myIPAddress, LoginPort); //建立与服务器的连接
+				networkStream = tcpClient.GetStream();
+				if (networkStream.CanWrite) {
+					TTS_Core.InfoChangeDataPackage info = new TTS_Core.InfoChangeDataPackage(UserID, myIPAddress + ":" +
+						MyPort.ToString(), "server", 1, changeUserInfo.value);
+					byte[] sendBytes = info.DataPackageToBytes(); //注册数据包转化为字节数组
+					networkStream.Write(sendBytes, 0, sendBytes.Length);
+				}
+				button11_Click(sender, e);
+			}
+			catch {
+				MessageBox.Show("无法连接到服务器!");
+				return;
+			}
+			finally {
+				if (networkStream != null) {
+					networkStream.Close();
+				}
+				tcpClient.Close();
+			}
+		} //更改用户昵称
+
+		private void button11_Click(object sender, RoutedEventArgs e) {
+			TcpClient tcpClient = null;
+			NetworkStream networkStream = null;
+			try {
+				tcpClient = new TcpClient();
+				tcpClient.Connect(myIPAddress, LoginPort); //建立与服务器的连接
+				networkStream = tcpClient.GetStream();
+				if (networkStream.CanWrite) {
+					TTS_Core.InfoChangeDataPackage info = new TTS_Core.InfoChangeDataPackage(UserID, myIPAddress + ":" +
+						MyPort.ToString(), "server", 3, "");
+					byte[] sendBytes = info.DataPackageToBytes(); //注册数据包转化为字节数组
+					networkStream.Write(sendBytes, 0, sendBytes.Length);
+				}
+				var newClient = tcpListener.AcceptTcpClient();
+				var bytes = ReadFromTcpClient(newClient); //获取数据
+				var package = new TTS_Core.DataPackage(bytes);
+				string message = package.Sender;
+				MessageBox.Show(message);
+				string[] infostr = package.Receiver.Split('\n');
+				this.Phone = infostr[0];
+				this.UserName = infostr[1];
+				this.RemainMoney = double.Parse(infostr[2]);
+				textBlock_Copy18.Text = infostr[0];
+				textBlock_Copy22.Text = infostr[1];
+				textBlock_Copy14.Text = infostr[2];
+			}
+			catch {
+				MessageBox.Show("无法连接到服务器!");
+				return;
+			}
+			finally {
+				if (networkStream != null) {
+					networkStream.Close();
+				}
+				tcpClient.Close();
+			}
+		} //刷新用户信息
+
+		private void button9_Click(object sender, RoutedEventArgs e) {
+			double addvalue;
+			double currentvalue = RemainMoney;
+			bool canTurnPortToInt = double.TryParse(textBox.Text, out addvalue);
+			if (canTurnPortToInt == false || addvalue > 100000 || addvalue <= 0) {
+				MessageBox.Show("请输入正确的充值金额");
+				return;
+			}
+
+			TcpClient tcpClient = null;
+			NetworkStream networkStream = null;
+			try {
+				tcpClient = new TcpClient();
+				tcpClient.Connect(myIPAddress, LoginPort); //建立与服务器的连接
+				networkStream = tcpClient.GetStream();
+				if (networkStream.CanWrite) {
+					TTS_Core.InfoChangeDataPackage info = new TTS_Core.InfoChangeDataPackage(UserID, myIPAddress + ":" +
+						MyPort.ToString(), "server", 4, addvalue.ToString());
+					byte[] sendBytes = info.DataPackageToBytes(); //注册数据包转化为字节数组
+					networkStream.Write(sendBytes, 0, sendBytes.Length);
+				}
+				var newClient = tcpListener.AcceptTcpClient();
+				var bytes = ReadFromTcpClient(newClient); //获取数据
+				var package = new TTS_Core.DataPackage(bytes);
+				string message = package.Sender;
+				MessageBox.Show(message);
+				string[] infostr = package.Receiver.Split('\n');
+				this.Phone = infostr[0];
+				this.UserName = infostr[1];
+				this.RemainMoney = double.Parse(infostr[2]);
+				textBlock_Copy18.Text = infostr[0];
+				textBlock_Copy22.Text = infostr[1];
+				textBlock_Copy14.Text = infostr[2];
+			}
+			catch {
+				MessageBox.Show("无法连接到服务器!");
+				return;
+			}
+			finally {
+				if (networkStream != null) {
+					networkStream.Close();
+				}
+				tcpClient.Close();
+			}
+		} //充值
 	}
 }

@@ -244,7 +244,50 @@ namespace TTS_Server {
 								var package = new TTS_Core.QueryDataPackage(receiveBytes);
 							} //特定查询
 							break;
-
+						case TTS_Core.MESSAGETYPE.K_USER_INFO_CHANGE: {
+								var package = new TTS_Core.InfoChangeDataPackage(receiveBytes);
+								if (package.ChangeType == 1) {
+									UserInfo serverData = UserInfoSearch(package.Sender);
+									serverData.UserName = package.ChangeValue;
+									UserInfoUpdate(serverData);
+								} //更改昵称
+								else if (package.ChangeType == 2) {
+									UserInfo serverData = UserInfoSearch(package.Sender);
+									serverData.Phone = package.ChangeValue;
+									UserInfoUpdate(serverData);
+								} //更改手机号
+								else if (package.ChangeType == 3) {
+									UserInfo serverData = UserInfoSearch(package.Sender);
+									string query = serverData.Phone + "\n"
+										+ serverData.UserName + "\n" + serverData.Balance.ToString();
+									TcpClient tcpClient;
+									StateObject stateObject;
+									tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+									stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+									stateObject.tcpClient = tcpClient;
+									var data = new TTS_Core.DataPackage("用户信息刷新成功！", IPandPort, query);
+									stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+									tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+										new AsyncCallback(SentCallBackF), stateObject);
+								} //更新用户信息
+								else if (package.ChangeType == 4) {
+									UserInfo serverData = UserInfoSearch(package.Sender);
+									serverData.Balance = serverData.Balance + double.Parse(package.ChangeValue);
+									UserInfoUpdate(serverData);
+									string query = serverData.Phone + "\n"
+										+ serverData.UserName + "\n" + serverData.Balance.ToString();
+									TcpClient tcpClient;
+									StateObject stateObject;
+									tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+									stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+									stateObject.tcpClient = tcpClient;
+									var data = new TTS_Core.DataPackage("充值成功！", IPandPort, query);
+									stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+									tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+										new AsyncCallback(SentCallBackF), stateObject);
+								} //充值
+							} // 用户信息更新
+							break;
 					}
 				}
 				catch {

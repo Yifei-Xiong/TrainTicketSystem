@@ -65,6 +65,9 @@
     <Compile Include="BuyTicketWindow.xaml.cs">
       <DependentUpon>BuyTicketWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ChangeUserInfo.xaml.cs">
+      <DependentUpon>ChangeUserInfo.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LineSelect.xaml.cs">
       <DependentUpon>LineSelect.xaml</DependentUpon>
     </Compile>
@@ -76,6 +79,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BuyTicketWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChangeUserInfo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

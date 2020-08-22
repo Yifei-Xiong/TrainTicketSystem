@@ -16,8 +16,9 @@ namespace TTS_Core
         K_LOGIN_DATA_PACKAGE,  //登入数据包类
         K_REGISTER_DATA_PACKAGE,  //注册数据包类
         K_QUERY_DATA_PACKAGE,  //查询数据包类
-        K_TICKETQUERY_DATA_PACKAGE  //客户端向服务端发送的查询条件类
-    }
+        K_TICKETQUERY_DATA_PACKAGE,  //客户端向服务端发送的查询条件类
+		K_USER_INFO_CHANGE //用户信息修改数据包类
+	}
 
     //查询类别的枚举
     public enum QUERYTYPE
@@ -132,6 +133,34 @@ namespace TTS_Core
 		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
 		public string UserID { get; set; } //注册用户名
 		public string Password { get; set; } //注册密码
+	}
+
+	//更改用户信息数据包类，Type=K_USER_INFO_CHANGE
+	[Serializable]
+	public class InfoChangeDataPackage : DataPackage {
+		public InfoChangeDataPackage(byte[] Bytes) {
+			using (MemoryStream ms = new MemoryStream(Bytes)) {
+				IFormatter formatter = new BinaryFormatter();
+				InfoChangeDataPackage infoChangeDataPackage = formatter.Deserialize(ms) as InfoChangeDataPackage;
+				if (infoChangeDataPackage != null) {
+					this.ChangeType = infoChangeDataPackage.ChangeType;
+					this.ChangeValue = infoChangeDataPackage.ChangeValue;
+					this.Sender = infoChangeDataPackage.Sender;
+					this.Receiver = infoChangeDataPackage.Receiver;
+					this.sendTime = infoChangeDataPackage.sendTime;
+					this.IPandPort = infoChangeDataPackage.IPandPort;
+					this.MessageType = infoChangeDataPackage.MessageType;
+				}
+			}
+		} //构造函数 字节数组转化为数据包
+		public InfoChangeDataPackage(string sender, string IPandPort, string receiver, int ChangeType,
+			string ChangeValue) : base(sender, IPandPort, receiver) {
+			MessageType = MESSAGETYPE.K_USER_INFO_CHANGE;
+			this.ChangeType = ChangeType;
+			this.ChangeValue = ChangeValue;
+		} //构造函数 接受发送者,接收者字符串,登录用户名与密码
+		public int ChangeType { get; set; } //更改类型，1为更改用户昵称，2为更改手机号码
+		public string ChangeValue { get; set; } //更改字段
 	}
 
 	//查询数据包类，Type=K_QUERY_DATA_PACKAGE
