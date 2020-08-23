@@ -46,6 +46,7 @@ namespace TTS_Client
 
         public ManagerWindow_user(string user, IPAddress ip_address, int port, TcpListener tcp_listener, int listen_port)
         {
+            InitializeComponent();
             this.user = user;
             this.ip_address = ip_address;
             this.port = port;
@@ -61,6 +62,8 @@ namespace TTS_Client
 
         private void Button_query_Click(object sender, RoutedEventArgs e)
         {
+            DataView.Items.Clear();
+
             TcpClient tcpClient = null;
             NetworkStream networkStream = null;
             try
@@ -70,9 +73,15 @@ namespace TTS_Client
                 networkStream = tcpClient.GetStream();
                 if (networkStream.CanWrite)
                 {
-                    var package = new TTS_Core.UserOperationPackage(user, ip_address + ":" + port.ToString(), "server",
+                    float fBalance = 0;
+                    if (!float.TryParse(Text_balance.Text, out fBalance))
+                    {
+                        fBalance = -1;
+                    }
+
+                    var package = new TTS_Core.UserOperationPackage(user, ip_address + ":" + listen_port.ToString(), "server",
                         TTS_Core.UserOperationPackage.Enum_USER_OP.K_QUERY,
-                        Text_userId.Text, Text_accounttype.Text, Text_phone.Text, Text_username.Text, (float)Convert.ToDouble(Text_balance.Text));
+                        Text_userId.Text, Text_accounttype.Text, Text_phone.Text, Text_username.Text, fBalance);
                     byte[] sendBytes = package.DataPackageToBytes(); //注册数据包转化为字节数组
                     networkStream.Write(sendBytes, 0, sendBytes.Length);
 
@@ -149,7 +158,7 @@ namespace TTS_Client
                 networkStream = tcpClient.GetStream();
                 if (networkStream.CanWrite)
                 {
-                    var package = new TTS_Core.UserOperationPackage(user, ip_address + ":" + port.ToString(), "server",
+                    var package = new TTS_Core.UserOperationPackage(user, ip_address + ":" + listen_port.ToString(), "server",
                         TTS_Core.UserOperationPackage.Enum_USER_OP.K_DELETE,
                         selected_userid, "",
                         "", "", 0);
@@ -212,9 +221,15 @@ namespace TTS_Client
                 networkStream = tcpClient.GetStream();
                 if (networkStream.CanWrite)
                 {
-                    var package = new TTS_Core.UserOperationPackage(user, ip_address + ":" + port.ToString(), "server",
+                    float fBalance = 0;
+                    if (!float.TryParse(Text_balance_Copy.Text, out fBalance))
+                    {
+                        fBalance = -1;
+                    }
+
+                    var package = new TTS_Core.UserOperationPackage(user, ip_address + ":" + listen_port.ToString(), "server",
                         TTS_Core.UserOperationPackage.Enum_USER_OP.K_MODIFY,
-                        itemInfo.userid, Text_accounttype_Copy.Text, Text_phone_Copy.Text, Text_username_Copy.Text, (float)Convert.ToDouble(Text_balance_Copy.Text));
+                        itemInfo.userid, Text_accounttype_Copy.Text, Text_phone_Copy.Text, Text_username_Copy.Text, fBalance);
 
                     byte[] sendBytes = package.DataPackageToBytes(); //注册数据包转化为字节数组
                     networkStream.Write(sendBytes, 0, sendBytes.Length);
