@@ -283,8 +283,8 @@ namespace TTS_Client {
         } //不在主线程执行
 
         private void Button_Click(object sender, RoutedEventArgs e) {
-			//LineSelect lineSelect = new LineSelect();
-			//lineSelect.ShowDialog();
+			LineSelect lineSelect = new LineSelect();
+			lineSelect.ShowDialog();
         }
     }
 }

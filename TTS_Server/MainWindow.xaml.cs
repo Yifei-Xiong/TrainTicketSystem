@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -318,6 +320,98 @@ namespace TTS_Server {
 								} //充值
 							} // 用户信息更新
 							break;
+						case TTS_Core.MESSAGETYPE.K_USER_OPERATION_PACKAGE:
+                            {
+								var package = new TTS_Core.UserOperationPackage(receiveBytes);
+								string command = "";
+								switch (package.opType)
+                                {
+									case TTS_Core.UserOperationPackage.Enum_USER_OP.K_DELETE:
+                                        {
+											command = "DELETE FROM alluser WHERE userid=\"" + package.UserID +  "\"";
+                                        }
+                                        break;
+                                    case TTS_Core.UserOperationPackage.Enum_USER_OP.K_MODIFY:
+                                        {
+											command = "UPDATE alluser SET " +
+														   "accounttype=\"" + package.Accounttype + "\" " + 
+														   "phone=\"" + package.Phone + "\" " +
+														   "username=\"" + package.Username + "\" " + 
+														   "balance=\"" + package.Balance + "\" " + 
+														   "WHERE userid=\"" + package.UserID + "\"";
+                                        }
+                                        break;
+                                    case TTS_Core.UserOperationPackage.Enum_USER_OP.K_QUERY:
+                                        {
+											command = "SELECT * FROM alluser";
+
+											bool first = false;
+                                            if (package.UserID != "")
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+                                                command += " userid=\"" + package.UserID + "\"";
+                                            }
+
+                                            if (package.Accounttype != "")
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+                                                command += " accounttype=\"" + package.Accounttype + "\"";
+                                            }
+
+                                            if (package.Phone != "")
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+                                                command += " phone=\"" + package.Phone + "\"";
+                                            }
+
+                                            if (package.Username != "")
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+                                                command += " username=\"" + package.Username + "\"";
+                                            }
+
+                                            if (package.Balance >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+                                                command += " balance>=\"" + package.Balance + "\"";
+                                            }
+                                        }
+                                        break;
+								}
+
+								DataSet result = GetSQLResult(command);
+								var sendBackPackage = new TTS_Core.DataSetPackage("server", IPandPort, package.Sender, result == null ? 1 : 0, result.Tables[0].Rows.Count, result.Tables[0].Columns.Count, result);
+
+                                TcpClient tcpClient;
+                                StateObject stateObject;
+                                tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+                                stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+                                stateObject.tcpClient = tcpClient;
+                                stateObject.buffer = sendBackPackage.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+                                tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+                                    new AsyncCallback(SentCallBackF), stateObject);
+                            }
+                            break;
 					}
 				}
 				catch {
@@ -325,8 +419,37 @@ namespace TTS_Server {
 			}
 		}
 
-		//从TcpClient对象中读出未知长度的字节数组
-		public byte[] ReadFromTcpClient(TcpClient tcpClient) {
+		public DataSet GetSQLResult(string command)
+        {
+            if (connection == null || connection.State != System.Data.ConnectionState.Open)
+            {
+                InitSQLDocker();
+            } //若不曾连接到数据库，则进行连接
+
+			try
+			{
+                DataSet ds = new DataSet();//DataSet对象
+                if (command[0] == 'S')
+				{
+					MySqlDataAdapter adptr = new MySqlDataAdapter(command, connection);//Adepter对象
+					adptr.Fill(ds);//填充DataSet 并为当前表命名
+				} 
+				else
+                {
+
+                    MySqlCommand query = new MySqlCommand(command, connection);
+                    query.ExecuteNonQuery();
+                }
+                return ds;
+            }
+            catch
+            {
+				return null;
+            }
+        }
+
+        //从TcpClient对象中读出未知长度的字节数组
+        public byte[] ReadFromTcpClient(TcpClient tcpClient) {
 			List<byte> data = new List<byte>();
 			NetworkStream netStream = null;
 			byte[] bytes = new byte[tcpClient.ReceiveBufferSize]; //字节数组保存接收到的数据
