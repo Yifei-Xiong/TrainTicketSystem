@@ -178,7 +178,7 @@ namespace TTS_Core
 					this.MessageType = queryPackage.MessageType;
 					this.IPandPort = queryPackage.IPandPort;
 					this.QueryType = queryPackage.QueryType;
-					this.ExtraMsg = ExtraMsg;
+					this.ExtraMsg = queryPackage.ExtraMsg;
 				}
 			}
 		} //构造函数 字节数组转化为数据包

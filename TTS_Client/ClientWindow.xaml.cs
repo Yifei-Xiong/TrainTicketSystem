@@ -264,18 +264,6 @@ namespace TTS_Client {
 				lineSelect.ShowDialog();
 			}
 
-
-
-				bool NeedChangeLine = false; //是否需要换乘
-			if (NeedChangeLine) {
-				//LineSelect lineSelect = new LineSelect(ticketQueryInfo);
-				//lineSelect.ShowDialog();
-			} //需要换乘，进入换乘方案选择窗口
-			else {
-				//BuyTicketWindow buyTicketWindow = new BuyTicketWindow(ticketQueryInfo);
-				//buyTicketWindow.ShowDialog();
-				//allBuyTicket.Add(buyTicketWindow.selectTicket);
-			} //不需要换乘，进入购票窗口
 		}
 
 
@@ -299,17 +287,23 @@ namespace TTS_Client {
             stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
             tcpClient.BeginConnect(myIPAddress, LoginPort, new AsyncCallback(SentCallBackF), stateObject); //异步连接
 
-            //弹出地点信息窗口
-            allStationInfo.Clear();  //清空信息
-            StationInfo stationInfo = new StationInfo();
-            stationInfo.StationName = "加载中...";
-            allStationInfo.Add(stationInfo);
-            LocationSelect locationSelect = new LocationSelect("请选择到达地点", allStationInfo);
+			//弹出地点信息窗口
+			allStationInfo.Clear();  //清空信息
+			var newClient = tcpListener.AcceptTcpClient();
+			var bytes = ReadFromTcpClient(newClient); //获取数据
+			var package = new TTS_Core.QueryDataPackage(bytes);
+			string[] ExtraMsg = package.Sender.Split('\r');
+			int Count = ExtraMsg.Length;
+			StationInfo stationInfo = new StationInfo();
+			for (int i = 0; i < Count-1; i++) {
+				stationInfo.StationNumber = int.Parse(ExtraMsg[i].Split('\n')[0]);
+				stationInfo.StationName = ExtraMsg[i].Split('\n')[1];
+				stationInfo.LineName = ExtraMsg[i].Split('\n')[2];
+				allStationInfo.Add(stationInfo);
+			}
+			LocationSelect locationSelect = new LocationSelect("请选择出发地点", allStationInfo);
 			locationSelect.ShowDialog();
 			if (locationSelect.StationName != null) {
-				if (locationSelect.StationName == "加载中...") {
-					return;
-				}
 				textBlock_Copy7.Text = locationSelect.StationName + " (" + locationSelect.StationNumber.ToString() + ")";
 				ticketQueryInfo.LeaveStationNumber = locationSelect.StationNumber;
 				ticketQueryInfo.LeaveStationName = locationSelect.StationName;
@@ -332,10 +326,22 @@ namespace TTS_Client {
 
             //弹出地点信息窗口
             allStationInfo.Clear();  //清空信息
-            StationInfo stationInfo = new StationInfo();
-            stationInfo.StationName = "加载中...";
-            allStationInfo.Add(stationInfo);
-            LocationSelect locationSelect = new LocationSelect("请选择出发地点", allStationInfo);
+			var newClient = tcpListener.AcceptTcpClient();
+			var bytes = ReadFromTcpClient(newClient); //获取数据
+			var package = new TTS_Core.QueryDataPackage(bytes);
+			string[] ExtraMsg = package.Sender.Split('\r');
+			int Count = ExtraMsg.Length;
+			StationInfo stationInfo = new StationInfo();
+			for (int i=0; i<Count-1;i++) {
+				string debuga = ExtraMsg[i];
+				string[] debugc = ExtraMsg[i].Split('\n');
+				string debugb = ExtraMsg[i].Split('\n')[0];
+				stationInfo.StationNumber = int.Parse(ExtraMsg[i].Split('\n')[0]);
+				stationInfo.StationName = ExtraMsg[i].Split('\n')[1];
+				stationInfo.LineName = ExtraMsg[i].Split('\n')[2];
+				allStationInfo.Add(stationInfo);
+			}
+			LocationSelect locationSelect = new LocationSelect("请选择出发地点", allStationInfo);
 			locationSelect.ShowDialog();
 			if (locationSelect.StationName != null) {
 				textBlock_Copy2.Text = locationSelect.StationName + " (" + locationSelect.StationNumber.ToString() + ")";

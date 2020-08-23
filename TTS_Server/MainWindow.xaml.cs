@@ -247,6 +247,30 @@ namespace TTS_Server {
 									case TTS_Core.QUERYTYPE.K_BUYTICKET_QUERY: {
 											buy_ticket_query(package.IPandPort, package.ExtraMsg.Split('\n')[0], package.ExtraMsg.Split('\n')[1]);
 										} break;
+									case TTS_Core.QUERYTYPE.K_DEPARTURE_STATION: {
+											string DepMsg = GetEnterStation();
+											TcpClient tcpClient;
+											StateObject stateObject;
+											tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+											stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+											stateObject.tcpClient = tcpClient;
+											var data = new TTS_Core.QueryDataPackage(DepMsg, package.IPandPort, package.Sender, TTS_Core.QUERYTYPE.K_DEPARTURE_STATION, "");
+											stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+											tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+												new AsyncCallback(SentCallBackF), stateObject);
+										} break;
+									case TTS_Core.QUERYTYPE.K_ARRIVAL_STATION: {
+											string DepMsg = GetEnterStation();
+											TcpClient tcpClient;
+											StateObject stateObject;
+											tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+											stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+											stateObject.tcpClient = tcpClient;
+											var data = new TTS_Core.QueryDataPackage(DepMsg, package.IPandPort, package.Sender, TTS_Core.QUERYTYPE.K_DEPARTURE_STATION, "");
+											stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+											tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+												new AsyncCallback(SentCallBackF), stateObject);
+										} break;
 								}
 							} //特定查询
 							break;
@@ -525,8 +549,8 @@ namespace TTS_Server {
 					MySqlDataReader reader = sql1.ExecuteReader();
 					while (reader.Read()) {
 						OutList1_1.Add(reader[0].ToString());
-						OutList1_2.Add(reader[0].ToString());
-						OutList1_3.Add(reader[0].ToString());
+						OutList1_2.Add(reader[1].ToString());
+						OutList1_3.Add(reader[2].ToString());
 					}
 					reader.Close();
 				}
@@ -538,7 +562,8 @@ namespace TTS_Server {
 					for (int i = 0; i < OutList1_1.Count; i++) {
 						ExtraMsg = ExtraMsg + OutList1_1[i] + "\n" + LineNameQuery(OutList1_1[i]) + "\n" +
 							OutList1_2[i] + "\n" + StationNameQuery(OutList1_2[i]) + "\n" +
-							OutList1_3[i] + "\n" + LineNameQuery(OutList1_3[i]) + "\n" +
+							OutList1_3[i] + "\n" + LineNameQuery(OutList1_3[i]) + "\n";
+						ExtraMsg = ExtraMsg +
 							(int.Parse(StationOrderQuery(OutList1_1[i], EnterID, OutList1_2[i])) + int.Parse(StationOrderQuery(OutList1_3[i], OutList1_2[i], LeaveID))).ToString() + "\n" +
 							(TimeQuery(OutList1_1[i], EnterID, OutList1_2[i]).AddTicks(TimeQuery(OutList1_3[i], OutList1_2[i], LeaveID).Ticks)).ToString() + "\n" +
 							(TicketPriceQuery(OutList1_1[i], EnterID, OutList1_2[i]) + TicketPriceQuery(OutList1_3[i], OutList1_2[i], LeaveID)).ToString() + "\r";
@@ -576,10 +601,10 @@ namespace TTS_Server {
 						MySqlDataReader reader = sql2.ExecuteReader();
 						while (reader.Read()) {
 							OutList2_1.Add(reader[0].ToString());
-							OutList2_2.Add(reader[0].ToString());
-							OutList2_3.Add(reader[0].ToString());
-							OutList2_4.Add(reader[0].ToString());
-							OutList2_5.Add(reader[0].ToString());
+							OutList2_2.Add(reader[1].ToString());
+							OutList2_3.Add(reader[2].ToString());
+							OutList2_4.Add(reader[3].ToString());
+							OutList2_5.Add(reader[4].ToString());
 						}
 						reader.Close();
 					}
@@ -624,10 +649,10 @@ namespace TTS_Server {
 						MySqlDataReader reader = sql2.ExecuteReader();
 						while (reader.Read()) {
 							OutList2_1.Add(reader[0].ToString());
-							OutList2_2.Add(reader[0].ToString());
-							OutList2_3.Add(reader[0].ToString());
-							OutList2_4.Add(reader[0].ToString());
-							OutList2_5.Add(reader[0].ToString());
+							OutList2_2.Add(reader[1].ToString());
+							OutList2_3.Add(reader[2].ToString());
+							OutList2_4.Add(reader[3].ToString());
+							OutList2_5.Add(reader[4].ToString());
 						}
 						reader.Close();
 					}
@@ -733,6 +758,21 @@ namespace TTS_Server {
 			}
 			catch { }
 			return ret;
+		}
+
+		private string GetEnterStation() {
+			string info = "";
+			MySqlCommand sql = new MySqlCommand("SELECT B.stationid, B.stationname, A.linename FROM line A, " +
+				"station B, stationline C WHERE A.lineid=C.lineid and B.stationid=C.stationid order by linename;", connection);
+			try {
+				MySqlDataReader reader = sql.ExecuteReader();
+				while (reader.Read()) {
+					info = info + reader[0].ToString() + "\n" + reader[1].ToString() + "\n" + reader[2].ToString() + "\r";
+				}
+				reader.Close();
+			}
+			catch { }
+			return info;
 		}
 	}
 }

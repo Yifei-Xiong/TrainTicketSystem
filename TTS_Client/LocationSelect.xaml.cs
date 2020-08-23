@@ -39,7 +39,7 @@ namespace TTS_Client
 				allStation.Add(source[i]);
 			} //Copy
 			listView.ItemsSource = this.allStation;
-			listView.Items.SortDescriptions.Add(new SortDescription("StationNumber", ListSortDirection.Ascending));
+			listView.Items.SortDescriptions.Add(new SortDescription("LineName", ListSortDirection.Ascending));
 		}
 
 		private void Button2_Click(object sender, RoutedEventArgs e) {

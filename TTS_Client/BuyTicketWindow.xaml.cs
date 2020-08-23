@@ -29,6 +29,9 @@ namespace TTS_Client
 			canBuyTicket = SubmitTicketQuery(ticketQueryInfo);
 			listView.ItemsSource = canBuyTicket;
 			IsBuy = false;
+			textBlock4.Text = ticketQueryInfo.EnterStationName;
+			textBlock5.Text = ticketQueryInfo.LeaveStationName;
+			textBlock6.Text = ticketQueryInfo.LineName;
 		}
 
 		public ClientWindow.TicketQueryInfo ticketQueryInfo;
@@ -224,6 +227,8 @@ namespace TTS_Client
 			selectTicket = new ClientWindow.BuyTicket();
 			selectTicket = (ClientWindow.BuyTicket)listView.SelectedItem;
 			selectTicket.BuyNumber = BuyNumber;
+
+
 			Close();
 		} //购买
 
