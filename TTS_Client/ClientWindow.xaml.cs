@@ -236,6 +236,7 @@ namespace TTS_Client {
 				if (Msg.Split('\n')[1] == "1") {
 					//无需换乘，一种路线
 					ticketQueryInfo.Line = int.Parse(Msg.Split('\n')[2]);
+					ticketQueryInfo.LineName = Msg.Split('\n')[3];
 					BuyTicketWindow buyTicketWindow = new BuyTicketWindow(ticketQueryInfo);
 					buyTicketWindow.ShowDialog();
 					allBuyTicket.Add(buyTicketWindow.selectTicket);
@@ -303,6 +304,10 @@ namespace TTS_Client {
 			}
 			LocationSelect locationSelect = new LocationSelect("请选择出发地点", allStationInfo);
 			locationSelect.ShowDialog();
+			if (locationSelect.StationName == ticketQueryInfo.EnterStationName) {
+				MessageBox.Show("到达地点不能和到达地点相同！");
+				return;
+			}
 			if (locationSelect.StationName != null) {
 				textBlock_Copy7.Text = locationSelect.StationName + " (" + locationSelect.StationNumber.ToString() + ")";
 				ticketQueryInfo.LeaveStationNumber = locationSelect.StationNumber;
@@ -343,6 +348,10 @@ namespace TTS_Client {
 			}
 			LocationSelect locationSelect = new LocationSelect("请选择出发地点", allStationInfo);
 			locationSelect.ShowDialog();
+			if (locationSelect.StationName == ticketQueryInfo.LeaveStationName) {
+				MessageBox.Show("出发地点不能和到达地点相同！");
+				return;
+			}
 			if (locationSelect.StationName != null) {
 				textBlock_Copy2.Text = locationSelect.StationName + " (" + locationSelect.StationNumber.ToString() + ")";
 				ticketQueryInfo.EnterStationNumber = locationSelect.StationNumber;

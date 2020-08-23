@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="地点选择" Height="342.713" Width="274.997" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
-        <ListView x:Name="listView" HorizontalAlignment="Left" Height="207" Margin="10,70,0,0" VerticalAlignment="Top" Width="249" SelectionMode="Single">
+        <ListView x:Name="listView" HorizontalAlignment="Left" Height="207" Margin="10,70,0,0" VerticalAlignment="Top" Width="249" SelectionMode="Single" MouseDoubleClick="listView_MouseDoubleClick">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="车站编号" Width="80" DisplayMemberBinding="{Binding StationNumber}"/>

@@ -126,5 +126,9 @@ namespace TTS_Client
 			StationName = info.StationName;
 			Close();
 		}
+
+		private void listView_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+			button_Click(sender, e);
+		}
 	}
 }

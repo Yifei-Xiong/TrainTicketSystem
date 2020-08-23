@@ -321,7 +321,6 @@ namespace TTS_Server {
 					}
 				}
 				catch {
-					break;
 				}
 			}
 		}
@@ -507,7 +506,7 @@ namespace TTS_Server {
 			}
 			catch { }
 			if (OutList.Count == 1) {
-				string ExtraMsg = "0" + "\n" + "1" + "\n" + OutList[0];
+				string ExtraMsg = "0" + "\n" + "1" + "\n" + OutList[0] + "\n" + LineNameQuery(OutList[0]);
 				TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
 				StateObject stateObject = new StateObject(); //每次发送建立一个StateObject类对象
 				stateObject.tcpClient = tcpClient;
@@ -584,7 +583,7 @@ namespace TTS_Server {
 							OutList1_3[i] + "\n" + LineNameQuery(OutList1_3[i]) + "\n" +
 							(int.Parse(StationOrderQuery(OutList1_1[i], EnterID, OutList1_2[i])) + int.Parse(StationOrderQuery(OutList1_3[i], OutList1_2[i], LeaveID))).ToString() + "\n" +
 							(TimeQuery(OutList1_1[i], EnterID, OutList1_2[i]).AddTicks(TimeQuery(OutList1_3[i], OutList1_2[i], LeaveID).Ticks)).ToString() + "\n" +
-							(TicketPriceQuery(OutList1_1[i], EnterID, OutList1_2[i])+ TicketPriceQuery(OutList1_3[i], OutList1_2[i], LeaveID)).ToString();
+							(TicketPriceQuery(OutList1_1[i], EnterID, OutList1_2[i])+ TicketPriceQuery(OutList1_3[i], OutList1_2[i], LeaveID)).ToString() + "\r";
 					} // lineid linename stationid stationname lineid linename order time price
 
 					ExtraMsg = ExtraMsg + "\\";
@@ -593,10 +592,10 @@ namespace TTS_Server {
 					List<string> OutList2_3 = new List<string>();
 					List<string> OutList2_4 = new List<string>();
 					List<string> OutList2_5 = new List<string>();
-					MySqlCommand sql2 = new MySqlCommand("SELECT A.lineid, B.stationid, C.lineid FROM stationline A, stationline B, " +
-						"stationline C, stationline D WHERE A.stationid=" + EnterID + " AND A.lineid=B.lineid AND A.stationid<>B.stationid " +
-						"AND B.stationid=C.stationid AND B.lineid<>C.lineid AND C.lineid=D.lineid AND C.stationid<>D.stationid AND" +
-						" D.stationid=" + LeaveID, connection);
+					MySqlCommand sql2 = new MySqlCommand("SELECT A.lineid, B.stationid, C.lineid, D.stationid, E.lineid FROM stationline A, " +
+						"stationline B, stationline C, stationline D, stationline E, stationline F WHERE A.stationid=" + EnterID +" AND A.lineid=B.lineid " +
+						"AND A.stationid<>B.stationid AND B.stationid=C.stationid AND B.lineid<>C.lineid AND C.lineid=D.lineid AND C.stationid<>D.stationid AND " +
+						"D.stationid=E.stationid AND D.lineid<>E.lineid AND E.lineid=F.lineid AND E.stationid<>F.stationid AND F.stationid=" + LeaveID, connection);
 					try {
 						MySqlDataReader reader = sql2.ExecuteReader();
 						while (reader.Read()) {
@@ -625,7 +624,7 @@ namespace TTS_Server {
 							TimeQuery(OutList2_5[i], OutList2_4[i], LeaveID).Ticks)).ToString() + "\n" +
 							(TicketPriceQuery(OutList2_1[i], EnterID, OutList2_2[i]) +
 							TicketPriceQuery(OutList2_3[i], OutList2_2[i], OutList2_4[i]) +
-							TicketPriceQuery(OutList2_5[i], OutList2_4[i], LeaveID)).ToString();
+							TicketPriceQuery(OutList2_5[i], OutList2_4[i], LeaveID)).ToString() + "\r";
 					}
 
 					TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
@@ -641,10 +640,10 @@ namespace TTS_Server {
 					List<string> OutList2_3 = new List<string>();
 					List<string> OutList2_4 = new List<string>();
 					List<string> OutList2_5 = new List<string>();
-					MySqlCommand sql2 = new MySqlCommand("SELECT A.lineid, B.stationid, C.lineid FROM stationline A, stationline B, " +
-						"stationline C, stationline D WHERE A.stationid=" + EnterID + " AND A.lineid=B.lineid AND A.stationid<>B.stationid " +
-						"AND B.stationid=C.stationid AND B.lineid<>C.lineid AND C.lineid=D.lineid AND C.stationid<>D.stationid AND" +
-						" D.stationid=" + LeaveID, connection);
+					MySqlCommand sql2 = new MySqlCommand("SELECT A.lineid, B.stationid, C.lineid, D.stationid, E.lineid FROM stationline A, " +
+						"stationline B, stationline C, stationline D, stationline E, stationline F WHERE A.stationid=" + EnterID + " AND A.lineid=B.lineid " +
+						"AND A.stationid<>B.stationid AND B.stationid=C.stationid AND B.lineid<>C.lineid AND C.lineid=D.lineid AND C.stationid<>D.stationid AND " +
+						"D.stationid=E.stationid AND D.lineid<>E.lineid AND E.lineid=F.lineid AND E.stationid<>F.stationid AND F.stationid=" + LeaveID, connection);
 					try {
 						MySqlDataReader reader = sql2.ExecuteReader();
 						while (reader.Read()) {
@@ -673,7 +672,7 @@ namespace TTS_Server {
 							TimeQuery(OutList2_5[i], OutList2_4[i], LeaveID).Ticks)).ToString() + "\n" +
 							(TicketPriceQuery(OutList2_1[i], EnterID, OutList2_2[i])+
 							TicketPriceQuery(OutList2_3[i], OutList2_2[i], OutList2_4[i])+
-							TicketPriceQuery(OutList2_5[i], OutList2_4[i], LeaveID)).ToString();
+							TicketPriceQuery(OutList2_5[i], OutList2_4[i], LeaveID)).ToString() + "\r";
 					} // lineid linename stationid stationname lineid linename stationid stationname lineid linename order time price
 					TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
 					StateObject stateObject = new StateObject(); //每次发送建立一个StateObject类对象
@@ -687,20 +686,26 @@ namespace TTS_Server {
 		} //实现线路的查询
 
 		private DateTime TimeQuery(string lineID, string EnterID, string LeaveID) {
-			MySqlCommand sql = new MySqlCommand("SELECT B.arrivetime-A.leavetime FROM trainstation A, trainstation B, train C WHERE " +
-				"A.trainid=B.trainid AND B.arrivetime>A.leavetime AND A.stationid="+EnterID+" AND B.stationid="+LeaveID+
+			MySqlCommand sql = new MySqlCommand("SELECT B.arrivetime,A.arrivetime FROM trainstation A, trainstation B, train C WHERE " +
+				"A.trainid=B.trainid AND B.arrivetime>A.arrivetime AND A.stationid="+EnterID+" AND B.stationid="+LeaveID+
 				" AND B.trainid=C.trainid AND C.lineid=" + lineID, connection);
-			string time = null;
+			string time1 = null;
+			string time2 = null;
 			try {
 				MySqlDataReader reader = sql.ExecuteReader();
 				while (reader.Read()) {
-					time = reader[0].ToString();
+					time1 = reader[0].ToString();
+					time2 = reader[1].ToString();
 				}
 				reader.Close();
 			}
 			catch { }
-			return DateTime.Parse(time) ;
+			if (time1==null || time2==null) {
+				return DateTime.Parse("0001-01-01 00:00:00");
+			}
+			return DateTime.Parse(time1).AddTicks(-DateTime.Parse(time2).Ticks);
 		}
+
 		private string StationOrderQuery(string lineID, string EnterID, string LeaveID) {
 			MySqlCommand sql = new MySqlCommand("SELECT ABS(B.stationorder-A.stationorder) FROM stationline A, stationline B WHERE " +
 				"A.lineid=B.lineid AND B.lineid=" + lineID + " AND A.stationid=" + EnterID + " AND B.stationid=" + LeaveID, connection);
@@ -715,6 +720,7 @@ namespace TTS_Server {
 			catch { }
 			return order;
 		}
+
 		private string StationNameQuery(string stationID) {
 			MySqlCommand sql = new MySqlCommand("SELECT stationname from station where stationid="+stationID, connection);
 			string name = null;
@@ -745,7 +751,7 @@ namespace TTS_Server {
 
 		private double TicketPriceQuery(string lineID, string EnterID, string LeaveID) {
 			MySqlCommand sql = new MySqlCommand("SELECT ticketprice FROM ticketprice WHERE enterstationid=" + EnterID 
-				+ " AND leavestationid=" + "LeaveID", connection);
+				+ " AND leavestationid=" + LeaveID + " AND lineid=" + lineID, connection);
 			string price = null;
 			double ret = 0;
 			try {

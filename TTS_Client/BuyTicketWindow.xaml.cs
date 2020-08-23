@@ -49,7 +49,7 @@ namespace TTS_Client
 			textBox_tic6.Clear();
 			textBox_tic7.Clear();
 			checkBox_remain.IsChecked = true;
-			precision.IsChecked = true;
+			precision.IsChecked = false;
 			textBox.Text = "1";
 			listView.ItemsSource = canBuyTicket;
 		} //清空

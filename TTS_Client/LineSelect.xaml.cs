@@ -195,9 +195,50 @@ namespace TTS_Client
 			}
 			if (allinfo.Count==0) {
 				MessageBox.Show("查询失败，可能是路线过于复杂");
-				Close();
             }
+
+			int minchangtimes = allinfo[0].ChangeTimes;
+			double minpay = allinfo[0].TotalPrice;
+			double mintime = allinfo[0]._totalTime.Ticks;
+			int minorder = allinfo[0].TotalOrder;
+			for (int i = 0; i < allinfo.Count; i++) {
+				if (allinfo[i].ChangeTimes < minchangtimes) {
+					minchangtimes = allinfo[i].ChangeTimes;
+				}
+				if (allinfo[i].TotalPrice < minpay) {
+					minpay = allinfo[i].TotalPrice;
+				}
+				if (allinfo[i]._totalTime.Ticks < mintime) {
+					mintime = allinfo[i]._totalTime.Ticks;
+				}
+				if (allinfo[i].TotalOrder < minorder) {
+					minorder = allinfo[i].TotalOrder;
+				}
+			}
+			for (int i = 0; i < allinfo.Count; i++) {
+				if (allinfo[i].ChangeTimes == minchangtimes) {
+					Info info = allinfo[i];
+					info.Note = info.Note + " 换乘次数最少 ";
+					allinfo[i] = info;
+				}
+				if (allinfo[i].TotalPrice == minpay) {
+					Info info = allinfo[i];
+					info.Note = allinfo[i].Note + " 车票总价最少 ";
+					allinfo[i] = info;
+				}
+				if (allinfo[i]._totalTime.Ticks == mintime) {
+					Info info = allinfo[i];
+					info.Note = allinfo[i].Note + " 乘坐耗时最少 ";
+					allinfo[i] = info;
+				}
+				if (allinfo[i].TotalOrder == minorder) {
+					Info info = allinfo[i];
+					info.Note = allinfo[i].Note + " 经过站数最少 ";
+					allinfo[i] = info;
+				}
+			}
 		}
+
 		private void debug_program () {
 			allinfo = new AllInfo();
 			listview.ItemsSource = allinfo;
