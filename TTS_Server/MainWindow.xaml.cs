@@ -47,12 +47,6 @@ namespace TTS_Server {
 			public double Balance { get; set; } //用户余额
 		} //用户信息
 
-		public struct ChangeLineInfo {
-			public int Changetimes { get; set; } //换乘次数
-			public string IDinfo { get; set; }
-			public string Nameinfo { get; set; }
-        }
-
 		public class StateObject {
 			public TcpClient tcpClient = null;
 			public NetworkStream netstream = null;
@@ -504,11 +498,12 @@ namespace TTS_Server {
 				for (int i = 0; i < OutList.Count; i++) {
 					ExtraMsg = ExtraMsg + OutList[i] + "\n";
 				} // 0 \n 2 \r startID \n startName \n endID \n endName \r 2 \n 7 \n \r line2name \n line2order \n
-				  // line2time \n line7name \n line7order \n line7time \n
+				  // line2time \n line2price \r line7name \n line7order \n line7time \n line7price \n
 				ExtraMsg = ExtraMsg + "\r";
 				for (int i = 0; i < OutList.Count; i++) {
 					ExtraMsg = ExtraMsg + LineNameQuery(OutList[i]) + "\n" + StationOrderQuery(OutList[i], EnterID, LeaveID)
-						+ "\n" + TimeQuery(OutList[i], EnterID, LeaveID).ToString() + "\n";
+						+ "\n" + TimeQuery(OutList[i], EnterID, LeaveID).ToString() + "\n" 
+						+ TicketPriceQuery(OutList[i], EnterID, LeaveID).ToString() + "\r";
 				}
 				TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
 				StateObject stateObject = new StateObject(); //每次发送建立一个StateObject类对象
@@ -545,8 +540,9 @@ namespace TTS_Server {
 							OutList1_2[i] + "\n" + StationNameQuery(OutList1_2[i]) + "\n" +
 							OutList1_3[i] + "\n" + LineNameQuery(OutList1_3[i]) + "\n" +
 							(int.Parse(StationOrderQuery(OutList1_1[i], EnterID, OutList1_2[i])) + int.Parse(StationOrderQuery(OutList1_3[i], OutList1_2[i], LeaveID))).ToString() + "\n" +
-							(TimeQuery(OutList1_1[i], EnterID, OutList1_2[i]).AddTicks(TimeQuery(OutList1_3[i], OutList1_2[i], LeaveID).Ticks)).ToString();
-					} // lineid linename stationid stationname lineid linename order time
+							(TimeQuery(OutList1_1[i], EnterID, OutList1_2[i]).AddTicks(TimeQuery(OutList1_3[i], OutList1_2[i], LeaveID).Ticks)).ToString() + "\n" +
+							(TicketPriceQuery(OutList1_1[i], EnterID, OutList1_2[i]) + TicketPriceQuery(OutList1_3[i], OutList1_2[i], LeaveID)).ToString() + "\r";
+					} // lineid linename stationid stationname lineid linename order time price
 					TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
 					StateObject stateObject = new StateObject(); //每次发送建立一个StateObject类对象
 					stateObject.tcpClient = tcpClient;
@@ -562,8 +558,9 @@ namespace TTS_Server {
 							OutList1_2[i] + "\n" + StationNameQuery(OutList1_2[i]) + "\n" +
 							OutList1_3[i] + "\n" + LineNameQuery(OutList1_3[i]) + "\n" +
 							(int.Parse(StationOrderQuery(OutList1_1[i], EnterID, OutList1_2[i])) + int.Parse(StationOrderQuery(OutList1_3[i], OutList1_2[i], LeaveID))).ToString() + "\n" +
-							(TimeQuery(OutList1_1[i], EnterID, OutList1_2[i]).AddTicks(TimeQuery(OutList1_3[i], OutList1_2[i], LeaveID).Ticks)).ToString();
-					} // lineid linename stationid stationname lineid linename order time
+							(TimeQuery(OutList1_1[i], EnterID, OutList1_2[i]).AddTicks(TimeQuery(OutList1_3[i], OutList1_2[i], LeaveID).Ticks)).ToString() + "\n" +
+							(TicketPriceQuery(OutList1_1[i], EnterID, OutList1_2[i])+ TicketPriceQuery(OutList1_3[i], OutList1_2[i], LeaveID)).ToString();
+					} // lineid linename stationid stationname lineid linename order time price
 
 					ExtraMsg = ExtraMsg + "\\";
 					List<string> OutList2_1 = new List<string>();
@@ -600,7 +597,10 @@ namespace TTS_Server {
 							int.Parse(StationOrderQuery(OutList2_5[i], OutList2_4[i], LeaveID))).ToString() + "\n" +
 							(TimeQuery(OutList2_1[i], EnterID, OutList2_2[i])
 							.AddTicks(TimeQuery(OutList2_3[i], OutList2_2[i], OutList2_4[i]).Ticks +
-							TimeQuery(OutList2_5[i], OutList2_4[i], LeaveID).Ticks)).ToString();
+							TimeQuery(OutList2_5[i], OutList2_4[i], LeaveID).Ticks)).ToString() + "\n" +
+							(TicketPriceQuery(OutList2_1[i], EnterID, OutList2_2[i]) +
+							TicketPriceQuery(OutList2_3[i], OutList2_2[i], OutList2_4[i]) +
+							TicketPriceQuery(OutList2_5[i], OutList2_4[i], LeaveID)).ToString();
 					}
 
 					TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
@@ -645,8 +645,11 @@ namespace TTS_Server {
 							int.Parse(StationOrderQuery(OutList2_5[i], OutList2_4[i], LeaveID))).ToString() + "\n" +
 							(TimeQuery(OutList2_1[i], EnterID, OutList2_2[i])
 							.AddTicks(TimeQuery(OutList2_3[i], OutList2_2[i], OutList2_4[i]).Ticks +
-							TimeQuery(OutList2_5[i], OutList2_4[i], LeaveID).Ticks)).ToString();
-					} // lineid linename stationid stationname lineid linename stationid stationname lineid linename order time
+							TimeQuery(OutList2_5[i], OutList2_4[i], LeaveID).Ticks)).ToString() + "\n" +
+							(TicketPriceQuery(OutList2_1[i], EnterID, OutList2_2[i])+
+							TicketPriceQuery(OutList2_3[i], OutList2_2[i], OutList2_4[i])+
+							TicketPriceQuery(OutList2_5[i], OutList2_4[i], LeaveID)).ToString();
+					} // lineid linename stationid stationname lineid linename stationid stationname lineid linename order time price
 					TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
 					StateObject stateObject = new StateObject(); //每次发送建立一个StateObject类对象
 					stateObject.tcpClient = tcpClient;
@@ -713,6 +716,23 @@ namespace TTS_Server {
 			}
 			catch { }
 			return name;
+		}
+
+		private double TicketPriceQuery(string lineID, string EnterID, string LeaveID) {
+			MySqlCommand sql = new MySqlCommand("SELECT ticketprice FROM ticketprice WHERE enterstationid=" + EnterID 
+				+ " AND leavestationid=" + "LeaveID", connection);
+			string price = null;
+			double ret = 0;
+			try {
+				MySqlDataReader reader = sql.ExecuteReader();
+				while (reader.Read()) {
+					price = reader[0].ToString();
+				}
+				reader.Close();
+				ret = double.Parse(price);
+			}
+			catch { }
+			return ret;
 		}
 	}
 }

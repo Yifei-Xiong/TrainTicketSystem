@@ -87,7 +87,6 @@ namespace TTS_Client {
             public string LeaveStationName { get; set; }
             public DateTime StartTime { get; set; }
             public DateTime EndTime { get; set; }
-            public bool SameLine { get; set; } //是否在一条线路上
             public int Line { get; set; } //若在一条线路上，则为线路编号
             public string LineName { get; set; } //若在一条线路上，则为线路名称
         }
@@ -162,6 +161,8 @@ namespace TTS_Client {
 			textBlock_Copy18.Text = infostr[0];
 			textBlock_Copy22.Text = infostr[1];
 			textBlock_Copy14.Text = infostr[2];
+			textBlock_Copy24.Text = MyPort.ToString();
+			textBlock_Copy26.Text = LoginPort;
 
 			ProgramItem_Data();
 
@@ -199,6 +200,7 @@ namespace TTS_Client {
 
 			TcpClient tcpClient = null;
 			NetworkStream networkStream = null;
+			string Msg = null;
 			string ExtraMsg = ticketQueryInfo.EnterStationNumber.ToString() + "\n" + ticketQueryInfo.LeaveStationNumber.ToString();
 			try {
 				tcpClient = new TcpClient();
@@ -213,7 +215,7 @@ namespace TTS_Client {
 				var newClient = tcpListener.AcceptTcpClient();
 				var bytes = ReadFromTcpClient(newClient); //获取数据
 				var package = new TTS_Core.QueryDataPackage(bytes);
-				string message = package.ExtraMsg;
+				Msg = package.ExtraMsg;
 
 			}
 			catch {
@@ -227,16 +229,52 @@ namespace TTS_Client {
 				tcpClient.Close();
 			}
 
-
-			bool NeedChangeLine = false; //是否需要换乘
-			if (NeedChangeLine) {
-				LineSelect lineSelect = new LineSelect(ticketQueryInfo);
+			if (Msg == null) {
+				return;
+            }
+			if (Msg.Split('\n')[0]=="0") {
+				if (Msg.Split('\n')[1] == "1") {
+					//无需换乘，一种路线
+					ticketQueryInfo.Line = int.Parse(Msg.Split('\n')[2]);
+					BuyTicketWindow buyTicketWindow = new BuyTicketWindow(ticketQueryInfo);
+					buyTicketWindow.ShowDialog();
+					allBuyTicket.Add(buyTicketWindow.selectTicket);
+				}
+				else {
+					//无需换乘，多种路线
+					LineSelect lineSelect = new LineSelect(ticketQueryInfo, Msg, allBuyTicket, 1);
+					lineSelect.ShowDialog();
+				}
+			}
+			else if (Msg.Split('\n')[0] == "1") {
+				if (Msg.IndexOf("\\") == -1) {
+					//一次换乘，多种路线
+					LineSelect lineSelect = new LineSelect(ticketQueryInfo, Msg, allBuyTicket, 2);
+					lineSelect.ShowDialog();
+				}
+				else {
+					//一次换乘，两次换乘
+					LineSelect lineSelect = new LineSelect(ticketQueryInfo, Msg, allBuyTicket, 3);
+					lineSelect.ShowDialog();
+				}
+            }
+			else if (Msg.Split('\n')[0] == "2") {
+				//两次换乘
+				LineSelect lineSelect = new LineSelect(ticketQueryInfo, Msg, allBuyTicket, 4);
 				lineSelect.ShowDialog();
+			}
+
+
+
+				bool NeedChangeLine = false; //是否需要换乘
+			if (NeedChangeLine) {
+				//LineSelect lineSelect = new LineSelect(ticketQueryInfo);
+				//lineSelect.ShowDialog();
 			} //需要换乘，进入换乘方案选择窗口
 			else {
-				BuyTicketWindow buyTicketWindow = new BuyTicketWindow(ticketQueryInfo);
-				buyTicketWindow.ShowDialog();
-				allBuyTicket.Add(buyTicketWindow.selectTicket);
+				//BuyTicketWindow buyTicketWindow = new BuyTicketWindow(ticketQueryInfo);
+				//buyTicketWindow.ShowDialog();
+				//allBuyTicket.Add(buyTicketWindow.selectTicket);
 			} //不需要换乘，进入购票窗口
 		}
 
@@ -257,8 +295,8 @@ namespace TTS_Client {
             tcpClient = new TcpClient();
             stateObject = new StateObject();
             stateObject.tcpClient = tcpClient;
-            //queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_ARRIVAL_STATION);  //到达站点查询
-            //stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+            queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, "Server", TTS_Core.QUERYTYPE.K_ARRIVAL_STATION, "");  //到达站点查询
+            stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
             tcpClient.BeginConnect(myIPAddress, LoginPort, new AsyncCallback(SentCallBackF), stateObject); //异步连接
 
             //弹出地点信息窗口
@@ -288,8 +326,8 @@ namespace TTS_Client {
             tcpClient = new TcpClient();
             stateObject = new StateObject();
             stateObject.tcpClient = tcpClient;
-            //queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_DEPARTURE_STATION);  //出发站点查询
-            //stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+            queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, "Server",TTS_Core.QUERYTYPE.K_DEPARTURE_STATION, "");  //出发站点查询
+            stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
             tcpClient.BeginConnect(myIPAddress, LoginPort, new AsyncCallback(SentCallBackF), stateObject); //异步连接
 
             //弹出地点信息窗口
