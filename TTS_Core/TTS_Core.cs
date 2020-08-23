@@ -37,6 +37,7 @@ namespace TTS_Core
         K_TRAIN_PASSENGERS, //列车乘客查询
         K_TICKET_PRICE,  //车票价格查询
 		K_BUYTICKET_QUERY, // //购买车票查询
+		K_TICKETINFO_QUERY, // 拆分后的购买
 		K_USER_INFO //用户详情信息
     }
 

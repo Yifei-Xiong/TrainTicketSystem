@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,7 +24,7 @@ namespace TTS_Client
 			InitializeComponent();
 		}
 
-		public BuyTicketWindow(ClientWindow.TicketQueryInfo ticketQueryInfo) {
+		public BuyTicketWindow(ClientWindow.TicketQueryInfo ticketQueryInfo, string ExtraMsg) {
 			InitializeComponent();
 			this.ticketQueryInfo = ticketQueryInfo;
 			canBuyTicket = SubmitTicketQuery(ticketQueryInfo);
@@ -185,6 +186,7 @@ namespace TTS_Client
 			ClientWindow.AllBuyTicket buyTickets = new ClientWindow.AllBuyTicket();
 			ClientWindow.BuyTicket buyTicket = new ClientWindow.BuyTicket();
 
+			/*
 			buyTicket.TrainID = 3;
 			buyTicket.EnterStationTimeIn = DateTime.Now.AddHours(1).ToString();
 			buyTicket.EnterStationTimeOut = DateTime.Now.AddHours(1.1).ToString();
@@ -210,6 +212,9 @@ namespace TTS_Client
 			buyTicket.TicketRemain = 15;
 			buyTicket.TicketPrice = 260;
 			buyTickets.Add(buyTicket);
+			*/
+
+
 
 			return buyTickets;
 		}

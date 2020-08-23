@@ -237,31 +237,33 @@ namespace TTS_Client {
 					//无需换乘，一种路线
 					ticketQueryInfo.Line = int.Parse(Msg.Split('\n')[2]);
 					ticketQueryInfo.LineName = Msg.Split('\n')[3];
-					BuyTicketWindow buyTicketWindow = new BuyTicketWindow(ticketQueryInfo);
+					BuyTicketWindow buyTicketWindow = new BuyTicketWindow(ticketQueryInfo, "");
 					buyTicketWindow.ShowDialog();
 					allBuyTicket.Add(buyTicketWindow.selectTicket);
 				}
 				else {
 					//无需换乘，多种路线
-					LineSelect lineSelect = new LineSelect(ticketQueryInfo, Msg, allBuyTicket, 1);
+					LineSelect lineSelect = new LineSelect(ticketQueryInfo, Msg, allBuyTicket, 1, UserID, myIPAddress, tcpListener, MyPort, LoginPort);
 					lineSelect.ShowDialog();
+
+
 				}
 			}
 			else if (Msg.Split('\n')[0] == "1") {
 				if (Msg.IndexOf("\\") == -1) {
 					//一次换乘，多种路线
-					LineSelect lineSelect = new LineSelect(ticketQueryInfo, Msg, allBuyTicket, 2);
+					LineSelect lineSelect = new LineSelect(ticketQueryInfo, Msg, allBuyTicket, 2, UserID, myIPAddress, tcpListener, MyPort, LoginPort);
 					lineSelect.ShowDialog();
 				}
 				else {
 					//一次换乘，两次换乘
-					LineSelect lineSelect = new LineSelect(ticketQueryInfo, Msg, allBuyTicket, 3);
+					LineSelect lineSelect = new LineSelect(ticketQueryInfo, Msg, allBuyTicket, 3, UserID, myIPAddress, tcpListener, MyPort, LoginPort);
 					lineSelect.ShowDialog();
 				}
             }
 			else if (Msg.Split('\n')[0] == "2") {
 				//两次换乘
-				LineSelect lineSelect = new LineSelect(ticketQueryInfo, Msg, allBuyTicket, 4);
+				LineSelect lineSelect = new LineSelect(ticketQueryInfo, Msg, allBuyTicket, 4, UserID, myIPAddress, tcpListener, MyPort, LoginPort);
 				lineSelect.ShowDialog();
 			}
 
