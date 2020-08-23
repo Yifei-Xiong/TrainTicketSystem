@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -45,6 +46,12 @@ namespace TTS_Server {
 			public string UserName { get; set; } //用户昵称
 			public double Balance { get; set; } //用户余额
 		} //用户信息
+
+		public struct ChangeLineInfo {
+			public int Changetimes { get; set; } //换乘次数
+			public string IDinfo { get; set; }
+			public string Nameinfo { get; set; }
+        }
 
 		public class StateObject {
 			public TcpClient tcpClient = null;
@@ -482,7 +489,7 @@ namespace TTS_Server {
 			}
 			catch { }
 			if (OutList.Count == 1) {
-				string ExtraMsg = "1" + "\n" + OutList[0];
+				string ExtraMsg = "0" + "\n" + "1" + "\n" + OutList[0];
 				TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
 				StateObject stateObject = new StateObject(); //每次发送建立一个StateObject类对象
 				stateObject.tcpClient = tcpClient;
@@ -491,9 +498,17 @@ namespace TTS_Server {
 				tcpClient.BeginConnect(ip.Split(':')[0], int.Parse(ip.Split(':')[1]), new AsyncCallback(SentCallBackF), stateObject);
 			}
 			else if (OutList.Count >= 1) {
-				string ExtraMsg = OutList.Count.ToString() + "\n";
+				string ExtraMsg = "0" + "\n" + OutList.Count.ToString() + "\r";
+				ExtraMsg = ExtraMsg + EnterID + "\n" + StationNameQuery(EnterID) + "\n" + LeaveID + "\n" +
+					StationNameQuery(LeaveID) + "\r";
 				for (int i = 0; i < OutList.Count; i++) {
 					ExtraMsg = ExtraMsg + OutList[i] + "\n";
+				} // 0 \n 2 \r startID \n startName \n endID \n endName \r 2 \n 7 \n \r line2name \n line2order \n
+				  // line2time \n line7name \n line7order \n line7time \n
+				ExtraMsg = ExtraMsg + "\r";
+				for (int i = 0; i < OutList.Count; i++) {
+					ExtraMsg = ExtraMsg + LineNameQuery(OutList[i]) + "\n" + StationOrderQuery(OutList[i], EnterID, LeaveID)
+						+ "\n" + TimeQuery(OutList[i], EnterID, LeaveID).ToString() + "\n";
 				}
 				TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
 				StateObject stateObject = new StateObject(); //每次发送建立一个StateObject类对象
@@ -503,9 +518,201 @@ namespace TTS_Server {
 				tcpClient.BeginConnect(ip.Split(':')[0], int.Parse(ip.Split(':')[1]), new AsyncCallback(SentCallBackF), stateObject);
 			}
 			else {
+				//需要换乘至少一次
+				List<string> OutList1_1 = new List<string>();
+				List<string> OutList1_2 = new List<string>();
+				List<string> OutList1_3 = new List<string>();
+				MySqlCommand sql1 = new MySqlCommand("SELECT A.lineid, B.stationid, C.lineid FROM stationline A, stationline B, " +
+					"stationline C, stationline D WHERE A.stationid="+EnterID+" AND A.lineid=B.lineid AND A.stationid<>B.stationid " +
+					"AND B.stationid=C.stationid AND B.lineid<>C.lineid AND C.lineid=D.lineid AND C.stationid<>D.stationid AND" +
+					" D.stationid="+ LeaveID, connection);
+				try {
+					MySqlDataReader reader = sql1.ExecuteReader();
+					while (reader.Read()) {
+						OutList1_1.Add(reader[0].ToString());
+						OutList1_2.Add(reader[0].ToString());
+						OutList1_3.Add(reader[0].ToString());
+					}
+					reader.Close();
+				}
+				catch { }
+				if (OutList1_1.Count >= 2) {
+					//若一次换乘的方案多于一种，则不考虑两次换乘方案
+					string ExtraMsg = "1" + "\n" + OutList1_1.Count.ToString() + "\r";
+					ExtraMsg = ExtraMsg + EnterID + "\n" + StationNameQuery(EnterID) + "\n" + LeaveID + "\n" + StationNameQuery(LeaveID) + "\r";
+					for (int i = 0; i < OutList1_1.Count; i++) {
+						ExtraMsg = ExtraMsg + OutList1_1[i] + "\n" + LineNameQuery(OutList1_1[i]) + "\n" +
+							OutList1_2[i] + "\n" + StationNameQuery(OutList1_2[i]) + "\n" +
+							OutList1_3[i] + "\n" + LineNameQuery(OutList1_3[i]) + "\n" +
+							(int.Parse(StationOrderQuery(OutList1_1[i], EnterID, OutList1_2[i])) + int.Parse(StationOrderQuery(OutList1_3[i], OutList1_2[i], LeaveID))).ToString() + "\n" +
+							(TimeQuery(OutList1_1[i], EnterID, OutList1_2[i]).AddTicks(TimeQuery(OutList1_3[i], OutList1_2[i], LeaveID).Ticks)).ToString();
+					} // lineid linename stationid stationname lineid linename order time
+					TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+					StateObject stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+					stateObject.tcpClient = tcpClient;
+					var data = new TTS_Core.QueryDataPackage("Server", ip, "", TTS_Core.QUERYTYPE.K_BUYTICKET_QUERY, ExtraMsg);
+					stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+					tcpClient.BeginConnect(ip.Split(':')[0], int.Parse(ip.Split(':')[1]), new AsyncCallback(SentCallBackF), stateObject);
+				} else if (OutList1_1.Count == 1) {
+					//一次换乘方案仅有一种，继续考虑两次换乘方案
+					string ExtraMsg = "1" + "\n" + OutList1_1.Count.ToString() + "\r";
+					ExtraMsg = ExtraMsg + EnterID + "\n" + StationNameQuery(EnterID) + "\n" + LeaveID + "\n" + StationNameQuery(LeaveID) + "\r";
+					for (int i = 0; i < OutList1_1.Count; i++) {
+						ExtraMsg = ExtraMsg + OutList1_1[i] + "\n" + LineNameQuery(OutList1_1[i]) + "\n" +
+							OutList1_2[i] + "\n" + StationNameQuery(OutList1_2[i]) + "\n" +
+							OutList1_3[i] + "\n" + LineNameQuery(OutList1_3[i]) + "\n" +
+							(int.Parse(StationOrderQuery(OutList1_1[i], EnterID, OutList1_2[i])) + int.Parse(StationOrderQuery(OutList1_3[i], OutList1_2[i], LeaveID))).ToString() + "\n" +
+							(TimeQuery(OutList1_1[i], EnterID, OutList1_2[i]).AddTicks(TimeQuery(OutList1_3[i], OutList1_2[i], LeaveID).Ticks)).ToString();
+					} // lineid linename stationid stationname lineid linename order time
 
-			} //需要换乘至少一次
+					ExtraMsg = ExtraMsg + "\\";
+					List<string> OutList2_1 = new List<string>();
+					List<string> OutList2_2 = new List<string>();
+					List<string> OutList2_3 = new List<string>();
+					List<string> OutList2_4 = new List<string>();
+					List<string> OutList2_5 = new List<string>();
+					MySqlCommand sql2 = new MySqlCommand("SELECT A.lineid, B.stationid, C.lineid FROM stationline A, stationline B, " +
+						"stationline C, stationline D WHERE A.stationid=" + EnterID + " AND A.lineid=B.lineid AND A.stationid<>B.stationid " +
+						"AND B.stationid=C.stationid AND B.lineid<>C.lineid AND C.lineid=D.lineid AND C.stationid<>D.stationid AND" +
+						" D.stationid=" + LeaveID, connection);
+					try {
+						MySqlDataReader reader = sql2.ExecuteReader();
+						while (reader.Read()) {
+							OutList2_1.Add(reader[0].ToString());
+							OutList2_2.Add(reader[0].ToString());
+							OutList2_3.Add(reader[0].ToString());
+							OutList2_4.Add(reader[0].ToString());
+							OutList2_5.Add(reader[0].ToString());
+						}
+						reader.Close();
+					}
+					catch { }
+					ExtraMsg = ExtraMsg + "2" + "\n" + OutList2_1.Count.ToString() + "\r";
+					ExtraMsg = ExtraMsg + EnterID + "\n" + StationNameQuery(EnterID) + "\n" + LeaveID + "\n" + StationNameQuery(LeaveID) + "\r";
+					for (int i = 0; i < OutList2_1.Count; i++) {
+						ExtraMsg = ExtraMsg + OutList2_1[i] + "\n" + LineNameQuery(OutList2_1[i]) + "\n" +
+							OutList2_2[i] + "\n" + StationNameQuery(OutList2_2[i]) + "\n" +
+							OutList2_3[i] + "\n" + LineNameQuery(OutList2_3[i]) + "\n" +
+							OutList2_4[i] + "\n" + StationNameQuery(OutList2_4[i]) + "\n" +
+							OutList2_5[i] + "\n" + LineNameQuery(OutList2_5[i]) + "\n" +
+							(int.Parse(StationOrderQuery(OutList2_1[i], EnterID, OutList2_2[i])) +
+							int.Parse(StationOrderQuery(OutList2_3[i], OutList2_2[i], OutList2_4[i])) +
+							int.Parse(StationOrderQuery(OutList2_5[i], OutList2_4[i], LeaveID))).ToString() + "\n" +
+							(TimeQuery(OutList2_1[i], EnterID, OutList2_2[i])
+							.AddTicks(TimeQuery(OutList2_3[i], OutList2_2[i], OutList2_4[i]).Ticks +
+							TimeQuery(OutList2_5[i], OutList2_4[i], LeaveID).Ticks)).ToString();
+					}
+
+					TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+					StateObject stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+					stateObject.tcpClient = tcpClient;
+					var data = new TTS_Core.QueryDataPackage("Server", ip, "", TTS_Core.QUERYTYPE.K_BUYTICKET_QUERY, ExtraMsg);
+					stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+					tcpClient.BeginConnect(ip.Split(':')[0], int.Parse(ip.Split(':')[1]), new AsyncCallback(SentCallBackF), stateObject);
+				} else {
+					//需要换乘至少两次
+					List<string> OutList2_1 = new List<string>();
+					List<string> OutList2_2 = new List<string>();
+					List<string> OutList2_3 = new List<string>();
+					List<string> OutList2_4 = new List<string>();
+					List<string> OutList2_5 = new List<string>();
+					MySqlCommand sql2 = new MySqlCommand("SELECT A.lineid, B.stationid, C.lineid FROM stationline A, stationline B, " +
+						"stationline C, stationline D WHERE A.stationid=" + EnterID + " AND A.lineid=B.lineid AND A.stationid<>B.stationid " +
+						"AND B.stationid=C.stationid AND B.lineid<>C.lineid AND C.lineid=D.lineid AND C.stationid<>D.stationid AND" +
+						" D.stationid=" + LeaveID, connection);
+					try {
+						MySqlDataReader reader = sql2.ExecuteReader();
+						while (reader.Read()) {
+							OutList2_1.Add(reader[0].ToString());
+							OutList2_2.Add(reader[0].ToString());
+							OutList2_3.Add(reader[0].ToString());
+							OutList2_4.Add(reader[0].ToString());
+							OutList2_5.Add(reader[0].ToString());
+						}
+						reader.Close();
+					}
+					catch { }
+					string ExtraMsg = "2" + "\n" + OutList2_1.Count.ToString() + "\r";
+					ExtraMsg = ExtraMsg + EnterID + "\n" + StationNameQuery(EnterID) + "\n" + LeaveID + "\n" + StationNameQuery(LeaveID) + "\r";
+					for (int i = 0; i < OutList2_1.Count; i++) {
+						ExtraMsg = ExtraMsg + OutList2_1[i] + "\n" + LineNameQuery(OutList2_1[i]) + "\n" +
+							OutList2_2[i] + "\n" + StationNameQuery(OutList2_2[i]) + "\n" +
+							OutList2_3[i] + "\n" + LineNameQuery(OutList2_3[i]) + "\n" +
+							OutList2_4[i] + "\n" + StationNameQuery(OutList2_4[i]) + "\n" +
+							OutList2_5[i] + "\n" + LineNameQuery(OutList2_5[i]) + "\n" +
+							(int.Parse(StationOrderQuery(OutList2_1[i], EnterID, OutList2_2[i])) +
+							int.Parse(StationOrderQuery(OutList2_3[i], OutList2_2[i], OutList2_4[i])) +
+							int.Parse(StationOrderQuery(OutList2_5[i], OutList2_4[i], LeaveID))).ToString() + "\n" +
+							(TimeQuery(OutList2_1[i], EnterID, OutList2_2[i])
+							.AddTicks(TimeQuery(OutList2_3[i], OutList2_2[i], OutList2_4[i]).Ticks +
+							TimeQuery(OutList2_5[i], OutList2_4[i], LeaveID).Ticks)).ToString();
+					} // lineid linename stationid stationname lineid linename stationid stationname lineid linename order time
+					TcpClient tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+					StateObject stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+					stateObject.tcpClient = tcpClient;
+					var data = new TTS_Core.QueryDataPackage("Server", ip, "", TTS_Core.QUERYTYPE.K_BUYTICKET_QUERY, ExtraMsg);
+					stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+					tcpClient.BeginConnect(ip.Split(':')[0], int.Parse(ip.Split(':')[1]), new AsyncCallback(SentCallBackF), stateObject);
+				} 
+			} 
 
 		} //实现线路的查询
+
+		private DateTime TimeQuery(string lineID, string EnterID, string LeaveID) {
+			MySqlCommand sql = new MySqlCommand("SELECT B.arrivetime-A.leavetime FROM trainstation A, trainstation B, train C WHERE " +
+				"A.trainid=B.trainid AND B.arrivetime>A.leavetime AND A.stationid="+EnterID+" AND B.stationid="+LeaveID+
+				" AND B.trainid=C.trainid AND C.lineid=" + lineID, connection);
+			string time = null;
+			try {
+				MySqlDataReader reader = sql.ExecuteReader();
+				while (reader.Read()) {
+					time = reader[0].ToString();
+				}
+				reader.Close();
+			}
+			catch { }
+			return DateTime.Parse(time) ;
+		}
+		private string StationOrderQuery(string lineID, string EnterID, string LeaveID) {
+			MySqlCommand sql = new MySqlCommand("SELECT ABS(B.stationorder-A.stationorder) FROM stationline A, stationline B WHERE " +
+				"A.lineid=B.lineid AND B.lineid=" + lineID + " AND A.stationid=" + EnterID + " AND B.stationid=" + LeaveID, connection);
+			string order = null;
+			try {
+				MySqlDataReader reader = sql.ExecuteReader();
+				while (reader.Read()) {
+					order = reader[0].ToString();
+				}
+				reader.Close();
+			}
+			catch { }
+			return order;
+		}
+		private string StationNameQuery(string stationID) {
+			MySqlCommand sql = new MySqlCommand("SELECT stationname from station where stationid="+stationID, connection);
+			string name = null;
+			try {
+				MySqlDataReader reader = sql.ExecuteReader();
+				while (reader.Read()) {
+					name = reader[0].ToString();
+				}
+				reader.Close();
+			}
+			catch { }
+			return name;
+		}
+
+		private string LineNameQuery(string LineID) {
+			MySqlCommand sql = new MySqlCommand("SELECT linename from line where lineid=" + LineID, connection);
+			string name = null;
+			try {
+				MySqlDataReader reader = sql.ExecuteReader();
+				while (reader.Read()) {
+					name = reader[0].ToString();
+				}
+				reader.Close();
+			}
+			catch { }
+			return name;
+		}
 	}
 }
