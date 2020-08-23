@@ -26,6 +26,7 @@ namespace TTS_Client
 
 		public BuyTicketWindow(ClientWindow.TicketQueryInfo ticketQueryInfo, string ExtraMsg) {
 			InitializeComponent();
+			canBuyTicket = new ClientWindow.AllBuyTicket();
 			this.ticketQueryInfo = ticketQueryInfo;
 			InitTicket(ExtraMsg);
 			listView.ItemsSource = canBuyTicket;
@@ -47,9 +48,13 @@ namespace TTS_Client
 				ticket.TrainID = int.Parse(split[i].Split('\n')[0]);
 				ticket.EnterStationTime = split[i].Split('\n')[1];
 				ticket.LeaveStationTimeIn = split[i].Split('\n')[2];
-				ticket.TimeTake = DateTime.Parse(split[i].Split('\n')[2]).AddTicks(-DateTime.Parse(split[i].Split('\n')[1]).Ticks).ToString() + "min";
+				DateTime dt = DateTime.Parse(split[i].Split('\n')[2]).AddTicks(-DateTime.Parse(split[i].Split('\n')[1]).Ticks);
+				ticket.TimeTake = (dt.Minute + dt.Hour*60).ToString() + "min";
 				ticket.TicketRemain = int.Parse(split[i].Split('\n')[3]);
 				ticket.TicketPrice = double.Parse(split[i].Split('\n')[4]);
+				ticket.LineName = textBlock6.Text;
+				ticket.EnterStationName = textBlock4.Text;
+				ticket.LeaveStationName = textBlock5.Text;
 				canBuyTicket.Add(ticket);
 			}
 		}

@@ -929,7 +929,7 @@ namespace TTS_Server {
 			string LineName = "";
 			string LeaveName = "";
 			MySqlCommand sql = new MySqlCommand("SELECT A.stationname, B.linename, C.stationname FROM station A, " +
-				"line B, station C WHERE A.stationid " + split[0] + " and B.lineid=" + split[1] + " and C.stationid=" + split[2], connection);
+				"line B, station C WHERE A.stationid=" + split[0] + " and B.lineid=" + split[1] + " and C.stationid=" + split[2], connection);
 			try {
 				MySqlDataReader reader = sql.ExecuteReader();
 				while (reader.Read()) {
@@ -943,8 +943,8 @@ namespace TTS_Server {
 			string output = EnterName + "\n" + LineName + "\n" + LeaveName + "\r";
 
 			sql = new MySqlCommand("select x.trainid,x.leavetime,y.arrivetime,remainticket,ticketprice from trainstation x,trainstation y," +
-				"remainticket,ticketprice where x.trainid=y.trainid AND x.stationid = " + split[0] + " AND y.stationid = " + split[2] + " AND x.leavetime >=" +
-				 split[3] + " AND y.arrivetime <= " + split[4] + " AND x.trainid = remainticket.trainid AND remainticket.enterstationid = " + split[0] + " AND " +
+				"remainticket,ticketprice where x.trainid=y.trainid AND x.stationid = " + split[0] + " AND y.stationid = " + split[2] + " AND x.leavetime >=\"" +
+				 split[3] + "\" AND y.arrivetime <= \"" + split[4] + "\" AND x.trainid = remainticket.trainid AND remainticket.enterstationid = " + split[0] + " AND " +
 				"remainticket.leavestationid = " + split[2] + " AND ticketprice.lineid=" + split[1] + " AND ticketprice.enterstationid = " + split[0] + " AND ticketprice.leavestationid = " + split[2], connection);
 			try {
 				MySqlDataReader reader = sql.ExecuteReader();

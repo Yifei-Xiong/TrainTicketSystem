@@ -116,13 +116,13 @@ namespace TTS_Client
 				var newClient = tcpListener.AcceptTcpClient();
 				var bytes = ReadFromTcpClient(newClient); //获取数据
 				var package = new TTS_Core.QueryDataPackage(bytes);
-				subinfo1.EnterStationName = package.ExtraMsg.Split('\r')[0];
-				subinfo1.LineName = package.ExtraMsg.Split('\r')[1];
-				subinfo1.LeaveStationName = package.ExtraMsg.Split('\r')[2];
+				subinfo1.EnterStationName = package.ExtraMsg.Split('\r')[0].Split('\n')[0];
+				subinfo1.LineName = package.ExtraMsg.Split('\r')[0].Split('\n')[1];
+				subinfo1.LeaveStationName = package.ExtraMsg.Split('\r')[0].Split('\n')[2];
 				info1Msg = package.ExtraMsg;
 			}
 			catch {
-				MessageBox.Show("无法连接到服务器!");
+				MessageBox.Show("指定时段内无可选车次！");
 				return;
 			}
 			finally {
