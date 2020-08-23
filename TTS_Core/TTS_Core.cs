@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -17,7 +18,9 @@ namespace TTS_Core
         K_REGISTER_DATA_PACKAGE,  //注册数据包类
         K_QUERY_DATA_PACKAGE,  //查询数据包类
         K_TICKETQUERY_DATA_PACKAGE,  //客户端向服务端发送的查询条件类
-		K_USER_INFO_CHANGE //用户信息修改数据包类
+		K_USER_INFO_CHANGE, //用户信息修改数据包类
+		K_USER_OPERATION_PACKAGE, //管理员查询用户信息包
+		K_DATASET_PACKAGE, //表类型包
 	}
 
     //查询类别的枚举
@@ -226,5 +229,99 @@ namespace TTS_Core
 		public int LeaveStationNumber { get; set; }
 		public DateTime StartTime { get; set; }
 		public DateTime EndTime { get; set; }
+	}
+
+
+	//客户端向服务端发送的查询条件类，Type=K_TICKETQUERY_DATA_PACKAGE
+	[Serializable]
+	public class UserOperationPackage : DataPackage
+	{
+		public UserOperationPackage(byte[] Bytes)
+		{
+			using (MemoryStream ms = new MemoryStream(Bytes))
+			{
+				IFormatter formatter = new BinaryFormatter();
+				UserOperationPackage package = formatter.Deserialize(ms) as UserOperationPackage;
+				if (package != null)
+				{
+					this.Sender = package.Sender;
+					this.Receiver = package.Receiver;
+					this.sendTime = package.sendTime;
+					this.MessageType = package.MessageType;
+					this.opType = package.opType;
+					this.UserID = package.UserID;
+					this.Accounttype = package.Accounttype;
+					this.Phone = package.Phone;
+					this.Username = package.Username;
+					this.IPandPort = package.IPandPort;
+				}
+			}
+		} //构造函数 字节数组转化为数据包
+
+		public UserOperationPackage(string sender, string IPandPort, string receiver,
+			Enum_USER_OP opType,
+			string UserID, string Accounttype, string phone, string username, float balance) : base(sender, IPandPort, receiver)
+		{
+			MessageType = MESSAGETYPE.K_USER_OPERATION_PACKAGE;
+			this.opType = opType;
+			this.UserID = UserID;
+			this.Accounttype = Accounttype;
+			this.Phone = phone;
+			this.Username = username;
+			this.Balance = balance;
+		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
+
+		public enum Enum_USER_OP
+        {
+			K_QUERY,
+			K_MODIFY,
+			K_DELETE
+        }
+
+		public Enum_USER_OP opType { get; set; }
+		public string UserID { get; set; }
+		public string Accounttype { get; set; }
+		public string Phone { get; set; }
+		public string Username { get; set; }
+		public float Balance { get; set; }
+	}
+
+
+	[Serializable]
+	public class DataSetPackage : DataPackage
+	{
+		public DataSetPackage(byte[] Bytes)
+		{
+			using (MemoryStream ms = new MemoryStream(Bytes))
+			{
+				IFormatter formatter = new BinaryFormatter();
+				DataSetPackage package = formatter.Deserialize(ms) as DataSetPackage;
+				if (package != null)
+				{
+					this.Sender = package.Sender;
+					this.Receiver = package.Receiver;
+					this.sendTime = package.sendTime;
+					this.forbid = package.forbid;
+					this.row = package.row;
+					this.col = package.col;
+					this.dataSet = package.dataSet;
+				}
+			}
+		} //构造函数 字节数组转化为数据包
+
+		public DataSetPackage(string sender, string IPandPort, string receiver,
+			int forbid, int row, int col, DataSet dataSet) : base(sender, IPandPort, receiver)
+		{
+			MessageType = MESSAGETYPE.K_DATASET_PACKAGE;
+			this.forbid = forbid;
+			this.row = row;
+			this.col = col;
+			this.dataSet = dataSet;
+		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
+
+		public int forbid { get; set; }
+		public int row { get; set; }
+		public int col { get; set; }
+		public DataSet dataSet { get; set; }
 	}
 }
