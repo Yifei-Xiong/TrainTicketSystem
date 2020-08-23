@@ -44,6 +44,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -70,6 +72,9 @@
     </Compile>
     <Compile Include="LineSelect.xaml.cs">
       <DependentUpon>LineSelect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ManagerWindow_user.xaml.cs">
+      <DependentUpon>ManagerWindow_user.xaml</DependentUpon>
     </Compile>
     <Compile Include="TimeSelect.xaml.cs">
       <DependentUpon>TimeSelect.xaml</DependentUpon>
@@ -119,6 +124,10 @@
       <DependentUpon>LoginWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ManagerWindow_user.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="TimeSelect.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

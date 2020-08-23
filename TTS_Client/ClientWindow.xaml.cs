@@ -1045,5 +1045,11 @@ namespace TTS_Client {
 				tcpClient.Close();
 			}
 		} //充值
-	}
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+			ManagerWindow_user activity = new ManagerWindow_user(UserID, myIPAddress, LoginPort, tcpListener, MyPort);
+			activity.ShowDialog();
+        }
+    }
 }

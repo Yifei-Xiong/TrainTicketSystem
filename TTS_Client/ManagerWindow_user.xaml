@@ -1,0 +1,42 @@
+﻿<Window x:Class="TTS_Client.ManagerWindow_user"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TTS_Client"
+        mc:Ignorable="d"
+        Title="ManagerWindow_user" Height="450" Width="800">
+    <Grid>
+        <ListView x:Name="DataView" HorizontalAlignment="Left" Height="217" Margin="35,96,0,0" VerticalAlignment="Top" Width="703" SelectionChanged="DataView_SelectionChanged">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="userid" Width="50" DisplayMemberBinding="{Binding userid}"/>
+                    <GridViewColumn Header="password" Width="150" DisplayMemberBinding="{Binding password}"/>
+                    <GridViewColumn Header="accounttype" Width="90" DisplayMemberBinding="{Binding acccounttype}"/>
+                    <GridViewColumn Header="phone" Width="120" DisplayMemberBinding="{Binding phone}"/>
+                    <GridViewColumn Header="username" Width="120" DisplayMemberBinding="{Binding username}"/>
+                    <GridViewColumn Header="balance" Width="170" DisplayMemberBinding="{Binding balance}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <TextBox x:Name="Text_userId" HorizontalAlignment="Left" Height="23" Margin="35,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="50"/>
+        <TextBox x:Name="Text_accounttype" HorizontalAlignment="Left" Height="23" Margin="241,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="84"/>
+        <TextBox x:Name="Text_phone" HorizontalAlignment="Left" Height="23" Margin="330,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" PreviewTextInput="balance_PreviewTextInput"/>
+        <TextBox x:Name="Text_username" HorizontalAlignment="Left" Height="23" Margin="455,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Text_balance" HorizontalAlignment="Left" Height="23" Margin="587,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" PreviewTextInput="balance_PreviewTextInput"/>
+        <TextBlock HorizontalAlignment="Left" Margin="35,24,0,0" TextWrapping="Wrap" Text="userId" VerticalAlignment="Top" Height="16" Width="50"/>
+        <TextBlock HorizontalAlignment="Left" Margin="369,24,0,0" TextWrapping="Wrap" Text="phone" VerticalAlignment="Top" Height="16" Width="50"/>
+        <TextBlock HorizontalAlignment="Left" Margin="241,24,0,0" TextWrapping="Wrap" Text="accounttype" VerticalAlignment="Top" Height="16" Width="84"/>
+        <TextBlock HorizontalAlignment="Left" Margin="628,24,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="16" Width="68"><Run Text="balance"/><LineBreak/><Run/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" Margin="477,24,0,0" TextWrapping="Wrap" Text="username" VerticalAlignment="Top" Height="16" Width="69"/>
+        <Button x:Name="Button_query" Content="查询" HorizontalAlignment="Left" Margin="718,47,0,0" VerticalAlignment="Top" Width="64" Height="23" Click="Button_query_Click"/>
+        <TextBox x:Name="Text_accounttype_Copy" HorizontalAlignment="Left" Height="23" Margin="241,341,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="84"/>
+        <TextBox x:Name="Text_phone_Copy" HorizontalAlignment="Left" Height="23" Margin="330,341,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" PreviewTextInput="balance_PreviewTextInput"/>
+        <TextBox x:Name="Text_username_Copy" HorizontalAlignment="Left" Height="23" Margin="455,341,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Text_balance_Copy" HorizontalAlignment="Left" Height="23" Margin="587,341,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" PreviewTextInput="balance_PreviewTextInput"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,329,0,0" TextWrapping="Wrap" Text="修改：" VerticalAlignment="Top"/>
+        <Button Content="删除" HorizontalAlignment="Left" Margin="587,383,0,0" VerticalAlignment="Top" Width="75" Click="Button_delete_Click"/>
+        <Button Content="修改" HorizontalAlignment="Left" Margin="690,383,0,0" VerticalAlignment="Top" Width="75" Click="Button_modify_Click"/>
+
+    </Grid>
+</Window>
