@@ -114,6 +114,10 @@
                     <Button x:Name="button_about" Content="关于" HorizontalAlignment="Left" Margin="29,162,0,0" VerticalAlignment="Top" Width="163" Click="button_about_Click"/>
                     <Button x:Name="button8" Content="载入测试数据(仅用于调试)" HorizontalAlignment="Left" Margin="29,192,0,0" VerticalAlignment="Top" Width="163" Click="button8_Click"/>
                     <Button x:Name="button8_Copy" Content="清空已有数据(仅用于调试)" HorizontalAlignment="Left" Margin="29,223,0,0" VerticalAlignment="Top" Width="163" Click="button8_Copy_Click"/>
+                    <TextBlock x:Name="textBlock_Copy23" HorizontalAlignment="Left" Margin="180,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113" Text="127.0.0.1"/>
+                    <TextBlock x:Name="textBlock_Copy24" HorizontalAlignment="Left" Margin="181,60,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113" Text="0"/>
+                    <TextBlock x:Name="textBlock_Copy25" HorizontalAlignment="Left" Margin="180,85,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113" Text="127.0.0.1"/>
+                    <TextBlock x:Name="textBlock_Copy26" HorizontalAlignment="Left" Margin="180,110,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113" Text="0"/>
                 </Grid>
             </TabItem>
             <TabItem Header="系统管理" x:Name="SystemItem">
