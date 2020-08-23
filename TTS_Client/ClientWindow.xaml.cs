@@ -887,13 +887,50 @@ namespace TTS_Client {
 		private void SendBuyTicketToServer (BuyTicket[] buyTicket) {
 			double totalCost = 0;
 			for (int i = 0; i < buyTicket.Length; i++) {
-				totalCost += allBuyTicket[i].TicketPrice;
+				totalCost += buyTicket[i].TicketPrice;
 			}
 			if (totalCost > RemainMoney) {
 				MessageBox.Show("余额不足，总共需要" + totalCost.ToString() + "元，当前用于余额为" + 
 					RemainMoney.ToString() + "元，还需" + (totalCost - RemainMoney).ToString() + "元。");
 				return;
 			}
+
+			string ExtraMsg = "";
+			for (int i = 0; i < buyTicket.Length; i++) {
+				//TrainID, EnterID, LeaveID, UserID, BuyNumber
+				ExtraMsg = ExtraMsg + buyTicket[i].TrainID + "\n" + buyTicket[i].EnterStationNumber.ToString() + "\n" +
+					buyTicket[i].LeaveStationNumber.ToString() + "\n" + UserID + "\n" + buyTicket[i].BuyNumber.ToString() + "\r";
+			}
+
+			TcpClient tcpClient = null;
+			NetworkStream networkStream = null;
+			try {
+				tcpClient = new TcpClient();
+				tcpClient.Connect(myIPAddress, LoginPort); //建立与服务器的连接
+				networkStream = tcpClient.GetStream();
+				if (networkStream.CanWrite) {
+					TTS_Core.QueryDataPackage data = new TTS_Core.QueryDataPackage(UserID, myIPAddress + ":" +
+						MyPort.ToString(), "server", TTS_Core.QUERYTYPE.K_SUBMIT_BUY, ExtraMsg);
+					byte[] sendBytes = data.DataPackageToBytes(); //注册数据包转化为字节数组
+					networkStream.Write(sendBytes, 0, sendBytes.Length);
+				}
+				var newClient = tcpListener.AcceptTcpClient();
+				var bytes = ReadFromTcpClient(newClient); //获取数据
+				var package = new TTS_Core.QueryDataPackage(bytes);
+				MessageBox.Show(package.ExtraMsg);
+			}
+			catch {
+				MessageBox.Show("无法连接到服务器!");
+				return;
+			}
+			finally {
+				if (networkStream != null) {
+					networkStream.Close();
+				}
+				tcpClient.Close();
+			}
+
+
 			int ByFlag = 1; //1 购买成功, 2 余票不足, 3 车站或线路管制中。
 			if (ByFlag == 1) {
 				MessageBox.Show("购买成功，您可以在订单查询选项卡查看详细信息！");
