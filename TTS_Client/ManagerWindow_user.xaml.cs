@@ -115,6 +115,8 @@ namespace TTS_Client
                                 balance = package_rec.dataSet.Tables[0].Rows[i][5].ToString().Trim(),
                             }) ;
                         }
+
+                        MessageBox.Show("查询成功");
                     }
                 }
             }
@@ -254,6 +256,7 @@ namespace TTS_Client
                         itemInfo.username = Text_username_Copy.Text;
                         itemInfo.balance = Text_balance_Copy.Text;
                         DataView.Items.Insert(DataView.SelectedIndex, itemInfo);
+                        DataView.Items.Remove(DataView.SelectedItem);
                     }
                 }
             }

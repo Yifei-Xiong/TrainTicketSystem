@@ -255,6 +255,7 @@ namespace TTS_Core
 					this.Phone = package.Phone;
 					this.Username = package.Username;
 					this.IPandPort = package.IPandPort;
+					this.Balance = package.Balance;
 				}
 			}
 		} //构造函数 字节数组转化为数据包

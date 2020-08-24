@@ -334,9 +334,9 @@ namespace TTS_Server {
                                     case TTS_Core.UserOperationPackage.Enum_USER_OP.K_MODIFY:
                                         {
 											command = "UPDATE alluser SET " +
-														   "accounttype=\"" + package.Accounttype + "\" " + 
-														   "phone=\"" + package.Phone + "\" " +
-														   "username=\"" + package.Username + "\" " + 
+														   "accounttype=\"" + package.Accounttype + "\", " + 
+														   "phone=\"" + package.Phone + "\", " +
+														   "username=\"" + package.Username + "\", " + 
 														   "balance=\"" + package.Balance + "\" " + 
 														   "WHERE userid=\"" + package.UserID + "\"";
                                         }
@@ -363,6 +363,8 @@ namespace TTS_Server {
 													command += " WHERE";
 													first = true;
 												}
+												else
+													command += " AND";
                                                 command += " accounttype=\"" + package.Accounttype + "\"";
                                             }
 
@@ -373,6 +375,8 @@ namespace TTS_Server {
 													command += " WHERE";
 													first = true;
 												}
+												else
+													command += " AND";
                                                 command += " phone=\"" + package.Phone + "\"";
                                             }
 
@@ -383,6 +387,8 @@ namespace TTS_Server {
 													command += " WHERE";
 													first = true;
 												}
+												else
+													command += " AND";
                                                 command += " username=\"" + package.Username + "\"";
                                             }
 
@@ -393,14 +399,28 @@ namespace TTS_Server {
 													command += " WHERE";
 													first = true;
 												}
-                                                command += " balance>=\"" + package.Balance + "\"";
+												else
+													command += " AND";
+                                                command += " balance>=" + package.Balance;
                                             }
                                         }
                                         break;
 								}
 
 								DataSet result = GetSQLResult(command);
-								var sendBackPackage = new TTS_Core.DataSetPackage("server", IPandPort, package.Sender, result == null ? 1 : 0, result.Tables[0].Rows.Count, result.Tables[0].Columns.Count, result);
+								int forbid = 1;
+								int row = 0;
+								int col = 0;
+								if (result != null)
+                                {
+									forbid = 0;
+									if (result.Tables.Count > 0)
+									{
+										row = result.Tables[0].Rows.Count;
+										col = result.Tables[0].Columns.Count;
+									}
+                                }
+								var sendBackPackage = new TTS_Core.DataSetPackage("server", IPandPort, package.Sender, forbid, row, col, result);
 
                                 TcpClient tcpClient;
                                 StateObject stateObject;
