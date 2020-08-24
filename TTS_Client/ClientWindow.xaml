@@ -22,15 +22,15 @@
                     <ListView x:Name="BuyTicketListView" HorizontalAlignment="Left" Height="253" Margin="36,165,0,0" VerticalAlignment="Top" Width="758">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="车次" Width="70" DisplayMemberBinding="{Binding TrainID}"/>
+                                <GridViewColumn Header="车次" Width="50" DisplayMemberBinding="{Binding TrainID}"/>
                                 <GridViewColumn Header="上车站点" Width="80" DisplayMemberBinding="{Binding EnterStationName}"/>
-                                <GridViewColumn Header="上车时间" Width="120" DisplayMemberBinding="{Binding EnterStationTime}"/>
+                                <GridViewColumn Header="上车时间" Width="130" DisplayMemberBinding="{Binding EnterStationTime}"/>
                                 <GridViewColumn Header="到达站点" Width="80" DisplayMemberBinding="{Binding LeaveStationName}"/>
-                                <GridViewColumn Header="到达时间" Width="80" DisplayMemberBinding="{Binding LeaveStationTimeIn}"/>
-                                <GridViewColumn Header="车票价格" Width="80" DisplayMemberBinding="{Binding TicketPrice}"/>
-                                <GridViewColumn Header="所属线路" Width="80" DisplayMemberBinding="{Binding LineName}"/>
-                                <GridViewColumn Header="车票价格" Width="80" DisplayMemberBinding="{Binding TicketPrice}"/>
-                                <GridViewColumn Header="购买数量" Width="80" DisplayMemberBinding="{Binding BuyNumber}"/>
+                                <GridViewColumn Header="到达时间" Width="130" DisplayMemberBinding="{Binding LeaveStationTimeIn}"/>
+                                <GridViewColumn Header="车票价格" Width="70" DisplayMemberBinding="{Binding TicketPrice}"/>
+                                <GridViewColumn Header="所属线路" Width="70" DisplayMemberBinding="{Binding LineName}"/>
+                                <GridViewColumn Header="车票价格" Width="70" DisplayMemberBinding="{Binding TicketPrice}"/>
+                                <GridViewColumn Header="购买数量" Width="70" DisplayMemberBinding="{Binding BuyNumber}"/>
                             </GridView>
                         </ListView.View>
                     </ListView>

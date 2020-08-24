@@ -26,20 +26,38 @@ namespace TTS_Client
 
 		public BuyTicketWindow(ClientWindow.TicketQueryInfo ticketQueryInfo, string ExtraMsg) {
 			InitializeComponent();
+			canBuyTicket = new ClientWindow.AllBuyTicket();
 			this.ticketQueryInfo = ticketQueryInfo;
-			canBuyTicket = SubmitTicketQuery(ticketQueryInfo);
+			InitTicket(ExtraMsg);
 			listView.ItemsSource = canBuyTicket;
-			IsBuy = false;
-			textBlock4.Text = ticketQueryInfo.EnterStationName;
-			textBlock5.Text = ticketQueryInfo.LeaveStationName;
-			textBlock6.Text = ticketQueryInfo.LineName;
 		}
 
 		public ClientWindow.TicketQueryInfo ticketQueryInfo;
 		public ClientWindow.AllBuyTicket searchBuyTicket;
 		public ClientWindow.AllBuyTicket canBuyTicket;
 		public ClientWindow.BuyTicket selectTicket;
-		bool IsBuy;
+
+		private void InitTicket(string ExtraMsg) {
+			string[] split = ExtraMsg.Split('\r');
+			textBlock4.Text = split[0].Split('\n')[0];
+			textBlock5.Text = split[0].Split('\n')[2];
+			textBlock6.Text = split[0].Split('\n')[1];
+
+			ClientWindow.BuyTicket ticket = new ClientWindow.BuyTicket();
+			for (int i=1; i<split.Length-1; i++) {
+				ticket.TrainID = int.Parse(split[i].Split('\n')[0]);
+				ticket.EnterStationTime = split[i].Split('\n')[1];
+				ticket.LeaveStationTimeIn = split[i].Split('\n')[2];
+				DateTime dt = DateTime.Parse(split[i].Split('\n')[2]).AddTicks(-DateTime.Parse(split[i].Split('\n')[1]).Ticks);
+				ticket.TimeTake = (dt.Minute + dt.Hour*60).ToString() + "min";
+				ticket.TicketRemain = int.Parse(split[i].Split('\n')[3]);
+				ticket.TicketPrice = double.Parse(split[i].Split('\n')[4]);
+				ticket.LineName = textBlock6.Text;
+				ticket.EnterStationName = textBlock4.Text;
+				ticket.LeaveStationName = textBlock5.Text;
+				canBuyTicket.Add(ticket);
+			}
+		}
 
 		private void Button2_Copy_Click(object sender, RoutedEventArgs e) {
 			textBox_tic1.Clear();
@@ -214,8 +232,6 @@ namespace TTS_Client
 			buyTickets.Add(buyTicket);
 			*/
 
-
-
 			return buyTickets;
 		}
 
@@ -232,8 +248,6 @@ namespace TTS_Client
 			selectTicket = new ClientWindow.BuyTicket();
 			selectTicket = (ClientWindow.BuyTicket)listView.SelectedItem;
 			selectTicket.BuyNumber = BuyNumber;
-
-
 			Close();
 		} //购买
 

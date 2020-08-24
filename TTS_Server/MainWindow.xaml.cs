@@ -273,6 +273,21 @@ namespace TTS_Server {
 											tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
 												new AsyncCallback(SentCallBackF), stateObject);
 										} break;
+									case TTS_Core.QUERYTYPE.K_TICKETINFO_QUERY: {
+											string ret = TicketInfoQuery(package.ExtraMsg);
+											TcpClient tcpClient;
+											StateObject stateObject;
+											tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+											stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+											stateObject.tcpClient = tcpClient;
+											var data = new TTS_Core.QueryDataPackage("Server", package.IPandPort, package.Sender, TTS_Core.QUERYTYPE.K_TICKETINFO_QUERY, ret);
+											stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+											tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+												new AsyncCallback(SentCallBackF), stateObject);
+										} break;
+									case TTS_Core.QUERYTYPE.K_SUBMIT_BUY: {
+											SubmitBuy(package.ExtraMsg);
+										} break;
 								}
 							} //特定查询
 							break;
@@ -923,5 +938,101 @@ namespace TTS_Server {
 			catch { }
 			return info;
 		}
+		string TicketInfoQuery (string input) {
+			string[] split = input.Split('\n');
+			// int EnterID = int.Parse(split[0]);
+			// int LineID = int.Parse(split[1]);
+			// int LeaveID = int.Parse(split[2]);
+			// DateTime StartTime = DateTime.Parse(split[3]);
+			// DateTime EndTime = DateTime.Parse(split[4]);
+			string EnterName = "";
+			string LineName = "";
+			string LeaveName = "";
+			MySqlCommand sql = new MySqlCommand("SELECT A.stationname, B.linename, C.stationname FROM station A, " +
+				"line B, station C WHERE A.stationid=" + split[0] + " and B.lineid=" + split[1] + " and C.stationid=" + split[2], connection);
+			try {
+				MySqlDataReader reader = sql.ExecuteReader();
+				while (reader.Read()) {
+					EnterName = reader[0].ToString();
+					LineName = reader[1].ToString();
+					LeaveName = reader[2].ToString();
+				}
+				reader.Close();
+			}
+			catch { }
+			string output = EnterName + "\n" + LineName + "\n" + LeaveName + "\r";
+
+			sql = new MySqlCommand("select x.trainid,x.leavetime,y.arrivetime,remainticket,ticketprice from trainstation x,trainstation y," +
+				"remainticket,ticketprice where x.trainid=y.trainid AND x.stationid = " + split[0] + " AND y.stationid = " + split[2] + " AND x.leavetime >=\"" +
+				 split[3] + "\" AND y.arrivetime <= \"" + split[4] + "\" AND x.trainid = remainticket.trainid AND remainticket.enterstationid = " + split[0] + " AND " +
+				"remainticket.leavestationid = " + split[2] + " AND ticketprice.lineid=" + split[1] + " AND ticketprice.enterstationid = " + split[0] + " AND ticketprice.leavestationid = " + split[2], connection);
+			try {
+				MySqlDataReader reader = sql.ExecuteReader();
+				while (reader.Read()) {
+					output = output + reader[0].ToString() + "\n" + reader[1].ToString() + "\n" + reader[2].ToString() + "\n" + reader[3].ToString() + "\n" + reader[4].ToString() + "\r";
+				}
+				reader.Close();
+			}
+			catch { }
+			return output;
+		}
+
+		private void SubmitBuy (string ExtraMsg) {
+			string[] sep = ExtraMsg.Split('\r');
+
+			int EnterID = 0; //
+			string EnterName = "";
+			int LeaveID = 0; //
+			string LeaveName = "";
+			string EnterTime = "";
+			string LeaveTime = "";
+			string LineName = "";
+			int LineID = 0;
+			int TrainID = 0; //
+			string UserID = ""; //
+			string BuyTime = DateTime.Now.ToString();
+			double price = 0;
+			int state = 1; //
+
+			for (int i=0; i<sep.Length-1; i++) {
+				string[] sep2 = sep[i].Split('\n');
+				TrainID = int.Parse(sep2[0]);
+				EnterID = int.Parse(sep2[1]);
+				LeaveID = int.Parse(sep2[2]);
+				UserID = sep2[3];
+				int BuyNumber = int.Parse(sep2[4]);
+
+				MySqlCommand sql = new MySqlCommand("SELECT A.ticketprice, B.lineid, C.stationname, D.stationname, E.linename, F.arrivetime, G.arrivetime " +
+					"FROM ticketprice A, train B, station C, station D, line E, trainstation F, trainstation G WHERE A.enterstationid=" + sep2[1]+ " AND " +
+					"A.leavestationid=" + sep2[2] + " AND A.lineid=B.lineid AND B.trainid=" + sep2[0] + " AND C.stationid=" + sep2[1] + " AND D.stationid=" + sep2[2] + " AND E.lineid=B.lineid AND " +
+					"F.trainid=" + sep2[0] + " AND F.stationid=" + sep2[1] + " AND G.trainid=" + sep2[0] + " AND G.stationid=" + sep2[2] + "", connection);
+				try {
+					MySqlDataReader reader = sql.ExecuteReader();
+					while (reader.Read()) {
+						price = double.Parse(reader[0].ToString());
+						LineID = int.Parse(reader[1].ToString());
+						EnterName = reader[2].ToString();
+						LeaveName = reader[3].ToString();
+						LineName = reader[4].ToString();
+						EnterTime = reader[5].ToString();
+						LeaveTime = reader[6].ToString();
+					}
+					reader.Close();
+				}
+				catch { }
+
+				var query = new MySqlCommand("INSERT INTO ticket(enterstationid, enterstationname, leavestationid, leavestationname, enterstationtime, " +
+					"leavestationtime, linename, lineid, trainid, userid, buytime, ticketprice, state) VALUES ("+ sep2[1] + ", \"" + EnterName + "\", " + sep2[2] +
+					", \"" + LeaveName + "\", \"" + EnterTime + "\", \"" + LeaveTime + "\", \"" + LineName + "\", " + LineID.ToString() + ", " + sep2[0] 
+					+ ", \"" + sep2[3] + "\", \"" + BuyTime + "\", " + price.ToString() + ", " + state.ToString() + ")", connection);
+				try {
+					query.ExecuteNonQuery();
+				}
+				catch { }
+			}
+			//return msg
+
+		}
+
 	}
 }
