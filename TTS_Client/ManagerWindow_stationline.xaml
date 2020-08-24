@@ -28,7 +28,7 @@
         <Button Content="删除" HorizontalAlignment="Left" Margin="587,383,0,0" VerticalAlignment="Top" Width="75" Click="Button_delete_Click"/>
         <Button Content="修改" HorizontalAlignment="Left" Margin="690,383,0,0" VerticalAlignment="Top" Width="75" Click="Button_modify_Click"/>
 
-        <TextBlock HorizontalAlignment="Left" Margin="10,329,0,0" TextWrapping="Wrap" Text="修改：" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="35,341,0,0" TextWrapping="Wrap" Text="修改：" VerticalAlignment="Top"/>
 
         <TextBox x:Name="Text_lineid_Copy" HorizontalAlignment="Left" Height="23" Margin="143,341,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="206"/>
         <TextBox x:Name="Text_stationorder_Copy" HorizontalAlignment="Left" Height="23" Margin="368,341,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="197"/>

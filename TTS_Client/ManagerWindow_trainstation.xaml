@@ -20,9 +20,9 @@
         </ListView>
         <TextBox x:Name="Text_trainid" HorizontalAlignment="Left" Height="23" Margin="35,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="121"/>
         <TextBox x:Name="Text_stationid" HorizontalAlignment="Left" Height="23" Margin="161,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="116"/>
-        <TextBox x:Name="Text_remainseat" HorizontalAlignment="Left" Height="23" Margin="631,47,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="82"/>
-        <TextBox x:Name="Text_arrivetime" HorizontalAlignment="Left" Height="23" Margin="282,47,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="175"/>
-        <TextBox x:Name="Text_leavetime" HorizontalAlignment="Left" Height="23" Margin="462,47,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="164"/>
+        <TextBox x:Name="Text_remainseat" HorizontalAlignment="Left" Height="23" Margin="631,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="82"/>
+        <TextBox x:Name="Text_arrivetime" HorizontalAlignment="Left" Height="23" Margin="282,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="175"/>
+        <TextBox x:Name="Text_leavetime" HorizontalAlignment="Left" Height="23" Margin="462,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="164"/>
 
         <TextBlock HorizontalAlignment="Left" Margin="73,24,0,0" TextWrapping="Wrap" Text="trainid" VerticalAlignment="Top" Height="16" Width="72" RenderTransformOrigin="0.5,0.5">
             <TextBlock.RenderTransform>
@@ -39,11 +39,11 @@
         <TextBlock HorizontalAlignment="Left" Margin="514,24,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="16" Width="84" Text="leavetime(&lt;=)"/>
         <TextBlock HorizontalAlignment="Left" Margin="338,24,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="16" Width="84" Text="arrivetime(&gt;=)"/>
 
-        <Button x:Name="Button_query" Content="查询" HorizontalAlignment="Left" Margin="718,47,0,0" VerticalAlignment="Top" Width="64" Height="23" Click="Button_query_Click"/>
+        <Button x:Name="Button_query" Content="查询" HorizontalAlignment="Left" Margin="718,45,0,0" VerticalAlignment="Top" Width="64" Height="23" Click="Button_query_Click"/>
         <Button Content="删除" HorizontalAlignment="Left" Margin="587,383,0,0" VerticalAlignment="Top" Width="75" Click="Button_delete_Click"/>
         <Button Content="修改" HorizontalAlignment="Left" Margin="690,383,0,0" VerticalAlignment="Top" Width="75" Click="Button_modify_Click"/>
 
-        <TextBlock HorizontalAlignment="Left" Margin="10,329,0,0" TextWrapping="Wrap" Text="修改：" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="42,341,0,0" TextWrapping="Wrap" Text="修改：" VerticalAlignment="Top"/>
         <TextBox x:Name="Text_remainseat_Copy" HorizontalAlignment="Left" Height="23" Margin="631,341,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="82"/>
         <TextBox x:Name="Text_arrivetime_Copy" HorizontalAlignment="Left" Height="23" Margin="282,341,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="175"/>
         <TextBox x:Name="Text_leavetime_Copy" HorizontalAlignment="Left" Height="23" Margin="462,341,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="164"/>
