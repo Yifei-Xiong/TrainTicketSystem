@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -37,7 +38,7 @@ namespace TTS_Client {
         public struct TicketInfo
         {
             public int TicketNumber { get; set; } //订单序号
-            public int TicketPrice { get; set; } //车票价格
+            public double TicketPrice { get; set; } //车票价格
             public int TicketLine { get; set; } //所属路线序号
             public string LineName { get; set; } //所属线路名称
             public int TrainID { get; set; } //车次
@@ -49,11 +50,15 @@ namespace TTS_Client {
             public string EnterStationTimeIn { get; set; }
             public string EnterStationTimeOut { get; set; }
 
-            public int LeaveStationNumber; //到达站点序号
+            public int LeaveStationNumber { get; set; } //到达站点序号
             public string LeaveStationName { get; set; } //到达站点名称
             public string LeaveStationTime { get; set; }
             public string LeaveStationTimeIn { get; set; }
             public string LeaveStationTimeOut { get; set; }
+
+			public string UserID { get; set; }
+			public int _state { get; set; } //1为已支付订单，2为申请取消的订单，3为失效的订单
+			public string State { get; set; }
         } //单个车票的相关信息
 
         public struct BuyTicket
@@ -138,9 +143,10 @@ namespace TTS_Client {
 
 			BuyTicketListView.ItemsSource = allBuyTicket;
             TicketListView.ItemsSource = allTicketInfo;
-            ticketQueryInfo = new TicketQueryInfo();
+			TicketListView.Items.SortDescriptions.Add(new SortDescription("TicketNumber", ListSortDirection.Descending));
+			ticketQueryInfo = new TicketQueryInfo();
             ticketQueryInfo.StartTime = DateTime.Now;
-            ticketQueryInfo.EndTime = DateTime.Now.AddHours(12);
+            ticketQueryInfo.EndTime = DateTime.Now.AddDays(10);
             textBlock_Copy12.Text = ticketQueryInfo.StartTime.ToString() + " - " + ticketQueryInfo.EndTime.ToString();
 			textBlock_Copy13.Text = ID;
 
@@ -168,11 +174,21 @@ namespace TTS_Client {
 
 			if (IsAdmin == true) {
 				textBlock_Copy16.Text = "管理员";
+				button7.IsEnabled = false;
+				TicketItem.IsEnabled = false;
+				tabControl.SelectedItem = UserItem;
+				this.Title = this.Title + " (管理员)";
 			} //是管理员
 			else {
-
+				button12.Visibility = System.Windows.Visibility.Hidden;
+				button13.Visibility = System.Windows.Visibility.Hidden;
+				SystemItem.Visibility = System.Windows.Visibility.Hidden;
 			} //是普通用户
-        }//构造函数，将登录页面的某些数据传过来
+
+			Refresh_Data(0); //获取用户信息
+
+
+		}//构造函数，将登录页面的某些数据传过来
 
         public ClientWindow() {
 			InitializeComponent();
@@ -235,11 +251,50 @@ namespace TTS_Client {
 			if (Msg.Split('\n')[0]=="0") {
 				if (Msg.Split('\n')[1] == "1") {
 					//无需换乘，一种路线
-					ticketQueryInfo.Line = int.Parse(Msg.Split('\n')[2]);
-					ticketQueryInfo.LineName = Msg.Split('\n')[3];
-					BuyTicketWindow buyTicketWindow = new BuyTicketWindow(ticketQueryInfo, "");
-					buyTicketWindow.ShowDialog();
-					allBuyTicket.Add(buyTicketWindow.selectTicket);
+					TicketQueryInfo subinfo1 = new ClientWindow.TicketQueryInfo();
+					subinfo1.EnterStationNumber = this.ticketQueryInfo.EnterStationNumber;
+					subinfo1.Line = int.Parse(Msg.Split('\n')[2]);
+					subinfo1.LeaveStationNumber = this.ticketQueryInfo.LeaveStationNumber;
+					subinfo1.StartTime = this.ticketQueryInfo.StartTime;
+					subinfo1.EndTime = this.ticketQueryInfo.EndTime;
+					string info1Msg = subinfo1.EnterStationNumber.ToString() + "\n" + subinfo1.Line.ToString()
+						+ "\n" + subinfo1.LeaveStationNumber.ToString() + "\n" + ticketQueryInfo.StartTime.ToString() + "\n" + ticketQueryInfo.EndTime.ToString();
+					TcpClient tcpClient1 = null;
+					NetworkStream networkStream1 = null;
+					try {
+						tcpClient1 = new TcpClient();
+						tcpClient1.Connect(myIPAddress, LoginPort); //建立与服务器的连接
+						networkStream1 = tcpClient1.GetStream();
+						if (networkStream1.CanWrite) {
+							TTS_Core.QueryDataPackage data = new TTS_Core.QueryDataPackage(UserID, myIPAddress + ":" +
+								MyPort.ToString(), "server", TTS_Core.QUERYTYPE.K_TICKETINFO_QUERY, info1Msg);
+							byte[] sendBytes = data.DataPackageToBytes(); //注册数据包转化为字节数组
+							networkStream1.Write(sendBytes, 0, sendBytes.Length);
+						}
+						var newClient = tcpListener.AcceptTcpClient();
+						var bytes = ReadFromTcpClient(newClient); //获取数据
+						var package = new TTS_Core.QueryDataPackage(bytes);
+						subinfo1.EnterStationName = package.ExtraMsg.Split('\r')[0].Split('\n')[0];
+						subinfo1.LineName = package.ExtraMsg.Split('\r')[0].Split('\n')[1];
+						subinfo1.LeaveStationName = package.ExtraMsg.Split('\r')[0].Split('\n')[2];
+						info1Msg = package.ExtraMsg;
+					}
+					catch {
+						MessageBox.Show("指定时段内无可选车次！");
+						return;
+					}
+					finally {
+						if (networkStream != null) {
+							networkStream1.Close();
+						}
+						tcpClient1.Close();
+					}
+
+					BuyTicketWindow buy = new BuyTicketWindow(subinfo1, info1Msg);
+					buy.ShowDialog();
+					if (buy.selectTicket.TrainID != 0) {
+						allBuyTicket.Add(buy.selectTicket);
+					}
 				}
 				else {
 					//无需换乘，多种路线
@@ -603,106 +658,11 @@ namespace TTS_Client {
 
                             break;
                     }
-
-
-                    /*
-                    IMClassLibrary.SingleChatDataPackage chatData1 = new IMClassLibrary.SingleChatDataPackage(bytes);
-					if (chatData1.Message == "添加您为好友") {
-						TcpClient tcpClient1;
-						StateObject stateObject;
-						tcpClient1 = new TcpClient(); //每次发送建立一个TcpClient类对象
-						stateObject = new StateObject(); ////每次发送建立一个StateObject类对象
-						stateObject.tcpClient = tcpClient1;
-						//stateObject.buffer = SendMsg;
-						stateObject.friendIPAndPort = chatData1.Receiver; //所选好友IP和端口号
-						IMClassLibrary.SingleChatDataPackage addFriendData = new IMClassLibrary.SingleChatDataPackage(UserID, IPAndPort, "已收到添加请求");
-						stateObject.buffer = addFriendData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
-						tcpClient1.BeginConnect(chatData1.Receiver.Split(':')[0], int.Parse(chatData1.Receiver.Split(':')[1]), new AsyncCallback(SentCallBackF), stateObject); //异步连接
-					}
-					friendIPAndPort.friendIP = chatData1.Receiver.Split(':')[0];
-					friendIPAndPort.friendPort = chatData1.Receiver.Split(':')[1];
-					friendIPAndPort.friendID = chatData1.Sender;
-					message = chatData1.Receiver + "（用户ID:" + chatData1.Sender + "）（" + chatData1.sendTime.ToString() + "）说:" + chatData1.Message;
-					Msg msg = new Msg();
-					msg.MsgID = (allMsg.Count + 1).ToString();
-					msg.MsgTime = chatData1.sendTime.ToString();
-					msg.UserIP = friendIPAndPort.friendIP;
-					msg.UserPort = friendIPAndPort.friendPort;
-					msg.UserName = chatData1.Sender;
-					msg.ChatMsg = chatData1.Message;
-					msg.IsGroup = "个人聊天";
-					msg.Type = chatData.MessageType;
-					//allMsg.Add(msg);
-					this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new SetMsg(SetMsgViewSource), msg);
-					break;
-				case 5: //多人聊天数据包
-					IMClassLibrary.MultiChatDataPackage chatData2 = new IMClassLibrary.MultiChatDataPackage(bytes);
-					friendIPAndPort.friendIP = chatData2.Receiver.Split(':')[0];
-					friendIPAndPort.friendPort = chatData2.Receiver.Split(':')[1];
-					friendIPAndPort.friendID = chatData2.Sender;
-					message = chatData2.Receiver + "（用户ID:" + chatData2.SenderID + ",来自群聊" + chatData2.Sender.ToString() + "）（" + chatData2.sendTime.ToString() + "）说:" + chatData2.Message;
-					Msg msg2 = new Msg();
-					msg2.MsgID = (allMsg.Count + 1).ToString();
-					msg2.MsgTime = chatData2.sendTime.ToString();
-					msg2.UserIP = friendIPAndPort.friendIP;
-					msg2.OriginPort = friendIPAndPort.friendPort;
-					msg2.UserPort = chatData2.Sender.ToString();
-					msg2.UserName = chatData2.SenderID;
-					msg2.ChatMsg = chatData2.Message;
-					msg2.IsGroup = "群组聊天";
-					msg2.Type = chatData.MessageType;
-					int j;
-					for (j = 0; j < allMsg.Count; j++) {
-						if (allMsg[j].UserName == msg2.UserName) {
-							break;
-						}
-					}
-					if (j == allMsg.Count) {
-						this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new SetMsg(SetMsgViewSource), msg2);
-					}
-					//allMsg.Add(msg2);
-					break;
-				case 7: //文件传输数据包
-					IMClassLibrary.FileDataPackage chatData3 = new IMClassLibrary.FileDataPackage(bytes);
-					FileList.Add(chatData3); //加入List中待下载
-					friendIPAndPort.friendIP = chatData3.Receiver.Split(':')[0];
-					friendIPAndPort.friendPort = chatData3.Receiver.Split(':')[1];
-					friendIPAndPort.friendID = chatData3.Sender;
-					message = chatData3.Receiver + "（用户ID:" + chatData3.Sender + "）（" + chatData3.sendTime.ToString() + "）给你发了一个文件，请接收";
-					Msg msg3 = new Msg();
-					msg3.MsgID = (allMsg.Count + 1).ToString();
-					msg3.MsgTime = chatData3.sendTime.ToString();
-					msg3.UserIP = friendIPAndPort.friendIP;
-					msg3.UserPort = friendIPAndPort.friendPort;
-					msg3.UserName = chatData3.Sender;
-					msg3.ChatMsg = "发送了一个文件";
-					msg3.IsGroup = "文件消息";
-					msg3.Type = chatData.MessageType;
-					this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new SetMsg(SetMsgViewSource), msg3);
-					//allMsg.Add(msg3);
-                    */
 					break;
 				default:
 					MessageBox.Show("聊天数据包读取失败");
 					return;
 			}
-            /*
-			int i;
-			for (i = 0; i < myFriendIPAndPorts.Count; i++) {
-				if (friendIPAndPort.friendPort == myFriendIPAndPorts[i].friendPort && friendIPAndPort.friendIP == myFriendIPAndPorts[i].friendIP ||
-					friendIPAndPort.friendPort == myFriendIPAndPorts[i].friendID && friendIPAndPort.friendIP == myFriendIPAndPorts[i].friendIP) {
-					break;
-				}
-			}
-			if (i == myFriendIPAndPorts.Count) {
-				friendIPAndPort = GetContact(friendIPAndPort);
-				//myFriendIPAndPorts.Add(friendIPAndPort);
-				this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new SetList(SetListViewSource), friendIPAndPort);
-			} //未找到该ip与端口号，需要增加
-			if (message != string.Empty) {
-				//FriendListBox.Items.Add(message);
-				this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new OneArgDelegate(SetFriendListBox), message); //接受信息在FriendListBox显示
-			}*/
 		} //被异步调用的方法
 
 
@@ -790,45 +750,90 @@ namespace TTS_Client {
         //选项卡切换函数
         private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //切换到订单查询选项
-            if(OrderItem.IsSelected)
-            {
-                OrderItem_Selected();
-            }
-            //切换到车票查询/购买选项
-            else if(TicketItem.IsSelected)
-            {
-                //
-            }
-            //切换到用户信息选项卡
-            else if(UserItem.IsSelected)
-            {
-                UserItem_Selected();
-            }
+			if (e.Source is TabControl) {
+				//切换到订单查询选项
+				if (OrderItem.IsSelected) {
+					OrderItem_Selected();
+				}
+				//切换到车票查询/购买选项
+				else if (TicketItem.IsSelected) {
+					//
+				}
+				//切换到用户信息选项卡
+				else if (UserItem.IsSelected) {
+					UserItem_Selected();
+				}
+			}
         }
 
         //切换到订单查询选项事件
         public void OrderItem_Selected()
         {
-            //向服务器发送异步请求
-            TcpClient tcpClient;
-            StateObject stateObject;
-            TTS_Core.QueryDataPackage queryData;
-            tcpClient = new TcpClient();
-            stateObject = new StateObject();
-            stateObject.tcpClient = tcpClient;
-            //queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_USER_ORDER);  //用户订单查询
-            //stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
-            tcpClient.BeginConnect(myIPAddress, LoginPort, new AsyncCallback(SentCallBackF), stateObject); //异步连接
+            //向服务器发送查询请求
+			TcpClient tcpClient = null;
+			NetworkStream networkStream = null;
+			string ExtraMsg = null;
+			try {
+				tcpClient = new TcpClient();
+				tcpClient.Connect(myIPAddress, LoginPort); //建立与服务器的连接
+				networkStream = tcpClient.GetStream();
+				if (networkStream.CanWrite) {
+					TTS_Core.QueryDataPackage data = new TTS_Core.QueryDataPackage(UserID, IPAndPort, "Server", TTS_Core.QUERYTYPE.K_USER_ORDER, "");
+					byte[] sendBytes = data.DataPackageToBytes(); //注册数据包转化为字节数组
+					networkStream.Write(sendBytes, 0, sendBytes.Length);
+				}
+				var newClient = tcpListener.AcceptTcpClient();
+				var bytes = ReadFromTcpClient(newClient); //获取数据
+				var package = new TTS_Core.QueryDataPackage(bytes);
+				ExtraMsg = package.ExtraMsg;
+			}
+			catch {
+				MessageBox.Show("无法连接到服务器!");
+				return;
+			}
+			finally {
+				if (networkStream != null) {
+					networkStream.Close();
+				}
+				tcpClient.Close();
+			}
+			if (ExtraMsg==null) {
+				MessageBox.Show("查询订单失败!");
+			} else {
+				string[] split = ExtraMsg.Split('\r');
+				allTicketInfo.Clear();
+				TicketInfo ticket = new TicketInfo();
+				for (int i=0; i<split.Length-1; i++) {
+					string[] substr = split[i].Split('\n');
+					ticket.TicketNumber = int.Parse(substr[0]);
+					ticket.EnterStationNumber = int.Parse(substr[1]);
+					ticket.EnterStationName = substr[2];
+					ticket.LeaveStationNumber = int.Parse(substr[3]);
+					ticket.LeaveStationName = substr[4];
+					ticket.EnterStationTime = substr[5];
+					ticket.LeaveStationTime = substr[6];
+					ticket.LineName = substr[7];
+					ticket.TicketLine = int.Parse(substr[8]);
+					ticket.TrainID = int.Parse(substr[9]);
+					ticket.UserID = substr[10];
+					ticket.BuyTime = substr[11];
+					ticket.TicketPrice = double.Parse(substr[12]);
+					ticket._state = int.Parse(substr[13]);
+					if (ticket._state == 1) {
+						ticket.State = "已支付";
+					}
+					else if (ticket._state == 2) {
+						ticket.State = "已申请取消";
+					}
+					else if (ticket._state == 3) {
+						ticket.State = "已取消";
+					}
+					allTicketInfo.Add(ticket);
+				}
 
-            //加载数据完成前
-            allBuyTicket.Clear();  //清空信息
-            BuyTicket buyTicket = new BuyTicket();
-            buyTicket.EnterStationTime = "加";
-            buyTicket.LeaveStationName = "载";
-            buyTicket.LeaveStationTimeIn = "中...";
-            allBuyTicket.Add(buyTicket);
-        }
+			}
+
+		}
 
         //切换到用户信息选项卡事件
         void UserItem_Selected()
@@ -865,11 +870,11 @@ namespace TTS_Client {
 				MessageBox.Show("未选择需要购买的车票");
 				return;
 			}
-			BuyTicket[] buyTicket = new BuyTicket[BuyTicketListView.SelectedItems.Count];
-			for (int i = 0; i < buyTicket.Length; i++) {
-				buyTicket[i] = (BuyTicket)BuyTicketListView.SelectedItems[i];
+			BuyTicket[] buyTickets = new BuyTicket[BuyTicketListView.SelectedItems.Count];
+			for (int i = 0; i < buyTickets.Length; i++) {
+				buyTickets[i] = (BuyTicket)BuyTicketListView.SelectedItems[i];
 			}
-			SendBuyTicketToServer(buyTicket);
+			SendBuyTicketToServer(buyTickets);
 		} //购买选中的车票
 
 		private void button6_Click(object sender, RoutedEventArgs e) {
@@ -877,17 +882,17 @@ namespace TTS_Client {
 				MessageBox.Show("您还未添加车票");
 				return;
 			}
-			BuyTicket[] buyTicket = new BuyTicket[allBuyTicket.Count];
-			for (int i = 0; i < buyTicket.Length; i++) {
-				buyTicket[i] = allBuyTicket[i];
+			BuyTicket[] buyTickets = new BuyTicket[allBuyTicket.Count];
+			for (int i = 0; i < buyTickets.Length; i++) {
+				buyTickets[i] = allBuyTicket[i];
 			}
-			SendBuyTicketToServer(buyTicket);
+			SendBuyTicketToServer(buyTickets);
 		} //添加购买的所有车票
 
-		private void SendBuyTicketToServer (BuyTicket[] buyTicket) {
+		private void SendBuyTicketToServer (BuyTicket[] buyTickets) {
 			double totalCost = 0;
-			for (int i = 0; i < buyTicket.Length; i++) {
-				totalCost += buyTicket[i].TicketPrice;
+			for (int i = 0; i < buyTickets.Length; i++) {
+				totalCost += buyTickets[i].TicketPrice;
 			}
 			if (totalCost > RemainMoney) {
 				MessageBox.Show("余额不足，总共需要" + totalCost.ToString() + "元，当前用于余额为" + 
@@ -896,10 +901,10 @@ namespace TTS_Client {
 			}
 
 			string ExtraMsg = "";
-			for (int i = 0; i < buyTicket.Length; i++) {
+			for (int i = 0; i < buyTickets.Length; i++) {
 				//TrainID, EnterID, LeaveID, UserID, BuyNumber
-				ExtraMsg = ExtraMsg + buyTicket[i].TrainID + "\n" + buyTicket[i].EnterStationNumber.ToString() + "\n" +
-					buyTicket[i].LeaveStationNumber.ToString() + "\n" + UserID + "\n" + buyTicket[i].BuyNumber.ToString() + "\r";
+				ExtraMsg = ExtraMsg + buyTickets[i].TrainID + "\n" + buyTickets[i].EnterStationName + "\n" +
+					buyTickets[i].LeaveStationName.ToString() + "\n" + UserID + "\n" + buyTickets[i].BuyNumber.ToString() + "\r";
 			}
 
 			TcpClient tcpClient = null;
@@ -917,7 +922,12 @@ namespace TTS_Client {
 				var newClient = tcpListener.AcceptTcpClient();
 				var bytes = ReadFromTcpClient(newClient); //获取数据
 				var package = new TTS_Core.QueryDataPackage(bytes);
-				MessageBox.Show(package.ExtraMsg);
+				MessageBox.Show(package.ExtraMsg); //可知购买成功或失败
+				if (package.ExtraMsg == "购买成功！") {
+					for (int i = 0; i < buyTickets.Length; i++) {
+						allBuyTicket.Remove(buyTickets[i]);
+					}
+				}
 			}
 			catch {
 				MessageBox.Show("无法连接到服务器!");
@@ -929,21 +939,6 @@ namespace TTS_Client {
 				}
 				tcpClient.Close();
 			}
-
-
-			int ByFlag = 1; //1 购买成功, 2 余票不足, 3 车站或线路管制中。
-			if (ByFlag == 1) {
-				MessageBox.Show("购买成功，您可以在订单查询选项卡查看详细信息！");
-				for (int i = 0; i < buyTicket.Length; i++) {
-					allBuyTicket.Remove(buyTicket[i]);
-				}
-			}
-			else if (ByFlag == 2) {
-				MessageBox.Show("购买失败，余额不足！");
-			}
-			else if (ByFlag == 3) {
-				MessageBox.Show("购买失败，部分车站或线路管制中！");
-			}
 		}
 
 		private void Button_Click_1(object sender, RoutedEventArgs e) {
@@ -952,6 +947,11 @@ namespace TTS_Client {
 			if (changeUserInfo.value == string.Empty) {
 				return;
 			}
+			if (System.Text.RegularExpressions.Regex.IsMatch(changeUserInfo.value, @"^1[3456789]\d{9}$") == false) {
+				MessageBox.Show("手机号无法通过正则表达式验证！");
+				return;
+			}
+
 			TcpClient tcpClient = null;
 			NetworkStream networkStream = null;
 			try {
@@ -984,6 +984,10 @@ namespace TTS_Client {
 			if (changeUserInfo.value == string.Empty) {
 				return;
 			}
+			if (System.Text.RegularExpressions.Regex.IsMatch(changeUserInfo.value, @"^[A-Za-z_0-9]{4,12}$") == false) {
+				MessageBox.Show("用户名无法通过正则表达式验证！");
+				return;
+			}
 			TcpClient tcpClient = null;
 			NetworkStream networkStream = null;
 			try {
@@ -1011,6 +1015,10 @@ namespace TTS_Client {
 		} //更改用户昵称
 
 		private void button11_Click(object sender, RoutedEventArgs e) {
+			Refresh_Data(1); //为1则包含弹窗提示
+		} //刷新用户信息
+
+		private void Refresh_Data(int show) {
 			TcpClient tcpClient = null;
 			NetworkStream networkStream = null;
 			try {
@@ -1027,7 +1035,9 @@ namespace TTS_Client {
 				var bytes = ReadFromTcpClient(newClient); //获取数据
 				var package = new TTS_Core.DataPackage(bytes);
 				string message = package.Sender;
-				MessageBox.Show(message);
+				if (show==1) {
+					MessageBox.Show(message);
+				}
 				string[] infostr = package.Receiver.Split('\n');
 				this.Phone = infostr[0];
 				this.UserName = infostr[1];
@@ -1106,6 +1116,7 @@ namespace TTS_Client {
 			activity.ShowDialog();
         }
 
+<<<<<<< HEAD
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
 			var activity = new ManagerWindow_station(UserID, myIPAddress, LoginPort, tcpListener, MyPort);
@@ -1136,4 +1147,104 @@ namespace TTS_Client {
 			activity.ShowDialog();
         }
     }
+=======
+		private void button7_Click(object sender, RoutedEventArgs e) {
+			//申请取消所选订单
+			if (TicketListView.SelectedItems.Count == 0) {
+				MessageBox.Show("未选择需要申请取消的订单");
+				return;
+			}
+			TicketInfo[] infos = new TicketInfo[TicketListView.SelectedItems.Count];
+			string ExtraMsg = "2" + "\r";
+			for (int i = 0; i < infos.Length; i++) {
+				infos[i] = (TicketInfo)TicketListView.SelectedItems[i];
+				if (infos[i]._state!=1) {
+					MessageBox.Show("你已经申请过取消该订单了！");
+					return;
+				}
+				ExtraMsg = ExtraMsg + infos[i].TicketNumber.ToString() + "\n";
+			}
+			TicketStateChange(ExtraMsg);
+		} //申请取消所选订单
+
+		private void button13_Click(object sender, RoutedEventArgs e) {
+			//将该订单置于失效状态
+			if (TicketListView.SelectedItems.Count == 0) {
+				MessageBox.Show("未选择需要置于失效的订单");
+				return;
+			}
+			TicketInfo[] infos = new TicketInfo[TicketListView.SelectedItems.Count];
+			string ExtraMsg = "3" + "\r";
+			for (int i = 0; i < infos.Length; i++) {
+				infos[i] = (TicketInfo)TicketListView.SelectedItems[i];
+				if (infos[i]._state == 3) {
+					MessageBox.Show("只有未失效的订单才可以置于失效！");
+					return;
+				}
+				ExtraMsg = ExtraMsg + infos[i].TicketNumber.ToString() + "\n";
+			}
+			TicketStateChange(ExtraMsg);
+		} //将该订单置于失效状态
+
+		private void button12_Click(object sender, RoutedEventArgs e) {
+			//将该订单置于生效状态
+			if (TicketListView.SelectedItems.Count == 0) {
+				MessageBox.Show("未选择需要置于已支付状态的订单");
+				return;
+			}
+			TicketInfo[] infos = new TicketInfo[TicketListView.SelectedItems.Count];
+			string ExtraMsg = "1" + "\r";
+			for (int i = 0; i < infos.Length; i++) {
+				infos[i] = (TicketInfo)TicketListView.SelectedItems[i];
+				if (infos[i]._state == 1) {
+					MessageBox.Show("只有未生效的订单才可以置于已支付状态！");
+					return;
+				}
+				ExtraMsg = ExtraMsg + infos[i].TicketNumber.ToString() + "\n";
+			}
+			TicketStateChange(ExtraMsg);
+		} //将该订单置于生效状态
+
+		private void TicketStateChange(string ExtraMsg) {
+			TcpClient tcpClient = null;
+			NetworkStream networkStream = null;
+			try {
+				tcpClient = new TcpClient();
+				tcpClient.Connect(myIPAddress, LoginPort); //建立与服务器的连接
+				networkStream = tcpClient.GetStream();
+				if (networkStream.CanWrite) {
+					TTS_Core.QueryDataPackage info = new TTS_Core.QueryDataPackage(UserID, myIPAddress + ":" +
+						MyPort.ToString(), "server", TTS_Core.QUERYTYPE.K_TICKET_STATE, ExtraMsg );
+					byte[] sendBytes = info.DataPackageToBytes(); //注册数据包转化为字节数组
+					networkStream.Write(sendBytes, 0, sendBytes.Length);
+				}
+				var newClient = tcpListener.AcceptTcpClient();
+				var bytes = ReadFromTcpClient(newClient); //获取数据
+				var package = new TTS_Core.QueryDataPackage(bytes);
+				MessageBox.Show(package.ExtraMsg);
+				OrderItem_Selected();
+			}
+			catch {
+				MessageBox.Show("无法连接到服务器!");
+				return;
+			}
+			finally {
+				if (networkStream != null) {
+					networkStream.Close();
+				}
+				tcpClient.Close();
+			}
+		} //订单状态改变
+
+		private void button10_Click(object sender, RoutedEventArgs e) {
+			LoginWindow loginWindow = new LoginWindow(UserID, "127.0.0.1:" + LoginPort);
+			loginWindow.Show();
+			this.Close();
+		} //退出登录
+
+		private void button2_Copy2_Click(object sender, RoutedEventArgs e) {
+			OrderItem_Selected();
+		} //订单表的刷新
+	}
+>>>>>>> 86c36a94fcc90aff53b77e097936a34d5f7ea1c3
 }

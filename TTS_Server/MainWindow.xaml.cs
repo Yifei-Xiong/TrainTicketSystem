@@ -286,8 +286,55 @@ namespace TTS_Server {
 												new AsyncCallback(SentCallBackF), stateObject);
 										} break;
 									case TTS_Core.QUERYTYPE.K_SUBMIT_BUY: {
-											SubmitBuy(package.ExtraMsg);
+											int ByFlag = SubmitBuy(package.ExtraMsg);
+											string retMsg = "";
+											if (ByFlag==5) {
+												retMsg = "购买成功！";
+											}
+											else if (ByFlag == 3) {
+												retMsg = "购买失败，余额不足！";
+											}
+											else if (ByFlag == 4) {
+												retMsg = "购买失败，余票不足！";
+											}
+											else {
+												retMsg = "购买失败，请与管理员取得联系！";
+											}
+											TcpClient tcpClient;
+											StateObject stateObject;
+											tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+											stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+											stateObject.tcpClient = tcpClient;
+											var data = new TTS_Core.QueryDataPackage("Server", package.IPandPort, package.Sender, TTS_Core.QUERYTYPE.K_SUBMIT_BUY, retMsg);
+											stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+											tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+												new AsyncCallback(SentCallBackF), stateObject);
 										} break;
+									case TTS_Core.QUERYTYPE.K_USER_ORDER: {
+											string retMsg = SearchOrder(package.Sender);
+											TcpClient tcpClient;
+											StateObject stateObject;
+											tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+											stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+											stateObject.tcpClient = tcpClient;
+											var data = new TTS_Core.QueryDataPackage("Server", package.IPandPort, package.Sender, TTS_Core.QUERYTYPE.K_USER_ORDER, retMsg);
+											stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+											tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+												new AsyncCallback(SentCallBackF), stateObject);
+										} break;
+									case TTS_Core.QUERYTYPE.K_TICKET_STATE: {
+											string retMsg = TicketStateChange(package.ExtraMsg);
+											TcpClient tcpClient;
+											StateObject stateObject;
+											tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+											stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+											stateObject.tcpClient = tcpClient;
+											var data = new TTS_Core.QueryDataPackage("Server", package.IPandPort, package.Sender, TTS_Core.QUERYTYPE.K_TICKET_STATE, retMsg);
+											stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+											tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+												new AsyncCallback(SentCallBackF), stateObject);
+										}
+										break;
 								}
 							} //特定查询
 							break;
@@ -1530,8 +1577,8 @@ namespace TTS_Server {
 			return output;
 		}
 
-		private void SubmitBuy (string ExtraMsg) {
-			string[] sep = ExtraMsg.Split('\r');
+		private int SubmitBuy (string ExtraMsg) {
+			string[] split = ExtraMsg.Split('\r');
 
 			int EnterID = 0; //
 			string EnterName = "";
@@ -1547,45 +1594,125 @@ namespace TTS_Server {
 			double price = 0;
 			int state = 1; //
 
-			for (int i=0; i<sep.Length-1; i++) {
-				string[] sep2 = sep[i].Split('\n');
+			for (int i=0; i< split.Length-1; i++) {
+				string[] sep2 = split[i].Split('\n');
 				TrainID = int.Parse(sep2[0]);
-				EnterID = int.Parse(sep2[1]);
-				LeaveID = int.Parse(sep2[2]);
+				EnterName = sep2[1];
+				LeaveName = sep2[2];
 				UserID = sep2[3];
 				int BuyNumber = int.Parse(sep2[4]);
 
-				MySqlCommand sql = new MySqlCommand("SELECT A.ticketprice, B.lineid, C.stationname, D.stationname, E.linename, F.arrivetime, G.arrivetime " +
-					"FROM ticketprice A, train B, station C, station D, line E, trainstation F, trainstation G WHERE A.enterstationid=" + sep2[1]+ " AND " +
-					"A.leavestationid=" + sep2[2] + " AND A.lineid=B.lineid AND B.trainid=" + sep2[0] + " AND C.stationid=" + sep2[1] + " AND D.stationid=" + sep2[2] + " AND E.lineid=B.lineid AND " +
-					"F.trainid=" + sep2[0] + " AND F.stationid=" + sep2[1] + " AND G.trainid=" + sep2[0] + " AND G.stationid=" + sep2[2] + "", connection);
+				MySqlCommand sql = new MySqlCommand("SELECT A.ticketprice, B.lineid, C.stationid, D.stationid, E.linename, F.arrivetime, G.arrivetime " +
+					"FROM ticketprice A, train B, station C, station D, line E, trainstation F, trainstation G WHERE A.enterstationid=C.stationid AND " +
+					"A.leavestationid=D.stationid AND A.lineid=B.lineid AND B.trainid=" + sep2[0] + " AND C.stationname=\"" + sep2[1] + "\" AND D.stationname=\"" + sep2[2] + "\" AND E.lineid=B.lineid AND " +
+					"F.trainid=" + sep2[0] + " AND F.stationid=C.stationid AND G.trainid=" + sep2[0] + " AND G.stationid=D.stationid", connection);
 				try {
 					MySqlDataReader reader = sql.ExecuteReader();
 					while (reader.Read()) {
 						price = double.Parse(reader[0].ToString());
 						LineID = int.Parse(reader[1].ToString());
-						EnterName = reader[2].ToString();
-						LeaveName = reader[3].ToString();
+						EnterID = int.Parse(reader[2].ToString());
+						LeaveID = int.Parse(reader[3].ToString());
 						LineName = reader[4].ToString();
 						EnterTime = reader[5].ToString();
 						LeaveTime = reader[6].ToString();
 					}
 					reader.Close();
 				}
-				catch { }
+				catch { return 1; }
 
-				var query = new MySqlCommand("INSERT INTO ticket(enterstationid, enterstationname, leavestationid, leavestationname, enterstationtime, " +
-					"leavestationtime, linename, lineid, trainid, userid, buytime, ticketprice, state) VALUES ("+ sep2[1] + ", \"" + EnterName + "\", " + sep2[2] +
-					", \"" + LeaveName + "\", \"" + EnterTime + "\", \"" + LeaveTime + "\", \"" + LineName + "\", " + LineID.ToString() + ", " + sep2[0] 
-					+ ", \"" + sep2[3] + "\", \"" + BuyTime + "\", " + price.ToString() + ", " + state.ToString() + ")", connection);
+				double balance = 0;
+				MySqlCommand sql1 = new MySqlCommand("SELECT balance FROM alluser WHERE userid = \"" + UserID + "\"", connection);
 				try {
-					query.ExecuteNonQuery();
+					MySqlDataReader reader = sql1.ExecuteReader();
+					while (reader.Read()) {
+						balance = double.Parse(reader[0].ToString());
+					}
+					reader.Close();
 				}
-				catch { }
+				catch { return 2; }
+				if (balance < price * BuyNumber) {
+					return 3;
+				} //用户余额不足
+				
+				for (int j=0; j < BuyNumber; j++) {
+					var query = new MySqlCommand("INSERT INTO ticket(enterstationid, enterstationname, leavestationid, leavestationname, enterstationtime, " +
+						"leavestationtime, linename, lineid, trainid, userid, buytime, ticketprice) VALUES (" + EnterID.ToString() + ", \"" + EnterName + "\", " + LeaveID.ToString() +
+						", \"" + LeaveName + "\", \"" + EnterTime + "\", \"" + LeaveTime + "\", \"" + LineName + "\", " + LineID.ToString() + ", " + sep2[0]
+						+ ", \"" + sep2[3] + "\", \"" + BuyTime + "\", " + price.ToString() + ")", connection);
+					var query2 = new MySqlCommand("update alluser set balance=balance-"+ (price * BuyNumber).ToString() + " where userid = \"" + UserID + "\"", connection);
+					try {
+						query.ExecuteNonQuery();
+						query2.ExecuteNonQuery();
+					}
+					catch { return 4; }
+				}
+
+
 			}
+			return 5;
 			//return msg
 
 		}
+
+		private string SearchOrder (string UserID) {
+			string info = "";
+			//首先判断是否为管理员
+			int accounttype = 0;
+			MySqlCommand sql1 = new MySqlCommand("SELECT accounttype FROM alluser WHERE userid = \"" + UserID + "\"", connection);
+			try {
+				MySqlDataReader reader = sql1.ExecuteReader();
+				while (reader.Read()) {
+					accounttype = int.Parse(reader[0].ToString());
+				}
+				reader.Close();
+			}
+			catch {  }
+			if (accounttype == 2) {
+				//为管理员
+				MySqlCommand sql = new MySqlCommand("SELECT ticketid, enterstationid, enterstationname, leavestationid, leavestationname, " +
+					"enterstationtime, leavestationtime, linename, lineid, trainid, userid, buytime, ticketprice, state FROM ticket", connection);
+				try {
+					MySqlDataReader reader = sql.ExecuteReader();
+					while (reader.Read()) {
+						info = info + reader[0].ToString() + "\n" + reader[1].ToString() + "\n" + reader[2].ToString() + "\n" + reader[3].ToString() + "\n"
+							 + reader[4].ToString() + "\n" + reader[5].ToString() + "\n" + reader[6].ToString() + "\n" + reader[7].ToString() + "\n" + reader[8].ToString() + "\n"
+							 + reader[9].ToString() + "\n" + reader[10].ToString() + "\n" + reader[11].ToString() + "\n" + reader[12].ToString() + "\n" + reader[13].ToString() + "\r";
+					}
+					reader.Close();
+				}
+				catch { }
+			} else {
+				//为用户
+				MySqlCommand sql = new MySqlCommand("SELECT ticketid, enterstationid, enterstationname, leavestationid, leavestationname, " +
+					"enterstationtime, leavestationtime, linename, lineid, trainid, userid, buytime, ticketprice, state FROM ticket WHERE userid = \"" + UserID + "\"", connection);
+				try {
+					MySqlDataReader reader = sql.ExecuteReader();
+					while (reader.Read()) {
+						info = info + reader[0].ToString() + "\n" + reader[1].ToString() + "\n" + reader[2].ToString() + "\n" + reader[3].ToString() + "\n"
+							 + reader[4].ToString() + "\n" + reader[5].ToString() + "\n" + reader[6].ToString() + "\n" + reader[7].ToString() + "\n" + reader[8].ToString() + "\n"
+							 + reader[9].ToString() + "\n" + reader[10].ToString() + "\n" + reader[11].ToString() + "\n" + reader[12].ToString() + "\n" + reader[13].ToString() + "\r";
+					}
+					reader.Close();
+				}
+				catch { }
+			}
+			return info;
+		}
+
+		private string TicketStateChange (string ExtraMsg) {
+			string[] ticketid = ExtraMsg.Split('\r')[1].Split('\n');
+			string state = ExtraMsg.Split('\r')[0];
+			for (int i = 0; i < ticketid.Length - 1; i++) {
+				try {
+					var query = new MySqlCommand("update ticket set state=" + state + " where ticketid=" + ticketid[i], connection);
+					query.ExecuteNonQuery();
+				}
+				catch { return "订单状态更新失败!"; }
+			}
+			return "订单状态更新成功!";
+		}
+
 
 	}
 }

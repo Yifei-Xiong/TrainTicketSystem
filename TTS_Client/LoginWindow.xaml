@@ -16,6 +16,6 @@
         <Button x:Name="button_register" Content="注册账号" HorizontalAlignment="Left" Margin="60,146,0,0" VerticalAlignment="Top" Width="75" Click="button_register_Click"/>
         <Button x:Name="button_login" Content="登陆" HorizontalAlignment="Left" Margin="150,146,0,0" VerticalAlignment="Top" Width="75" Click="button_login_Click"/>
         <Button x:Name="button_about" Content="关于" HorizontalAlignment="Left" Margin="241,146,0,0" VerticalAlignment="Top" Width="75" Click="button_about_Click"/>
-        <Button Content="Debug" HorizontalAlignment="Left" Margin="150,174,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+        <Button Content="Debug" HorizontalAlignment="Left" Margin="150,174,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click" Visibility="Hidden"/>
     </Grid>
 </Window>

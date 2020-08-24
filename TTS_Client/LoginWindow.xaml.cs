@@ -145,7 +145,15 @@ namespace TTS_Client {
 		
         //点击注册按钮
 		private void button_register_Click(object sender, RoutedEventArgs e) {
-            //向服务器发送请求
+			//向服务器发送请求
+			if (System.Text.RegularExpressions.Regex.IsMatch(textBox_id.Text, @"^[A-Za-z_0-9]{4,12}$") == false) {
+				MessageBox.Show("用户ID要求由4-12位数字、字母和下划线构成！");
+				return;
+			}
+			if (System.Text.RegularExpressions.Regex.IsMatch(passwordBox.Password, @"^[A-Za-z_0-9]{4,12}$") == false) {
+				MessageBox.Show("密码要求由4-12位数字、字母和下划线构成！");
+				return;
+			}
 			TcpClient tcpClient = null;
 			NetworkStream networkStream = null;
 			try {
