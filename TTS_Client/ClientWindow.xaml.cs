@@ -1116,7 +1116,6 @@ namespace TTS_Client {
 			activity.ShowDialog();
         }
 
-<<<<<<< HEAD
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
 			var activity = new ManagerWindow_station(UserID, myIPAddress, LoginPort, tcpListener, MyPort);
@@ -1146,8 +1145,7 @@ namespace TTS_Client {
 			var activity = new ManagerWindow_ticketprice(UserID, myIPAddress, LoginPort, tcpListener, MyPort);
 			activity.ShowDialog();
         }
-    }
-=======
+    
 		private void button7_Click(object sender, RoutedEventArgs e) {
 			//申请取消所选订单
 			if (TicketListView.SelectedItems.Count == 0) {
@@ -1246,5 +1244,4 @@ namespace TTS_Client {
 			OrderItem_Selected();
 		} //订单表的刷新
 	}
->>>>>>> 86c36a94fcc90aff53b77e097936a34d5f7ea1c3
 }

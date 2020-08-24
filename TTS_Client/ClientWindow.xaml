@@ -136,25 +136,17 @@
                 <Grid Background="#FFE5E5E5">
                     <Button Content="修改用户账户信息" HorizontalAlignment="Left" Margin="50,25,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_3"/>
                     <Button Content="修改线路名称" HorizontalAlignment="Left" Margin="50,60,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_4"/>
-<<<<<<< HEAD
                     <Button Content="修改列车信息" HorizontalAlignment="Left" Margin="50,95,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_6"/>
                     <Button Content="修改车站信息" HorizontalAlignment="Left" Margin="50,130,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_5"/>
                     <Button Content="修改车站-线路归属" HorizontalAlignment="Left" Margin="50,165,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_7"/>
                     <Button Content="修改列车-车站归属" HorizontalAlignment="Left" Margin="50,200,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_8"/>
                     <Button Content="修改车票价格" HorizontalAlignment="Left" Margin="50,235,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_9"/>
-=======
-                    <Button Content="修改列车信息" HorizontalAlignment="Left" Margin="50,95,0,0" VerticalAlignment="Top" Width="128"/>
-                    <Button Content="修改车站信息" HorizontalAlignment="Left" Margin="50,130,0,0" VerticalAlignment="Top" Width="128"/>
-                    <Button Content="修改车站-线路归属" HorizontalAlignment="Left" Margin="50,165,0,0" VerticalAlignment="Top" Width="128"/>
-                    <Button Content="修改列车-车站归属" HorizontalAlignment="Left" Margin="50,200,0,0" VerticalAlignment="Top" Width="128"/>
-                    <Button Content="修改车票价格" HorizontalAlignment="Left" Margin="50,235,0,0" VerticalAlignment="Top" Width="128"/>
                 </Grid>
             </TabItem>
             <TabItem Header="程序信息" x:Name="ProgramItem" Visibility="Hidden">
                 <Grid Background="#FFE5E5E5">
                     <Button x:Name="button8" Content="载入测试数据(仅用于调试)" HorizontalAlignment="Left" Margin="29,192,0,0" VerticalAlignment="Top" Width="163" Click="button8_Click"/>
                     <Button x:Name="button8_Copy" Content="清空已有数据(仅用于调试)" HorizontalAlignment="Left" Margin="29,223,0,0" VerticalAlignment="Top" Width="163" Click="button8_Copy_Click"/>
->>>>>>> 86c36a94fcc90aff53b77e097936a34d5f7ea1c3
                 </Grid>
             </TabItem>
         </TabControl>
