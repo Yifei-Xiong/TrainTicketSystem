@@ -24,6 +24,7 @@
         <TextBlock HorizontalAlignment="Left" Margin="10,329,0,0" TextWrapping="Wrap" Text="修改：" VerticalAlignment="Top"/>
         <Button Content="删除" HorizontalAlignment="Left" Margin="587,383,0,0" VerticalAlignment="Top" Width="75" Click="Button_delete_Click"/>
         <Button Content="修改" HorizontalAlignment="Left" Margin="690,383,0,0" VerticalAlignment="Top" Width="75" Click="Button_modify_Click"/>
+        <TextBox x:Name="Text_lineid_Copy" HorizontalAlignment="Left" Height="23" Margin="35,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="103"/>
 
     </Grid>
 </Window>

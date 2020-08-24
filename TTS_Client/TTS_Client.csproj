@@ -73,6 +73,21 @@
     <Compile Include="LineSelect.xaml.cs">
       <DependentUpon>LineSelect.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ManagerWindow_ticketprice.xaml.cs">
+      <DependentUpon>ManagerWindow_ticketprice.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ManagerWindow_trainstation.xaml.cs">
+      <DependentUpon>ManagerWindow_trainstation.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ManagerWindow_stationline.xaml.cs">
+      <DependentUpon>ManagerWindow_stationline.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ManagerWindow_train.xaml.cs">
+      <DependentUpon>ManagerWindow_train.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ManagerWindow_station.xaml.cs">
+      <DependentUpon>ManagerWindow_station.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ManagerWindow_line.xaml.cs">
       <DependentUpon>ManagerWindow_line.xaml</DependentUpon>
     </Compile>
@@ -127,6 +142,26 @@
       <DependentUpon>LoginWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ManagerWindow_ticketprice.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ManagerWindow_trainstation.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ManagerWindow_stationline.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ManagerWindow_train.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ManagerWindow_station.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ManagerWindow_line.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -124,12 +124,11 @@
                 <Grid Background="#FFE5E5E5">
                     <Button Content="修改用户账户信息" HorizontalAlignment="Left" Margin="50,25,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_3"/>
                     <Button Content="修改线路名称" HorizontalAlignment="Left" Margin="50,60,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_4"/>
-                    <Button Content="修改列车信息" HorizontalAlignment="Left" Margin="50,95,0,0" VerticalAlignment="Top" Width="128"/>
-                    <Button Content="修改车站信息" HorizontalAlignment="Left" Margin="50,130,0,0" VerticalAlignment="Top" Width="128"/>
-                    <Button Content="修改车站-线路归属" HorizontalAlignment="Left" Margin="50,165,0,0" VerticalAlignment="Top" Width="128"/>
-                    <Button Content="修改列车-车站归属" HorizontalAlignment="Left" Margin="50,200,0,0" VerticalAlignment="Top" Width="128"/>
-                    <Button Content="管理用户订单" HorizontalAlignment="Left" Margin="50,235,0,0" VerticalAlignment="Top" Width="128"/>
-                    <Button Content="修改车票价格" HorizontalAlignment="Left" Margin="50,270,0,0" VerticalAlignment="Top" Width="128"/>
+                    <Button Content="修改列车信息" HorizontalAlignment="Left" Margin="50,95,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_6"/>
+                    <Button Content="修改车站信息" HorizontalAlignment="Left" Margin="50,130,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_5"/>
+                    <Button Content="修改车站-线路归属" HorizontalAlignment="Left" Margin="50,165,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_7"/>
+                    <Button Content="修改列车-车站归属" HorizontalAlignment="Left" Margin="50,200,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_8"/>
+                    <Button Content="修改车票价格" HorizontalAlignment="Left" Margin="50,235,0,0" VerticalAlignment="Top" Width="128" Click="Button_Click_9"/>
                 </Grid>
             </TabItem>
         </TabControl>
