@@ -14,7 +14,7 @@
                     <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="153,55,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="109" TextAlignment="Center" Text="已选择到达地点："/>
                     <Button x:Name="button" Content="选择出发地点" HorizontalAlignment="Left" Margin="35,29,0,0" VerticalAlignment="Top" Width="101" Click="button_Click"/>
                     <Button x:Name="button1" Content="选择到达地点" HorizontalAlignment="Left" Margin="35,54,0,0" VerticalAlignment="Top" Width="101" Click="button1_Click"/>
-                    <Button x:Name="button2" Content="查询/购买" HorizontalAlignment="Left" Margin="35,114,0,0" VerticalAlignment="Top" Width="101" Click="button2_Click"/>
+                    <Button x:Name="button2" Content="查询/购买" HorizontalAlignment="Left" Margin="35,103,0,0" VerticalAlignment="Top" Width="101" Click="button2_Click" Height="37"/>
                     <Button x:Name="button3" Content="选择出发时间" HorizontalAlignment="Left" Margin="35,79
                             ,0,0" VerticalAlignment="Top" Width="101" Click="button3_Click"/>
                     <TextBlock x:Name="textBlock_Copy1" HorizontalAlignment="Left" Margin="153,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="109" TextAlignment="Center" Text="已选择出发时间："/>
@@ -83,11 +83,11 @@
                     <TextBlock x:Name="textBlock1_Copy" HorizontalAlignment="Left" Margin="106,18,0,0" TextWrapping="Wrap" Text="出发站号" VerticalAlignment="Top"/>
                     <TextBox x:Name="textBox_tic1" HorizontalAlignment="Left" Height="23" Margin="12,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="44"/>
                     <TextBox x:Name="textBox_tic3" HorizontalAlignment="Left" Height="23" Margin="103,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="53"/>
-                    <Button x:Name="button2_Copy" Content="筛选" HorizontalAlignment="Left" Margin="242,66,0,0" VerticalAlignment="Top" Width="63" Click="button2_Copy_Click_1"/>
-                    <Button x:Name="button2_Copy1" Content="清空" HorizontalAlignment="Left" Margin="162,66,0,0" VerticalAlignment="Top" Width="63" Click="Button2_Copy_Click" />
+                    <Button x:Name="button2_Copy" Content="筛选" HorizontalAlignment="Left" Margin="339,66,0,0" VerticalAlignment="Top" Width="63" Click="button2_Copy_Click_1"/>
+                    <Button x:Name="button2_Copy1" Content="清空" HorizontalAlignment="Left" Margin="259,66,0,0" VerticalAlignment="Top" Width="63" Click="Button2_Copy_Click" />
                     <TextBox x:Name="textBox_tic4" HorizontalAlignment="Left" Height="23" Margin="159,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="61"/>
                     <TextBlock x:Name="textBlock1_Copy1" HorizontalAlignment="Left" Margin="258,18,0,0" TextWrapping="Wrap" Text="出发时间" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="precision" Content="精确搜索" HorizontalAlignment="Left" Margin="73,68,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="precision" Content="精确搜索" HorizontalAlignment="Left" Margin="170,68,0,0" VerticalAlignment="Top"/>
                     <TextBlock x:Name="textBlock_Copy6" HorizontalAlignment="Left" Margin="405,18,0,0" TextWrapping="Wrap" Text="到达站点" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662"/>
                     <TextBlock x:Name="textBlock1_Copy2" HorizontalAlignment="Left" Margin="498,18,0,0" TextWrapping="Wrap" Text="到达时间" VerticalAlignment="Top"/>
                     <TextBox x:Name="textBox_tic5" HorizontalAlignment="Left" Height="23" Margin="224,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="116"/>
@@ -113,14 +113,16 @@
                     <TextBlock x:Name="textBlock1_Copy11" HorizontalAlignment="Left" Margin="929,18,0,0" TextWrapping="Wrap" Text="订单状态" VerticalAlignment="Top"/>
                     <Button x:Name="button12" Content="将该订单置于已支付状态" HorizontalAlignment="Left" Margin="515,66,0,0" VerticalAlignment="Top" Width="155" Click="button12_Click"/>
                     <Button x:Name="button13" Content="将该订单置于失效状态" HorizontalAlignment="Left" Margin="675,66,0,0" VerticalAlignment="Top" Width="137" Click="button13_Click"/>
-                    <Button x:Name="button2_Copy2" Content="刷新" HorizontalAlignment="Left" Margin="322,66,0,0" VerticalAlignment="Top" Width="63" Click="button2_Copy2_Click"/>
+                    <Button x:Name="button2_Copy2" Content="刷新" HorizontalAlignment="Left" Margin="419,66,0,0" VerticalAlignment="Top" Width="63" Click="button2_Copy2_Click"/>
+                    <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="12,68,0,0" TextWrapping="Wrap" Text="总订单数:" VerticalAlignment="Top"/>
+                    <TextBlock x:Name="textBlock4" HorizontalAlignment="Left" Margin="68,68,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top"/>
                 </Grid>
             </TabItem>
             <TabItem Header="用户信息" x:Name="UserItem">
                 <Grid Background="#FFE5E5E5">
                     <TextBlock x:Name="textBlock_Copy20" HorizontalAlignment="Left" Margin="29,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113"><Run Text="当前登录用户ID"/><Run Text="："/></TextBlock>
                     <TextBlock x:Name="textBlock_Copy13" HorizontalAlignment="Left" Margin="142,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="101" Text="ID"/>
-                    <Button x:Name="button10" Content="退出登录" HorizontalAlignment="Left" Margin="209,137,0,0" VerticalAlignment="Top" Width="125" Click="button10_Click"/>
+                    <Button x:Name="button10" Content="退出登录" HorizontalAlignment="Left" Margin="209,150,0,0" VerticalAlignment="Top" Width="125" Click="button10_Click"/>
                     <TextBlock x:Name="textBlock_Copy15" HorizontalAlignment="Left" Margin="29,45,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113"><Run Text="当前登录账号类别"/><Run Text="："/></TextBlock>
                     <TextBlock x:Name="textBlock_Copy16" HorizontalAlignment="Left" Margin="142,45,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="76" Text="普通用户"/>
                     <TextBlock x:Name="textBlock_Copy17" HorizontalAlignment="Left" Margin="29,70,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113"><Run Text="手机号码"/><Run Text="："/></TextBlock>
@@ -129,7 +131,9 @@
                     <TextBlock x:Name="textBlock_Copy22" HorizontalAlignment="Left" Margin="142,95,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="128" Text="ID"/>
                     <Button Content="更改手机号码" HorizontalAlignment="Left" Margin="278,68,0,0" VerticalAlignment="Top" Width="95" Click="Button_Click_1"/>
                     <Button Content="更改用户昵称" HorizontalAlignment="Left" Margin="278,93,0,0" VerticalAlignment="Top" Width="95" Click="Button_Click_2"/>
-                    <Button x:Name="button11" Content="刷新用户信息" HorizontalAlignment="Left" Margin="41,137,0,0" VerticalAlignment="Top" Width="125" Click="button11_Click"/>
+                    <Button x:Name="button11" Content="刷新用户信息" HorizontalAlignment="Left" Margin="41,150,0,0" VerticalAlignment="Top" Width="125" Click="button11_Click"/>
+                    <TextBlock x:Name="textBlock_Copy27" HorizontalAlignment="Left" Margin="29,120,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113"><Run Text="用户"/><Run Text="在线时长"/><Run Text="："/></TextBlock>
+                    <TextBlock x:Name="textBlock_Copy28" HorizontalAlignment="Left" Margin="142,120,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="128" Text="0"/>
                 </Grid>
             </TabItem>
             <TabItem Header="系统管理" x:Name="SystemItem">

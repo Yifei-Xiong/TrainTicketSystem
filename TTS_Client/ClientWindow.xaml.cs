@@ -131,6 +131,7 @@ namespace TTS_Client {
         private Thread ListenerThread; //接收信息的侦听线程类变量
         public DateTime QueryStartTime { get; set; }
         public DateTime QueryEndTime { get; set; }
+		public DateTime LoginTime { get; set; } //登陆时间
 
 
         //构造函数重载
@@ -149,6 +150,7 @@ namespace TTS_Client {
             ticketQueryInfo.EndTime = DateTime.Now.AddDays(10);
             textBlock_Copy12.Text = ticketQueryInfo.StartTime.ToString() + " - " + ticketQueryInfo.EndTime.ToString();
 			textBlock_Copy13.Text = ID;
+			this.LoginTime = DateTime.Now;
 
 			myIPAddress = IPAddress.Parse("127.0.0.1");
             IPAndPort = myIPAddress.ToString() + ":" + MyPort.ToString();
@@ -830,6 +832,7 @@ namespace TTS_Client {
 					}
 					allTicketInfo.Add(ticket);
 				}
+				textBlock4.Text = allTicketInfo.Count.ToString();
 
 			}
 
@@ -838,8 +841,8 @@ namespace TTS_Client {
         //切换到用户信息选项卡事件
         void UserItem_Selected()
         {
-            //
-        }
+			Refresh_Data(0);
+		}
 
 
         //程序信息选项卡信息载入
@@ -1019,6 +1022,7 @@ namespace TTS_Client {
 		} //刷新用户信息
 
 		private void Refresh_Data(int show) {
+			textBlock_Copy28.Text = DateTime.Now.AddTicks(-LoginTime.Ticks).Minute.ToString() + "分钟";
 			TcpClient tcpClient = null;
 			NetworkStream networkStream = null;
 			try {
