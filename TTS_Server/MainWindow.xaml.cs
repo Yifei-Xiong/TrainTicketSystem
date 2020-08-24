@@ -319,6 +319,19 @@ namespace TTS_Server {
 											tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
 												new AsyncCallback(SentCallBackF), stateObject);
 										} break;
+									case TTS_Core.QUERYTYPE.K_TICKET_STATE: {
+											string retMsg = TicketStateChange(package.ExtraMsg);
+											TcpClient tcpClient;
+											StateObject stateObject;
+											tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+											stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+											stateObject.tcpClient = tcpClient;
+											var data = new TTS_Core.QueryDataPackage("Server", package.IPandPort, package.Sender, TTS_Core.QUERYTYPE.K_TICKET_STATE, retMsg);
+											stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+											tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+												new AsyncCallback(SentCallBackF), stateObject);
+										}
+										break;
 								}
 							} //特定查询
 							break;
@@ -1201,6 +1214,19 @@ namespace TTS_Server {
 				catch { }
 			}
 			return info;
+		}
+
+		private string TicketStateChange (string ExtraMsg) {
+			string[] ticketid = ExtraMsg.Split('\r')[1].Split('\n');
+			string state = ExtraMsg.Split('\r')[0];
+			for (int i = 0; i < ticketid.Length - 1; i++) {
+				try {
+					var query = new MySqlCommand("update ticket set state=" + state + " where ticketid=" + ticketid[i], connection);
+					query.ExecuteNonQuery();
+				}
+				catch { return "订单状态更新失败!"; }
+			}
+			return "订单状态更新成功!";
 		}
 
 	}

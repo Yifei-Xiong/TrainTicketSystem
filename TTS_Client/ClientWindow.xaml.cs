@@ -177,6 +177,7 @@ namespace TTS_Client {
 				button7.IsEnabled = false;
 				TicketItem.IsEnabled = false;
 				tabControl.SelectedItem = UserItem;
+				this.Title = this.Title + " (管理员)";
 			} //是管理员
 			else {
 				button12.Visibility = System.Windows.Visibility.Hidden;
@@ -946,6 +947,11 @@ namespace TTS_Client {
 			if (changeUserInfo.value == string.Empty) {
 				return;
 			}
+			if (System.Text.RegularExpressions.Regex.IsMatch(changeUserInfo.value, @"^1[3456789]\d{9}$") == false) {
+				MessageBox.Show("手机号无法通过正则表达式验证！");
+				return;
+			}
+
 			TcpClient tcpClient = null;
 			NetworkStream networkStream = null;
 			try {
@@ -1107,7 +1113,97 @@ namespace TTS_Client {
         }
 
 		private void button7_Click(object sender, RoutedEventArgs e) {
-
+			//申请取消所选订单
+			if (TicketListView.SelectedItems.Count == 0) {
+				MessageBox.Show("未选择需要申请取消的订单");
+				return;
+			}
+			TicketInfo[] infos = new TicketInfo[TicketListView.SelectedItems.Count];
+			string ExtraMsg = "2" + "\r";
+			for (int i = 0; i < infos.Length; i++) {
+				infos[i] = (TicketInfo)TicketListView.SelectedItems[i];
+				if (infos[i]._state!=1) {
+					MessageBox.Show("你已经申请过取消该订单了！");
+					return;
+				}
+				ExtraMsg = ExtraMsg + infos[i].TicketNumber.ToString() + "\n";
+			}
+			TicketStateChange(ExtraMsg);
 		} //申请取消所选订单
+
+		private void button13_Click(object sender, RoutedEventArgs e) {
+			//将该订单置于失效状态
+			if (TicketListView.SelectedItems.Count == 0) {
+				MessageBox.Show("未选择需要置于失效的订单");
+				return;
+			}
+			TicketInfo[] infos = new TicketInfo[TicketListView.SelectedItems.Count];
+			string ExtraMsg = "3" + "\r";
+			for (int i = 0; i < infos.Length; i++) {
+				infos[i] = (TicketInfo)TicketListView.SelectedItems[i];
+				if (infos[i]._state == 3) {
+					MessageBox.Show("只有未失效的订单才可以置于失效！");
+					return;
+				}
+				ExtraMsg = ExtraMsg + infos[i].TicketNumber.ToString() + "\n";
+			}
+			TicketStateChange(ExtraMsg);
+		} //将该订单置于失效状态
+
+		private void button12_Click(object sender, RoutedEventArgs e) {
+			//将该订单置于生效状态
+			if (TicketListView.SelectedItems.Count == 0) {
+				MessageBox.Show("未选择需要置于已支付状态的订单");
+				return;
+			}
+			TicketInfo[] infos = new TicketInfo[TicketListView.SelectedItems.Count];
+			string ExtraMsg = "1" + "\r";
+			for (int i = 0; i < infos.Length; i++) {
+				infos[i] = (TicketInfo)TicketListView.SelectedItems[i];
+				if (infos[i]._state == 1) {
+					MessageBox.Show("只有未生效的订单才可以置于已支付状态！");
+					return;
+				}
+				ExtraMsg = ExtraMsg + infos[i].TicketNumber.ToString() + "\n";
+			}
+			TicketStateChange(ExtraMsg);
+		} //将该订单置于生效状态
+
+		private void TicketStateChange(string ExtraMsg) {
+			TcpClient tcpClient = null;
+			NetworkStream networkStream = null;
+			try {
+				tcpClient = new TcpClient();
+				tcpClient.Connect(myIPAddress, LoginPort); //建立与服务器的连接
+				networkStream = tcpClient.GetStream();
+				if (networkStream.CanWrite) {
+					TTS_Core.QueryDataPackage info = new TTS_Core.QueryDataPackage(UserID, myIPAddress + ":" +
+						MyPort.ToString(), "server", TTS_Core.QUERYTYPE.K_TICKET_STATE, ExtraMsg );
+					byte[] sendBytes = info.DataPackageToBytes(); //注册数据包转化为字节数组
+					networkStream.Write(sendBytes, 0, sendBytes.Length);
+				}
+				var newClient = tcpListener.AcceptTcpClient();
+				var bytes = ReadFromTcpClient(newClient); //获取数据
+				var package = new TTS_Core.QueryDataPackage(bytes);
+				MessageBox.Show(package.ExtraMsg);
+				OrderItem_Selected();
+			}
+			catch {
+				MessageBox.Show("无法连接到服务器!");
+				return;
+			}
+			finally {
+				if (networkStream != null) {
+					networkStream.Close();
+				}
+				tcpClient.Close();
+			}
+		} //订单状态改变
+
+		private void button10_Click(object sender, RoutedEventArgs e) {
+			LoginWindow loginWindow = new LoginWindow(UserID, "127.0.0.1:" + LoginPort);
+			loginWindow.Show();
+			this.Close();
+		} //退出登录
 	}
 }
