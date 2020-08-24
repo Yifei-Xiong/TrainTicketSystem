@@ -1160,7 +1160,46 @@ namespace TTS_Server {
 
 		private string SearchOrder (string UserID) {
 			string info = "";
-
+			//首先判断是否为管理员
+			int accounttype = 0;
+			MySqlCommand sql1 = new MySqlCommand("SELECT accounttype FROM alluser WHERE userid = \"" + UserID + "\"", connection);
+			try {
+				MySqlDataReader reader = sql1.ExecuteReader();
+				while (reader.Read()) {
+					accounttype = int.Parse(reader[0].ToString());
+				}
+				reader.Close();
+			}
+			catch {  }
+			if (accounttype == 2) {
+				//为管理员
+				MySqlCommand sql = new MySqlCommand("SELECT ticketid, enterstationid, enterstationname, leavestationid, leavestationname, " +
+					"enterstationtime, leavestationtime, linename, lineid, trainid, userid, buytime, ticketprice, state FROM ticket", connection);
+				try {
+					MySqlDataReader reader = sql.ExecuteReader();
+					while (reader.Read()) {
+						info = info + reader[0].ToString() + "\n" + reader[1].ToString() + "\n" + reader[2].ToString() + "\n" + reader[3].ToString() + "\n"
+							 + reader[4].ToString() + "\n" + reader[5].ToString() + "\n" + reader[6].ToString() + "\n" + reader[7].ToString() + "\n" + reader[8].ToString() + "\n"
+							 + reader[9].ToString() + "\n" + reader[10].ToString() + "\n" + reader[11].ToString() + "\n" + reader[12].ToString() + "\n" + reader[13].ToString() + "\r";
+					}
+					reader.Close();
+				}
+				catch { }
+			} else {
+				//为用户
+				MySqlCommand sql = new MySqlCommand("SELECT ticketid, enterstationid, enterstationname, leavestationid, leavestationname, " +
+					"enterstationtime, leavestationtime, linename, lineid, trainid, userid, buytime, ticketprice, state FROM ticket WHERE userid = \"" + UserID + "\"", connection);
+				try {
+					MySqlDataReader reader = sql.ExecuteReader();
+					while (reader.Read()) {
+						info = info + reader[0].ToString() + "\n" + reader[1].ToString() + "\n" + reader[2].ToString() + "\n" + reader[3].ToString() + "\n"
+							 + reader[4].ToString() + "\n" + reader[5].ToString() + "\n" + reader[6].ToString() + "\n" + reader[7].ToString() + "\n" + reader[8].ToString() + "\n"
+							 + reader[9].ToString() + "\n" + reader[10].ToString() + "\n" + reader[11].ToString() + "\n" + reader[12].ToString() + "\n" + reader[13].ToString() + "\r";
+					}
+					reader.Close();
+				}
+				catch { }
+			}
 			return info;
 		}
 

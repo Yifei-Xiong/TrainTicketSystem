@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -37,7 +38,7 @@ namespace TTS_Client {
         public struct TicketInfo
         {
             public int TicketNumber { get; set; } //订单序号
-            public int TicketPrice { get; set; } //车票价格
+            public double TicketPrice { get; set; } //车票价格
             public int TicketLine { get; set; } //所属路线序号
             public string LineName { get; set; } //所属线路名称
             public int TrainID { get; set; } //车次
@@ -49,11 +50,15 @@ namespace TTS_Client {
             public string EnterStationTimeIn { get; set; }
             public string EnterStationTimeOut { get; set; }
 
-            public int LeaveStationNumber; //到达站点序号
+            public int LeaveStationNumber { get; set; } //到达站点序号
             public string LeaveStationName { get; set; } //到达站点名称
             public string LeaveStationTime { get; set; }
             public string LeaveStationTimeIn { get; set; }
             public string LeaveStationTimeOut { get; set; }
+
+			public string UserID { get; set; }
+			public int _state { get; set; } //1为已支付订单，2为申请取消的订单，3为失效的订单
+			public string State { get; set; }
         } //单个车票的相关信息
 
         public struct BuyTicket
@@ -138,7 +143,8 @@ namespace TTS_Client {
 
 			BuyTicketListView.ItemsSource = allBuyTicket;
             TicketListView.ItemsSource = allTicketInfo;
-            ticketQueryInfo = new TicketQueryInfo();
+			TicketListView.Items.SortDescriptions.Add(new SortDescription("TicketNumber", ListSortDirection.Descending));
+			ticketQueryInfo = new TicketQueryInfo();
             ticketQueryInfo.StartTime = DateTime.Now;
             ticketQueryInfo.EndTime = DateTime.Now.AddDays(10);
             textBlock_Copy12.Text = ticketQueryInfo.StartTime.ToString() + " - " + ticketQueryInfo.EndTime.ToString();
@@ -173,7 +179,7 @@ namespace TTS_Client {
 
 			} //是普通用户
 
-			Refresh_Data(); //获取用户信息
+			Refresh_Data(0); //获取用户信息
 
 
 		}//构造函数，将登录页面的某些数据传过来
@@ -646,106 +652,11 @@ namespace TTS_Client {
 
                             break;
                     }
-
-
-                    /*
-                    IMClassLibrary.SingleChatDataPackage chatData1 = new IMClassLibrary.SingleChatDataPackage(bytes);
-					if (chatData1.Message == "添加您为好友") {
-						TcpClient tcpClient1;
-						StateObject stateObject;
-						tcpClient1 = new TcpClient(); //每次发送建立一个TcpClient类对象
-						stateObject = new StateObject(); ////每次发送建立一个StateObject类对象
-						stateObject.tcpClient = tcpClient1;
-						//stateObject.buffer = SendMsg;
-						stateObject.friendIPAndPort = chatData1.Receiver; //所选好友IP和端口号
-						IMClassLibrary.SingleChatDataPackage addFriendData = new IMClassLibrary.SingleChatDataPackage(UserID, IPAndPort, "已收到添加请求");
-						stateObject.buffer = addFriendData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
-						tcpClient1.BeginConnect(chatData1.Receiver.Split(':')[0], int.Parse(chatData1.Receiver.Split(':')[1]), new AsyncCallback(SentCallBackF), stateObject); //异步连接
-					}
-					friendIPAndPort.friendIP = chatData1.Receiver.Split(':')[0];
-					friendIPAndPort.friendPort = chatData1.Receiver.Split(':')[1];
-					friendIPAndPort.friendID = chatData1.Sender;
-					message = chatData1.Receiver + "（用户ID:" + chatData1.Sender + "）（" + chatData1.sendTime.ToString() + "）说:" + chatData1.Message;
-					Msg msg = new Msg();
-					msg.MsgID = (allMsg.Count + 1).ToString();
-					msg.MsgTime = chatData1.sendTime.ToString();
-					msg.UserIP = friendIPAndPort.friendIP;
-					msg.UserPort = friendIPAndPort.friendPort;
-					msg.UserName = chatData1.Sender;
-					msg.ChatMsg = chatData1.Message;
-					msg.IsGroup = "个人聊天";
-					msg.Type = chatData.MessageType;
-					//allMsg.Add(msg);
-					this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new SetMsg(SetMsgViewSource), msg);
-					break;
-				case 5: //多人聊天数据包
-					IMClassLibrary.MultiChatDataPackage chatData2 = new IMClassLibrary.MultiChatDataPackage(bytes);
-					friendIPAndPort.friendIP = chatData2.Receiver.Split(':')[0];
-					friendIPAndPort.friendPort = chatData2.Receiver.Split(':')[1];
-					friendIPAndPort.friendID = chatData2.Sender;
-					message = chatData2.Receiver + "（用户ID:" + chatData2.SenderID + ",来自群聊" + chatData2.Sender.ToString() + "）（" + chatData2.sendTime.ToString() + "）说:" + chatData2.Message;
-					Msg msg2 = new Msg();
-					msg2.MsgID = (allMsg.Count + 1).ToString();
-					msg2.MsgTime = chatData2.sendTime.ToString();
-					msg2.UserIP = friendIPAndPort.friendIP;
-					msg2.OriginPort = friendIPAndPort.friendPort;
-					msg2.UserPort = chatData2.Sender.ToString();
-					msg2.UserName = chatData2.SenderID;
-					msg2.ChatMsg = chatData2.Message;
-					msg2.IsGroup = "群组聊天";
-					msg2.Type = chatData.MessageType;
-					int j;
-					for (j = 0; j < allMsg.Count; j++) {
-						if (allMsg[j].UserName == msg2.UserName) {
-							break;
-						}
-					}
-					if (j == allMsg.Count) {
-						this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new SetMsg(SetMsgViewSource), msg2);
-					}
-					//allMsg.Add(msg2);
-					break;
-				case 7: //文件传输数据包
-					IMClassLibrary.FileDataPackage chatData3 = new IMClassLibrary.FileDataPackage(bytes);
-					FileList.Add(chatData3); //加入List中待下载
-					friendIPAndPort.friendIP = chatData3.Receiver.Split(':')[0];
-					friendIPAndPort.friendPort = chatData3.Receiver.Split(':')[1];
-					friendIPAndPort.friendID = chatData3.Sender;
-					message = chatData3.Receiver + "（用户ID:" + chatData3.Sender + "）（" + chatData3.sendTime.ToString() + "）给你发了一个文件，请接收";
-					Msg msg3 = new Msg();
-					msg3.MsgID = (allMsg.Count + 1).ToString();
-					msg3.MsgTime = chatData3.sendTime.ToString();
-					msg3.UserIP = friendIPAndPort.friendIP;
-					msg3.UserPort = friendIPAndPort.friendPort;
-					msg3.UserName = chatData3.Sender;
-					msg3.ChatMsg = "发送了一个文件";
-					msg3.IsGroup = "文件消息";
-					msg3.Type = chatData.MessageType;
-					this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new SetMsg(SetMsgViewSource), msg3);
-					//allMsg.Add(msg3);
-                    */
 					break;
 				default:
 					MessageBox.Show("聊天数据包读取失败");
 					return;
 			}
-            /*
-			int i;
-			for (i = 0; i < myFriendIPAndPorts.Count; i++) {
-				if (friendIPAndPort.friendPort == myFriendIPAndPorts[i].friendPort && friendIPAndPort.friendIP == myFriendIPAndPorts[i].friendIP ||
-					friendIPAndPort.friendPort == myFriendIPAndPorts[i].friendID && friendIPAndPort.friendIP == myFriendIPAndPorts[i].friendIP) {
-					break;
-				}
-			}
-			if (i == myFriendIPAndPorts.Count) {
-				friendIPAndPort = GetContact(friendIPAndPort);
-				//myFriendIPAndPorts.Add(friendIPAndPort);
-				this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new SetList(SetListViewSource), friendIPAndPort);
-			} //未找到该ip与端口号，需要增加
-			if (message != string.Empty) {
-				//FriendListBox.Items.Add(message);
-				this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new OneArgDelegate(SetFriendListBox), message); //接受信息在FriendListBox显示
-			}*/
 		} //被异步调用的方法
 
 
@@ -856,6 +767,7 @@ namespace TTS_Client {
             //向服务器发送查询请求
 			TcpClient tcpClient = null;
 			NetworkStream networkStream = null;
+			string ExtraMsg = null;
 			try {
 				tcpClient = new TcpClient();
 				tcpClient.Connect(myIPAddress, LoginPort); //建立与服务器的连接
@@ -868,7 +780,7 @@ namespace TTS_Client {
 				var newClient = tcpListener.AcceptTcpClient();
 				var bytes = ReadFromTcpClient(newClient); //获取数据
 				var package = new TTS_Core.QueryDataPackage(bytes);
-				
+				ExtraMsg = package.ExtraMsg;
 			}
 			catch {
 				MessageBox.Show("无法连接到服务器!");
@@ -879,6 +791,41 @@ namespace TTS_Client {
 					networkStream.Close();
 				}
 				tcpClient.Close();
+			}
+			if (ExtraMsg==null) {
+				MessageBox.Show("查询订单失败!");
+			} else {
+				string[] split = ExtraMsg.Split('\r');
+				allTicketInfo.Clear();
+				TicketInfo ticket = new TicketInfo();
+				for (int i=0; i<split.Length-1; i++) {
+					string[] substr = split[i].Split('\n');
+					ticket.TicketNumber = int.Parse(substr[0]);
+					ticket.EnterStationNumber = int.Parse(substr[1]);
+					ticket.EnterStationName = substr[2];
+					ticket.LeaveStationNumber = int.Parse(substr[3]);
+					ticket.LeaveStationName = substr[4];
+					ticket.EnterStationTime = substr[5];
+					ticket.LeaveStationTime = substr[6];
+					ticket.LineName = substr[7];
+					ticket.TicketLine = int.Parse(substr[8]);
+					ticket.TrainID = int.Parse(substr[9]);
+					ticket.UserID = substr[10];
+					ticket.BuyTime = substr[11];
+					ticket.TicketPrice = double.Parse(substr[12]);
+					ticket._state = int.Parse(substr[13]);
+					if (ticket._state == 1) {
+						ticket.State = "已支付";
+					}
+					else if (ticket._state == 2) {
+						ticket.State = "已申请取消";
+					}
+					else if (ticket._state == 3) {
+						ticket.State = "已取消";
+					}
+					allTicketInfo.Add(ticket);
+				}
+
 			}
 
 		}
@@ -1054,10 +1001,10 @@ namespace TTS_Client {
 		} //更改用户昵称
 
 		private void button11_Click(object sender, RoutedEventArgs e) {
-			Refresh_Data();
+			Refresh_Data(1); //为1则包含弹窗提示
 		} //刷新用户信息
 
-		private void Refresh_Data() {
+		private void Refresh_Data(int show) {
 			TcpClient tcpClient = null;
 			NetworkStream networkStream = null;
 			try {
@@ -1074,7 +1021,9 @@ namespace TTS_Client {
 				var bytes = ReadFromTcpClient(newClient); //获取数据
 				var package = new TTS_Core.DataPackage(bytes);
 				string message = package.Sender;
-				MessageBox.Show(message);
+				if (show==1) {
+					MessageBox.Show(message);
+				}
 				string[] infostr = package.Receiver.Split('\n');
 				this.Phone = infostr[0];
 				this.UserName = infostr[1];
@@ -1152,5 +1101,9 @@ namespace TTS_Client {
 			var activity = new ManagerWindow_line(UserID, myIPAddress, LoginPort, tcpListener, MyPort);
 			activity.ShowDialog();
         }
-    }
+
+		private void button7_Click(object sender, RoutedEventArgs e) {
+
+		} //申请取消所选订单
+	}
 }
