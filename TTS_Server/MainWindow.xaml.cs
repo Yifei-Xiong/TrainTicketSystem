@@ -286,10 +286,13 @@ namespace TTS_Server {
 												new AsyncCallback(SentCallBackF), stateObject);
 										} break;
 									case TTS_Core.QUERYTYPE.K_SUBMIT_BUY: {
-											bool ByFlag = SubmitBuy(package.ExtraMsg);
+											int ByFlag = SubmitBuy(package.ExtraMsg);
 											string retMsg = "";
-											if (ByFlag==true) {
+											if (ByFlag==5) {
 												retMsg = "购买成功！";
+											}
+											else if (ByFlag == 3) {
+												retMsg = "购买失败，余额不足！";
 											}
 											else {
 												retMsg = "购买失败，请与管理员取得联系！";
@@ -300,6 +303,18 @@ namespace TTS_Server {
 											stateObject = new StateObject(); //每次发送建立一个StateObject类对象
 											stateObject.tcpClient = tcpClient;
 											var data = new TTS_Core.QueryDataPackage("Server", package.IPandPort, package.Sender, TTS_Core.QUERYTYPE.K_SUBMIT_BUY, retMsg);
+											stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+											tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+												new AsyncCallback(SentCallBackF), stateObject);
+										} break;
+									case TTS_Core.QUERYTYPE.K_USER_ORDER: {
+											string retMsg = SearchOrder(package.Sender);
+											TcpClient tcpClient;
+											StateObject stateObject;
+											tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+											stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+											stateObject.tcpClient = tcpClient;
+											var data = new TTS_Core.QueryDataPackage("Server", package.IPandPort, package.Sender, TTS_Core.QUERYTYPE.K_USER_ORDER, retMsg);
 											stateObject.buffer = data.DataPackageToBytes(); //buffer为发送的数据包的字节数组
 											tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
 												new AsyncCallback(SentCallBackF), stateObject);
@@ -1067,7 +1082,7 @@ namespace TTS_Server {
 			return output;
 		}
 
-		private bool SubmitBuy (string ExtraMsg) {
+		private int SubmitBuy (string ExtraMsg) {
 			string[] split = ExtraMsg.Split('\r');
 
 			int EnterID = 0; //
@@ -1109,20 +1124,44 @@ namespace TTS_Server {
 					}
 					reader.Close();
 				}
-				catch { return false; }
+				catch { return 1; }
 
-				var query = new MySqlCommand("INSERT INTO ticket(enterstationid, enterstationname, leavestationid, leavestationname, enterstationtime, " +
-					"leavestationtime, linename, lineid, trainid, userid, buytime, ticketprice) VALUES ("+ EnterID.ToString() + ", \"" + EnterName + "\", " + LeaveID.ToString() +
-					", \"" + LeaveName + "\", \"" + EnterTime + "\", \"" + LeaveTime + "\", \"" + LineName + "\", " + LineID.ToString() + ", " + sep2[0] 
-					+ ", \"" + sep2[3] + "\", \"" + BuyTime + "\", " + price.ToString() + ")", connection);
+				double balance = 0;
+				MySqlCommand sql1 = new MySqlCommand("SELECT balance FROM alluser WHERE userid = \"" + UserID + "\"", connection);
 				try {
-					query.ExecuteNonQuery();
+					MySqlDataReader reader = sql1.ExecuteReader();
+					while (reader.Read()) {
+						balance = double.Parse(reader[0].ToString());
+					}
+					reader.Close();
 				}
-				catch { return false; }
+				catch { return 2; }
+				if (balance < price * BuyNumber) {
+					return 3;
+				} //用户余额不足
+				
+				for (int j=0; j < BuyNumber; j++) {
+					var query = new MySqlCommand("INSERT INTO ticket(enterstationid, enterstationname, leavestationid, leavestationname, enterstationtime, " +
+						"leavestationtime, linename, lineid, trainid, userid, buytime, ticketprice) VALUES (" + EnterID.ToString() + ", \"" + EnterName + "\", " + LeaveID.ToString() +
+						", \"" + LeaveName + "\", \"" + EnterTime + "\", \"" + LeaveTime + "\", \"" + LineName + "\", " + LineID.ToString() + ", " + sep2[0]
+						+ ", \"" + sep2[3] + "\", \"" + BuyTime + "\", " + price.ToString() + ")", connection);
+					var query2 = new MySqlCommand("update alluser set balance=balance-"+ (price * BuyNumber).ToString() + " where userid = \"" + UserID + "\"", connection);
+					try {
+						query.ExecuteNonQuery();
+					}
+					catch { return 4; }
+				}
+
 			}
-			return true;
+			return 5;
 			//return msg
 
+		}
+
+		private string SearchOrder (string UserID) {
+			string info = "";
+
+			return info;
 		}
 
 	}

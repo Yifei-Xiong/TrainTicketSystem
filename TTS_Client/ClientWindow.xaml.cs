@@ -239,11 +239,50 @@ namespace TTS_Client {
 			if (Msg.Split('\n')[0]=="0") {
 				if (Msg.Split('\n')[1] == "1") {
 					//无需换乘，一种路线
-					ticketQueryInfo.Line = int.Parse(Msg.Split('\n')[2]);
-					ticketQueryInfo.LineName = Msg.Split('\n')[3];
-					BuyTicketWindow buyTicketWindow = new BuyTicketWindow(ticketQueryInfo, "");
-					buyTicketWindow.ShowDialog();
-					allBuyTicket.Add(buyTicketWindow.selectTicket);
+					TicketQueryInfo subinfo1 = new ClientWindow.TicketQueryInfo();
+					subinfo1.EnterStationNumber = this.ticketQueryInfo.EnterStationNumber;
+					subinfo1.Line = int.Parse(Msg.Split('\n')[2]);
+					subinfo1.LeaveStationNumber = this.ticketQueryInfo.LeaveStationNumber;
+					subinfo1.StartTime = this.ticketQueryInfo.StartTime;
+					subinfo1.EndTime = this.ticketQueryInfo.EndTime;
+					string info1Msg = subinfo1.EnterStationNumber.ToString() + "\n" + subinfo1.Line.ToString()
+						+ "\n" + subinfo1.LeaveStationNumber.ToString() + "\n" + ticketQueryInfo.StartTime.ToString() + "\n" + ticketQueryInfo.EndTime.ToString();
+					TcpClient tcpClient1 = null;
+					NetworkStream networkStream1 = null;
+					try {
+						tcpClient1 = new TcpClient();
+						tcpClient1.Connect(myIPAddress, LoginPort); //建立与服务器的连接
+						networkStream1 = tcpClient1.GetStream();
+						if (networkStream1.CanWrite) {
+							TTS_Core.QueryDataPackage data = new TTS_Core.QueryDataPackage(UserID, myIPAddress + ":" +
+								MyPort.ToString(), "server", TTS_Core.QUERYTYPE.K_TICKETINFO_QUERY, info1Msg);
+							byte[] sendBytes = data.DataPackageToBytes(); //注册数据包转化为字节数组
+							networkStream1.Write(sendBytes, 0, sendBytes.Length);
+						}
+						var newClient = tcpListener.AcceptTcpClient();
+						var bytes = ReadFromTcpClient(newClient); //获取数据
+						var package = new TTS_Core.QueryDataPackage(bytes);
+						subinfo1.EnterStationName = package.ExtraMsg.Split('\r')[0].Split('\n')[0];
+						subinfo1.LineName = package.ExtraMsg.Split('\r')[0].Split('\n')[1];
+						subinfo1.LeaveStationName = package.ExtraMsg.Split('\r')[0].Split('\n')[2];
+						info1Msg = package.ExtraMsg;
+					}
+					catch {
+						MessageBox.Show("指定时段内无可选车次！");
+						return;
+					}
+					finally {
+						if (networkStream != null) {
+							networkStream1.Close();
+						}
+						tcpClient1.Close();
+					}
+
+					BuyTicketWindow buy = new BuyTicketWindow(subinfo1, info1Msg);
+					buy.ShowDialog();
+					if (buy.selectTicket.TrainID != 0) {
+						allBuyTicket.Add(buy.selectTicket);
+					}
 				}
 				else {
 					//无需换乘，多种路线
@@ -814,25 +853,35 @@ namespace TTS_Client {
         //切换到订单查询选项事件
         public void OrderItem_Selected()
         {
-            //向服务器发送异步请求
-            TcpClient tcpClient;
-            StateObject stateObject;
-            TTS_Core.QueryDataPackage queryData;
-            tcpClient = new TcpClient();
-            stateObject = new StateObject();
-            stateObject.tcpClient = tcpClient;
-            //queryData = new TTS_Core.QueryDataPackage(UserID, IPAndPort, TTS_Core.QUERYTYPE.K_USER_ORDER);  //用户订单查询
-            //stateObject.buffer = queryData.DataPackageToBytes(); //buffer为发送的数据包的字节数组
-            tcpClient.BeginConnect(myIPAddress, LoginPort, new AsyncCallback(SentCallBackF), stateObject); //异步连接
+            //向服务器发送查询请求
+			TcpClient tcpClient = null;
+			NetworkStream networkStream = null;
+			try {
+				tcpClient = new TcpClient();
+				tcpClient.Connect(myIPAddress, LoginPort); //建立与服务器的连接
+				networkStream = tcpClient.GetStream();
+				if (networkStream.CanWrite) {
+					TTS_Core.QueryDataPackage data = new TTS_Core.QueryDataPackage(UserID, IPAndPort, "Server", TTS_Core.QUERYTYPE.K_USER_ORDER, "");
+					byte[] sendBytes = data.DataPackageToBytes(); //注册数据包转化为字节数组
+					networkStream.Write(sendBytes, 0, sendBytes.Length);
+				}
+				var newClient = tcpListener.AcceptTcpClient();
+				var bytes = ReadFromTcpClient(newClient); //获取数据
+				var package = new TTS_Core.QueryDataPackage(bytes);
+				
+			}
+			catch {
+				MessageBox.Show("无法连接到服务器!");
+				return;
+			}
+			finally {
+				if (networkStream != null) {
+					networkStream.Close();
+				}
+				tcpClient.Close();
+			}
 
-            //加载数据完成前
-            allBuyTicket.Clear();  //清空信息
-            BuyTicket buyTicket = new BuyTicket();
-            buyTicket.EnterStationTime = "加";
-            buyTicket.LeaveStationName = "载";
-            buyTicket.LeaveStationTimeIn = "中...";
-            allBuyTicket.Add(buyTicket);
-        }
+		}
 
         //切换到用户信息选项卡事件
         void UserItem_Selected()
@@ -922,6 +971,11 @@ namespace TTS_Client {
 				var bytes = ReadFromTcpClient(newClient); //获取数据
 				var package = new TTS_Core.QueryDataPackage(bytes);
 				MessageBox.Show(package.ExtraMsg); //可知购买成功或失败
+				if (package.ExtraMsg == "购买成功！") {
+					for (int i = 0; i < buyTickets.Length; i++) {
+						allBuyTicket.Remove(buyTickets[i]);
+					}
+				}
 			}
 			catch {
 				MessageBox.Show("无法连接到服务器!");
