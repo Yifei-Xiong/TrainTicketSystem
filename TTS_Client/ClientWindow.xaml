@@ -59,7 +59,7 @@
             </TabItem>
             <TabItem Header="订单详情" x:Name="OrderItem">
                 <Grid Background="#FFE5E5E5">
-                    <ListView x:Name="TicketListView" HorizontalAlignment="Left" Height="343" Margin="10,92,0,0" VerticalAlignment="Top" Width="978">
+                    <ListView x:Name="TicketListView" HorizontalAlignment="Left" Height="368" Margin="10,92,0,0" VerticalAlignment="Top" Width="978">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="订单号" Width="45" DisplayMemberBinding="{Binding TicketNumber}"/>
@@ -70,10 +70,10 @@
                                 <GridViewColumn Header="到达站号" Width="55" DisplayMemberBinding="{Binding LeaveStationNumber}"/>
                                 <GridViewColumn Header="到达站点" Width="65" DisplayMemberBinding="{Binding LeaveStationName}"/>
                                 <GridViewColumn Header="到达时间" Width="120" DisplayMemberBinding="{Binding LeaveStationTime}"/>
-                                <GridViewColumn Header="线路编号" Width="55" DisplayMemberBinding="{Binding TicketLine}"/>
+                                <GridViewColumn Header="线路编号" Width="50" DisplayMemberBinding="{Binding TicketLine}"/>
                                 <GridViewColumn Header="线路名称" Width="55" DisplayMemberBinding="{Binding LineName}"/>
                                 <GridViewColumn Header="用户名称" Width="60" DisplayMemberBinding="{Binding UserID}"/>
-                                <GridViewColumn Header="购买时间" Width="120" DisplayMemberBinding="{Binding BuyTime}"/>
+                                <GridViewColumn Header="购买时间" Width="125" DisplayMemberBinding="{Binding BuyTime}"/>
                                 <GridViewColumn Header="票价" Width="40" DisplayMemberBinding="{Binding TicketPrice}"/>
                                 <GridViewColumn Header="订单状态" Width="80" DisplayMemberBinding="{Binding State}"/>
                             </GridView>
@@ -94,25 +94,25 @@
                     <TextBox x:Name="textBox_tic6" HorizontalAlignment="Left" Height="23" Margin="344,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="52"/>
                     <TextBox x:Name="textBox_tic7" HorizontalAlignment="Left" Height="23" Margin="399,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="61"/>
                     <TextBox x:Name="textBox_tic8" HorizontalAlignment="Left" Height="23" Margin="464,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="116"/>
-                    <Button x:Name="button7" Content="取消所选订单" HorizontalAlignment="Left" Margin="817,66,0,0" VerticalAlignment="Top" Width="94" Click="button7_Click"/>
+                    <Button x:Name="button7" Content="申请取消所选订单" HorizontalAlignment="Left" Margin="817,66,0,0" VerticalAlignment="Top" Width="117" Click="button7_Click"/>
                     <TextBlock x:Name="textBlock1_Copy5" HorizontalAlignment="Left" Margin="67,18,0,0" TextWrapping="Wrap" Text="车次" VerticalAlignment="Top"/>
                     <TextBox x:Name="textBox_tic2" HorizontalAlignment="Left" Height="23" Margin="59,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="42"/>
-                    <TextBox x:Name="textBox_tic9" HorizontalAlignment="Left" Height="23" Margin="584,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="52"/>
-                    <TextBlock x:Name="textBlock1_Copy6" HorizontalAlignment="Left" Margin="788,18,0,0" TextWrapping="Wrap" Text="购买时间" VerticalAlignment="Top"/>
-                    <TextBox x:Name="textBox_tic10" HorizontalAlignment="Left" Height="23" Margin="639,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="52"/>
-                    <TextBox x:Name="textBox_tic11" HorizontalAlignment="Left" Height="23" Margin="694,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="57"/>
-                    <TextBox x:Name="textBox_tic12" HorizontalAlignment="Left" Height="23" Margin="754,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="117"/>
+                    <TextBox x:Name="textBox_tic9" HorizontalAlignment="Left" Height="23" Margin="584,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="46"/>
+                    <TextBlock x:Name="textBlock1_Copy6" HorizontalAlignment="Left" Margin="786,18,0,0" TextWrapping="Wrap" Text="购买时间" VerticalAlignment="Top"/>
+                    <TextBox x:Name="textBox_tic10" HorizontalAlignment="Left" Height="23" Margin="633,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="52"/>
+                    <TextBox x:Name="textBox_tic11" HorizontalAlignment="Left" Height="23" Margin="688,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="57"/>
+                    <TextBox x:Name="textBox_tic12" HorizontalAlignment="Left" Height="23" Margin="749,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="122"/>
                     <TextBox x:Name="textBox_tic13" HorizontalAlignment="Left" Height="23" Margin="874,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="37"/>
                     <TextBox x:Name="textBox_tic14" HorizontalAlignment="Left" Height="23" Margin="914,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
                     <TextBlock x:Name="textBlock1_Copy7" HorizontalAlignment="Left" Margin="166,18,0,0" TextWrapping="Wrap" Text="出发站号" VerticalAlignment="Top"/>
                     <TextBlock x:Name="textBlock1_Copy3" HorizontalAlignment="Left" Margin="346,18,0,0" TextWrapping="Wrap" Text="到达站号" VerticalAlignment="Top"/>
-                    <TextBlock x:Name="textBlock1_Copy4" HorizontalAlignment="Left" Margin="698,18,0,0" TextWrapping="Wrap" Text="用户名称" VerticalAlignment="Top"/>
-                    <TextBlock x:Name="textBlock1_Copy8" HorizontalAlignment="Left" Margin="641,18,0,0" TextWrapping="Wrap" Text="线路名称" VerticalAlignment="Top"/>
-                    <TextBlock x:Name="textBlock1_Copy9" HorizontalAlignment="Left" Margin="585,18,0,0" TextWrapping="Wrap" Text="线路编号" VerticalAlignment="Top"/>
+                    <TextBlock x:Name="textBlock1_Copy4" HorizontalAlignment="Left" Margin="693,18,0,0" TextWrapping="Wrap" Text="用户名称" VerticalAlignment="Top"/>
+                    <TextBlock x:Name="textBlock1_Copy8" HorizontalAlignment="Left" Margin="636,18,0,0" TextWrapping="Wrap" Text="线路名称" VerticalAlignment="Top"/>
+                    <TextBlock x:Name="textBlock1_Copy9" HorizontalAlignment="Left" Margin="583,18,0,0" TextWrapping="Wrap" Text="线路编号" VerticalAlignment="Top"/>
                     <TextBlock x:Name="textBlock1_Copy10" HorizontalAlignment="Left" Margin="881,18,0,0" TextWrapping="Wrap" Text="票价" VerticalAlignment="Top"/>
                     <TextBlock x:Name="textBlock1_Copy11" HorizontalAlignment="Left" Margin="929,18,0,0" TextWrapping="Wrap" Text="订单状态" VerticalAlignment="Top"/>
                     <Button x:Name="button12" Content="将该订单置于生效状态" HorizontalAlignment="Left" Margin="533,66,0,0" VerticalAlignment="Top" Width="137"/>
-                    <Button x:Name="button12_Copy" Content="将该订单置于失效状态" HorizontalAlignment="Left" Margin="675,66,0,0" VerticalAlignment="Top" Width="137"/>
+                    <Button x:Name="button13" Content="将该订单置于失效状态" HorizontalAlignment="Left" Margin="675,66,0,0" VerticalAlignment="Top" Width="137"/>
                 </Grid>
             </TabItem>
             <TabItem Header="用户信息" x:Name="UserItem">

@@ -174,9 +174,14 @@ namespace TTS_Client {
 
 			if (IsAdmin == true) {
 				textBlock_Copy16.Text = "管理员";
+				button7.IsEnabled = false;
+				TicketItem.IsEnabled = false;
+				tabControl.SelectedItem = UserItem;
 			} //是管理员
 			else {
-
+				button12.Visibility = System.Windows.Visibility.Hidden;
+				button13.Visibility = System.Windows.Visibility.Hidden;
+				SystemItem.Visibility = System.Windows.Visibility.Hidden;
 			} //是普通用户
 
 			Refresh_Data(0); //获取用户信息
@@ -744,21 +749,20 @@ namespace TTS_Client {
         //选项卡切换函数
         private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //切换到订单查询选项
-            if(OrderItem.IsSelected)
-            {
-                OrderItem_Selected();
-            }
-            //切换到车票查询/购买选项
-            else if(TicketItem.IsSelected)
-            {
-                //
-            }
-            //切换到用户信息选项卡
-            else if(UserItem.IsSelected)
-            {
-                UserItem_Selected();
-            }
+			if (e.Source is TabControl) {
+				//切换到订单查询选项
+				if (OrderItem.IsSelected) {
+					OrderItem_Selected();
+				}
+				//切换到车票查询/购买选项
+				else if (TicketItem.IsSelected) {
+					//
+				}
+				//切换到用户信息选项卡
+				else if (UserItem.IsSelected) {
+					UserItem_Selected();
+				}
+			}
         }
 
         //切换到订单查询选项事件
