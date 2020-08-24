@@ -57,6 +57,9 @@ namespace TTS_Client
 				ticket.LeaveStationName = textBlock5.Text;
 				canBuyTicket.Add(ticket);
 			}
+			if (canBuyTicket.Count==0) {
+				MessageBox.Show("所选时间段内未找到车次！");
+			}
 		}
 
 		private void Button2_Copy_Click(object sender, RoutedEventArgs e) {

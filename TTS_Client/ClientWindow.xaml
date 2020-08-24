@@ -19,18 +19,17 @@
                             ,0,0" VerticalAlignment="Top" Width="101" Click="button3_Click"/>
                     <TextBlock x:Name="textBlock_Copy1" HorizontalAlignment="Left" Margin="153,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="109" TextAlignment="Center" Text="已选择出发时间："/>
                     <TextBlock x:Name="textBlock_Copy4" HorizontalAlignment="Left" Margin="35,145,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="109" TextAlignment="Center" Text="已添加车票信息："/>
-                    <ListView x:Name="BuyTicketListView" HorizontalAlignment="Left" Height="253" Margin="36,165,0,0" VerticalAlignment="Top" Width="758">
+                    <ListView x:Name="BuyTicketListView" SelectionMode="Multiple" HorizontalAlignment="Left" Height="253" Margin="36,165,0,0" VerticalAlignment="Top" Width="758">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="车次" Width="50" DisplayMemberBinding="{Binding TrainID}"/>
-                                <GridViewColumn Header="上车站点" Width="80" DisplayMemberBinding="{Binding EnterStationName}"/>
-                                <GridViewColumn Header="上车时间" Width="130" DisplayMemberBinding="{Binding EnterStationTime}"/>
-                                <GridViewColumn Header="到达站点" Width="80" DisplayMemberBinding="{Binding LeaveStationName}"/>
-                                <GridViewColumn Header="到达时间" Width="130" DisplayMemberBinding="{Binding LeaveStationTimeIn}"/>
-                                <GridViewColumn Header="车票价格" Width="70" DisplayMemberBinding="{Binding TicketPrice}"/>
-                                <GridViewColumn Header="所属线路" Width="70" DisplayMemberBinding="{Binding LineName}"/>
-                                <GridViewColumn Header="车票价格" Width="70" DisplayMemberBinding="{Binding TicketPrice}"/>
-                                <GridViewColumn Header="购买数量" Width="70" DisplayMemberBinding="{Binding BuyNumber}"/>
+                                <GridViewColumn Header="车次" Width="60" DisplayMemberBinding="{Binding TrainID}"/>
+                                <GridViewColumn Header="上车站点" Width="90" DisplayMemberBinding="{Binding EnterStationName}"/>
+                                <GridViewColumn Header="上车时间" Width="140" DisplayMemberBinding="{Binding EnterStationTime}"/>
+                                <GridViewColumn Header="到达站点" Width="90" DisplayMemberBinding="{Binding LeaveStationName}"/>
+                                <GridViewColumn Header="到达时间" Width="140" DisplayMemberBinding="{Binding LeaveStationTimeIn}"/>
+                                <GridViewColumn Header="所属线路" Width="80" DisplayMemberBinding="{Binding LineName}"/>
+                                <GridViewColumn Header="车票价格" Width="80" DisplayMemberBinding="{Binding TicketPrice}"/>
+                                <GridViewColumn Header="购买数量" Width="80" DisplayMemberBinding="{Binding BuyNumber}"/>
                             </GridView>
                         </ListView.View>
                     </ListView>

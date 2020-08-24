@@ -140,7 +140,7 @@ namespace TTS_Client {
             TicketListView.ItemsSource = allTicketInfo;
             ticketQueryInfo = new TicketQueryInfo();
             ticketQueryInfo.StartTime = DateTime.Now;
-            ticketQueryInfo.EndTime = DateTime.Now.AddHours(12);
+            ticketQueryInfo.EndTime = DateTime.Now.AddDays(10);
             textBlock_Copy12.Text = ticketQueryInfo.StartTime.ToString() + " - " + ticketQueryInfo.EndTime.ToString();
 			textBlock_Copy13.Text = ID;
 
@@ -172,7 +172,11 @@ namespace TTS_Client {
 			else {
 
 			} //是普通用户
-        }//构造函数，将登录页面的某些数据传过来
+
+			Refresh_Data(); //获取用户信息
+
+
+		}//构造函数，将登录页面的某些数据传过来
 
         public ClientWindow() {
 			InitializeComponent();
@@ -865,11 +869,11 @@ namespace TTS_Client {
 				MessageBox.Show("未选择需要购买的车票");
 				return;
 			}
-			BuyTicket[] buyTicket = new BuyTicket[BuyTicketListView.SelectedItems.Count];
-			for (int i = 0; i < buyTicket.Length; i++) {
-				buyTicket[i] = (BuyTicket)BuyTicketListView.SelectedItems[i];
+			BuyTicket[] buyTickets = new BuyTicket[BuyTicketListView.SelectedItems.Count];
+			for (int i = 0; i < buyTickets.Length; i++) {
+				buyTickets[i] = (BuyTicket)BuyTicketListView.SelectedItems[i];
 			}
-			SendBuyTicketToServer(buyTicket);
+			SendBuyTicketToServer(buyTickets);
 		} //购买选中的车票
 
 		private void button6_Click(object sender, RoutedEventArgs e) {
@@ -877,17 +881,17 @@ namespace TTS_Client {
 				MessageBox.Show("您还未添加车票");
 				return;
 			}
-			BuyTicket[] buyTicket = new BuyTicket[allBuyTicket.Count];
-			for (int i = 0; i < buyTicket.Length; i++) {
-				buyTicket[i] = allBuyTicket[i];
+			BuyTicket[] buyTickets = new BuyTicket[allBuyTicket.Count];
+			for (int i = 0; i < buyTickets.Length; i++) {
+				buyTickets[i] = allBuyTicket[i];
 			}
-			SendBuyTicketToServer(buyTicket);
+			SendBuyTicketToServer(buyTickets);
 		} //添加购买的所有车票
 
-		private void SendBuyTicketToServer (BuyTicket[] buyTicket) {
+		private void SendBuyTicketToServer (BuyTicket[] buyTickets) {
 			double totalCost = 0;
-			for (int i = 0; i < buyTicket.Length; i++) {
-				totalCost += buyTicket[i].TicketPrice;
+			for (int i = 0; i < buyTickets.Length; i++) {
+				totalCost += buyTickets[i].TicketPrice;
 			}
 			if (totalCost > RemainMoney) {
 				MessageBox.Show("余额不足，总共需要" + totalCost.ToString() + "元，当前用于余额为" + 
@@ -896,10 +900,10 @@ namespace TTS_Client {
 			}
 
 			string ExtraMsg = "";
-			for (int i = 0; i < buyTicket.Length; i++) {
+			for (int i = 0; i < buyTickets.Length; i++) {
 				//TrainID, EnterID, LeaveID, UserID, BuyNumber
-				ExtraMsg = ExtraMsg + buyTicket[i].TrainID + "\n" + buyTicket[i].EnterStationNumber.ToString() + "\n" +
-					buyTicket[i].LeaveStationNumber.ToString() + "\n" + UserID + "\n" + buyTicket[i].BuyNumber.ToString() + "\r";
+				ExtraMsg = ExtraMsg + buyTickets[i].TrainID + "\n" + buyTickets[i].EnterStationName + "\n" +
+					buyTickets[i].LeaveStationName.ToString() + "\n" + UserID + "\n" + buyTickets[i].BuyNumber.ToString() + "\r";
 			}
 
 			TcpClient tcpClient = null;
@@ -917,7 +921,7 @@ namespace TTS_Client {
 				var newClient = tcpListener.AcceptTcpClient();
 				var bytes = ReadFromTcpClient(newClient); //获取数据
 				var package = new TTS_Core.QueryDataPackage(bytes);
-				MessageBox.Show(package.ExtraMsg);
+				MessageBox.Show(package.ExtraMsg); //可知购买成功或失败
 			}
 			catch {
 				MessageBox.Show("无法连接到服务器!");
@@ -928,21 +932,6 @@ namespace TTS_Client {
 					networkStream.Close();
 				}
 				tcpClient.Close();
-			}
-
-
-			int ByFlag = 1; //1 购买成功, 2 余票不足, 3 车站或线路管制中。
-			if (ByFlag == 1) {
-				MessageBox.Show("购买成功，您可以在订单查询选项卡查看详细信息！");
-				for (int i = 0; i < buyTicket.Length; i++) {
-					allBuyTicket.Remove(buyTicket[i]);
-				}
-			}
-			else if (ByFlag == 2) {
-				MessageBox.Show("购买失败，余额不足！");
-			}
-			else if (ByFlag == 3) {
-				MessageBox.Show("购买失败，部分车站或线路管制中！");
 			}
 		}
 
@@ -1011,6 +1000,10 @@ namespace TTS_Client {
 		} //更改用户昵称
 
 		private void button11_Click(object sender, RoutedEventArgs e) {
+			Refresh_Data();
+		} //刷新用户信息
+
+		private void Refresh_Data() {
 			TcpClient tcpClient = null;
 			NetworkStream networkStream = null;
 			try {

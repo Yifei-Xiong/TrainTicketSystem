@@ -134,7 +134,10 @@ namespace TTS_Client
 
 			BuyTicketWindow buy = new BuyTicketWindow(subinfo1, info1Msg);
 			buy.ShowDialog();
-			allBuyTicket.Add(buy.selectTicket);
+			if (buy.selectTicket.TrainID!=0) {
+				allBuyTicket.Add(buy.selectTicket);
+			}
+			
 		} //调起买票窗体
 
 		private void InitListView () {
