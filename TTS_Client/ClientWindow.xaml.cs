@@ -984,6 +984,10 @@ namespace TTS_Client {
 			if (changeUserInfo.value == string.Empty) {
 				return;
 			}
+			if (System.Text.RegularExpressions.Regex.IsMatch(changeUserInfo.value, @"^[A-Za-z_0-9]{4,12}$") == false) {
+				MessageBox.Show("用户名无法通过正则表达式验证！");
+				return;
+			}
 			TcpClient tcpClient = null;
 			NetworkStream networkStream = null;
 			try {
