@@ -250,6 +250,10 @@ namespace TTS_Client
 			}
 			selectTicket = new ClientWindow.BuyTicket();
 			selectTicket = (ClientWindow.BuyTicket)listView.SelectedItem;
+			if (selectTicket.TicketRemain < BuyNumber) {
+				MessageBox.Show("余票不足！");
+				return;
+			}
 			selectTicket.BuyNumber = BuyNumber;
 			Close();
 		} //购买

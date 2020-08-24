@@ -294,6 +294,9 @@ namespace TTS_Server {
 											else if (ByFlag == 3) {
 												retMsg = "购买失败，余额不足！";
 											}
+											else if (ByFlag == 4) {
+												retMsg = "购买失败，余票不足！";
+											}
 											else {
 												retMsg = "购买失败，请与管理员取得联系！";
 											}
@@ -1161,9 +1164,11 @@ namespace TTS_Server {
 					var query2 = new MySqlCommand("update alluser set balance=balance-"+ (price * BuyNumber).ToString() + " where userid = \"" + UserID + "\"", connection);
 					try {
 						query.ExecuteNonQuery();
+						query2.ExecuteNonQuery();
 					}
 					catch { return 4; }
 				}
+
 
 			}
 			return 5;
@@ -1228,6 +1233,7 @@ namespace TTS_Server {
 			}
 			return "订单状态更新成功!";
 		}
+
 
 	}
 }
