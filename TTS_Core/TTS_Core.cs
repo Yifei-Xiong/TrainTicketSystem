@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,6 +22,11 @@ namespace TTS_Core
 		K_USER_INFO_CHANGE, //用户信息修改数据包类
 		K_USER_OPERATION_PACKAGE, //管理员操作用户信息包
 		K_LINE_OPERATION_PACKAGE, //管理员操作线路信息包
+		K_STATION_OPERATION_PACKAGE, //管理员操作站点信息包
+		K_TRAIN_OPERATION_PACKAGE, //管理员操作列车信息包
+		K_STATIONLINE_OPERATION_PACKAGE, //管理员操作车站线路信息包
+		K_TRAINSTATION_OPERATION_PACKAGE, //管理员操作火车站台信息包
+		K_TICKETPRICE_OPERATION_PACKAGE, //管理员操作火车站台信息包
 		K_DATASET_PACKAGE, //表类型包
 	}
 
@@ -288,7 +294,8 @@ namespace TTS_Core
         {
 			K_QUERY,
 			K_MODIFY,
-			K_DELETE
+			K_DELETE,
+			K_INSERT
         }
 
 		public Enum_USER_OP opType { get; set; }
@@ -339,6 +346,244 @@ namespace TTS_Core
 		public int lineid { get; set; }
 
 		public string linename { get; set; }
+	}
+
+
+	[Serializable]
+	public class StationOperationPackage : DataPackage
+	{
+		public StationOperationPackage(byte[] Bytes)
+		{
+			using (MemoryStream ms = new MemoryStream(Bytes))
+			{
+				IFormatter formatter = new BinaryFormatter();
+				StationOperationPackage package = formatter.Deserialize(ms) as StationOperationPackage;
+				if (package != null)
+				{
+					this.Sender = package.Sender;
+					this.Receiver = package.Receiver;
+					this.sendTime = package.sendTime;
+					this.MessageType = package.MessageType;
+					this.opType = package.opType;
+					this.stationid = package.stationid;
+					this.stationname = package.stationname;
+					this.IPandPort = package.IPandPort;
+				}
+			}
+		} //构造函数 字节数组转化为数据包
+
+		public StationOperationPackage(string sender, string IPandPort, string receiver,
+			Enum_OP opType,
+			int stationid, string stationname) : base(sender, IPandPort, receiver)
+		{
+			MessageType = MESSAGETYPE.K_STATION_OPERATION_PACKAGE;
+			this.opType = opType;
+			this.stationid = stationid;
+			this.stationname = stationname;
+		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
+
+
+		public Enum_OP opType { get; set; }
+
+		public int stationid { get; set; }
+
+		public string stationname { get; set; }
+	}
+
+
+	[Serializable]
+	public class TrainOperationPackage : DataPackage
+	{
+		public TrainOperationPackage(byte[] Bytes)
+		{
+			using (MemoryStream ms = new MemoryStream(Bytes))
+			{
+				IFormatter formatter = new BinaryFormatter();
+				TrainOperationPackage package = formatter.Deserialize(ms) as TrainOperationPackage;
+				if (package != null)
+				{
+					this.Sender = package.Sender;
+					this.Receiver = package.Receiver;
+					this.sendTime = package.sendTime;
+					this.MessageType = package.MessageType;
+					this.opType = package.opType;
+					this.trainid = package.trainid;
+					this.lineid = package.lineid;
+					this.traintype = package.traintype;
+					this.seatcount = package.seatcount;
+					this.IPandPort = package.IPandPort;
+				}
+			}
+		} //构造函数 字节数组转化为数据包
+
+		public TrainOperationPackage(string sender, string IPandPort, string receiver,
+			Enum_OP opType,
+			int trainid, int lineid, string traintype, int seatcount) : base(sender, IPandPort, receiver)
+		{
+			MessageType = MESSAGETYPE.K_TRAIN_OPERATION_PACKAGE;
+			this.opType = opType;
+			this.trainid = trainid;
+			this.lineid = lineid;
+			this.traintype = traintype;
+			this.seatcount = seatcount;
+		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
+
+		public Enum_OP opType { get; set; }
+
+		public int trainid { get; set; }
+
+		public int lineid { get; set; }
+
+		public string traintype { get; set; }
+
+		public int seatcount { get; set; }
+	}
+
+
+	[Serializable]
+	public class StationLineOperationPackage : DataPackage
+	{
+		public StationLineOperationPackage(byte[] Bytes)
+		{
+			using (MemoryStream ms = new MemoryStream(Bytes))
+			{
+				IFormatter formatter = new BinaryFormatter();
+				StationLineOperationPackage package = formatter.Deserialize(ms) as StationLineOperationPackage;
+				if (package != null)
+				{
+					this.Sender = package.Sender;
+					this.Receiver = package.Receiver;
+					this.sendTime = package.sendTime;
+					this.MessageType = package.MessageType;
+					this.opType = package.opType;
+					this.stationid = package.stationid;
+					this.lineid = package.lineid;
+					this.stationorder = package.stationorder;
+					this.IPandPort = package.IPandPort;
+				}
+			}
+		} //构造函数 字节数组转化为数据包
+
+		public StationLineOperationPackage(string sender, string IPandPort, string receiver,
+			Enum_OP opType,
+			int stationid, int lineid, int stationorder) : base(sender, IPandPort, receiver)
+		{
+			MessageType = MESSAGETYPE.K_STATIONLINE_OPERATION_PACKAGE;
+			this.opType = opType;
+			this.stationid = stationid;
+			this.lineid = lineid;
+			this.stationorder = stationorder;
+		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
+
+		public Enum_OP opType { get; set; }
+
+		public int stationid { get; set; }
+
+		public int lineid { get; set; }
+
+		public int stationorder { get; set; }
+	}
+
+
+	[Serializable]
+	public class TrainStationOperationPackage : DataPackage
+	{
+		public TrainStationOperationPackage(byte[] Bytes)
+		{
+			using (MemoryStream ms = new MemoryStream(Bytes))
+			{
+				IFormatter formatter = new BinaryFormatter();
+				TrainStationOperationPackage package = formatter.Deserialize(ms) as TrainStationOperationPackage;
+				if (package != null)
+				{
+					this.Sender = package.Sender;
+					this.Receiver = package.Receiver;
+					this.sendTime = package.sendTime;
+					this.MessageType = package.MessageType;
+					this.opType = package.opType;
+					this.trainid = package.trainid;
+					this.stationid = package.stationid;
+					this.arrivetime = package.arrivetime;
+					this.leavetime = package.leavetime;
+					this.remainseat = package.remainseat;
+					this.IPandPort = package.IPandPort;
+				}
+			}
+		} //构造函数 字节数组转化为数据包
+
+		public TrainStationOperationPackage(string sender, string IPandPort, string receiver,
+			Enum_OP opType,
+			int trainid, int stationid, string arrivetime, string leavetime, int remainseat) : base(sender, IPandPort, receiver)
+		{
+			MessageType = MESSAGETYPE.K_TRAINSTATION_OPERATION_PACKAGE;
+			this.opType = opType;
+			this.trainid = trainid;
+			this.stationid = stationid;
+			this.arrivetime = arrivetime;
+			this.leavetime = leavetime;
+			this.remainseat = remainseat;
+		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
+
+		public Enum_OP opType { get; set; }
+
+		public int trainid { get; set; }
+
+		public int stationid { get; set; }
+
+		public string arrivetime { get; set; }
+
+		public string leavetime { get; set; }
+
+		public int remainseat { get; set; }
+	}
+
+
+	[Serializable]
+	public class TicketPriceOperationPackage : DataPackage
+	{
+		public TicketPriceOperationPackage(byte[] Bytes)
+		{
+			using (MemoryStream ms = new MemoryStream(Bytes))
+			{
+				IFormatter formatter = new BinaryFormatter();
+				var package = formatter.Deserialize(ms) as TicketPriceOperationPackage;
+				if (package != null)
+				{
+					this.Sender = package.Sender;
+					this.Receiver = package.Receiver;
+					this.sendTime = package.sendTime;
+					this.MessageType = package.MessageType;
+					this.opType = package.opType;
+					this.enterstationid = package.enterstationid;
+					this.leavestationid = package.leavestationid;
+					this.lineid = package.lineid;
+					this.ticketprice = package.ticketprice;
+					this.IPandPort = package.IPandPort;
+				}
+			}
+		} //构造函数 字节数组转化为数据包
+
+		public TicketPriceOperationPackage(string sender, string IPandPort, string receiver,
+			Enum_OP opType,
+			int enterstationid, int leavestationid, int lineid, float ticketprice) : base(sender, IPandPort, receiver)
+		{
+			MessageType = MESSAGETYPE.K_TICKETPRICE_OPERATION_PACKAGE;
+			this.opType = opType;
+			this.enterstationid = enterstationid;
+			this.leavestationid = leavestationid;
+			this.lineid = lineid;
+			this.ticketprice = ticketprice;
+		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
+
+		public Enum_OP opType { get; set; }
+
+		public int enterstationid { get; set; }
+
+		public int leavestationid { get; set; }
+
+		public int lineid { get; set; }
+
+		public float ticketprice { get; set; }
 	}
 
 	[Serializable]

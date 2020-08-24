@@ -503,7 +503,7 @@ namespace TTS_Server {
                                 {
 									case TTS_Core.Enum_OP.K_DELETE:
                                         {
-											command = "DELETE FROM line WHERE line=" + package.lineid;
+											command = "DELETE FROM line WHERE lineid=" + package.lineid;
                                         }
                                         break;
                                     case TTS_Core.Enum_OP.K_MODIFY:
@@ -539,6 +539,485 @@ namespace TTS_Server {
 													command += " AND";
                                                 command += " linename=\"" + package.linename + "\"";
                                             }
+                                        }
+                                        break;
+								}
+
+								DataSet result = GetSQLResult(command);
+								int forbid = 1;
+								int row = 0;
+								int col = 0;
+								if (result != null)
+                                {
+									forbid = 0;
+									if (result.Tables.Count > 0)
+									{
+										row = result.Tables[0].Rows.Count;
+										col = result.Tables[0].Columns.Count;
+									}
+                                }
+								var sendBackPackage = new TTS_Core.DataSetPackage("server", IPandPort, package.Sender, forbid, row, col, result);
+
+                                TcpClient tcpClient;
+                                StateObject stateObject;
+                                tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+                                stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+                                stateObject.tcpClient = tcpClient;
+                                stateObject.buffer = sendBackPackage.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+                                tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+                                    new AsyncCallback(SentCallBackF), stateObject);
+                            }
+                            break;
+
+						case TTS_Core.MESSAGETYPE.K_STATION_OPERATION_PACKAGE:
+                            {
+								var package = new TTS_Core.StationOperationPackage(receiveBytes);
+								string command = "";
+								switch (package.opType)
+                                {
+									case TTS_Core.Enum_OP.K_DELETE:
+                                        {
+											command = "DELETE FROM station WHERE stationid=" + package.stationid;
+                                        }
+                                        break;
+                                    case TTS_Core.Enum_OP.K_MODIFY:
+                                        {
+											command = "UPDATE station SET " +
+														   "stationname=\"" + package.stationname + "\" " + 
+														   "WHERE stationid=" + package.stationid;
+                                        }
+                                        break;
+                                    case TTS_Core.Enum_OP.K_QUERY:
+                                        {
+											command = "SELECT * FROM station";
+
+											bool first = false;
+                                            if (package.stationid >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+                                                command += " stationid=" + package.stationid;
+                                            }
+
+                                            if (package.stationname != "")
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " stationname=\"" + package.stationname + "\"";
+                                            }
+                                        }
+                                        break;
+								}
+
+								DataSet result = GetSQLResult(command);
+								int forbid = 1;
+								int row = 0;
+								int col = 0;
+								if (result != null)
+                                {
+									forbid = 0;
+									if (result.Tables.Count > 0)
+									{
+										row = result.Tables[0].Rows.Count;
+										col = result.Tables[0].Columns.Count;
+									}
+                                }
+								var sendBackPackage = new TTS_Core.DataSetPackage("server", IPandPort, package.Sender, forbid, row, col, result);
+
+                                TcpClient tcpClient;
+                                StateObject stateObject;
+                                tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+                                stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+                                stateObject.tcpClient = tcpClient;
+                                stateObject.buffer = sendBackPackage.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+                                tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+                                    new AsyncCallback(SentCallBackF), stateObject);
+                            }
+                            break;
+
+						case TTS_Core.MESSAGETYPE.K_TRAIN_OPERATION_PACKAGE:
+                            {
+								var package = new TTS_Core.TrainOperationPackage(receiveBytes);
+								string command = "";
+								switch (package.opType)
+                                {
+									case TTS_Core.Enum_OP.K_DELETE:
+                                        {
+											command = "DELETE FROM train WHERE trainid=" + package.trainid;
+                                        }
+                                        break;
+                                    case TTS_Core.Enum_OP.K_MODIFY:
+                                        {
+											command = "UPDATE train SET " +
+														   "lineid=" + package.lineid + ", " +
+														   "traintype=\"" + package.traintype + "\", " + 
+														   "seatcount=" + package.seatcount + " " +
+														   "WHERE trainid=" + package.trainid;
+                                        }
+                                        break;
+                                    case TTS_Core.Enum_OP.K_QUERY:
+                                        {
+											command = "SELECT * FROM train";
+
+											bool first = false;
+                                            if (package.trainid >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+                                                command += " trainid=" + package.trainid;
+                                            }
+
+                                            if (package.lineid >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " lineid=" + package.lineid;
+                                            }
+
+                                            if (package.traintype != "")
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " traintype=\"" + package.traintype + "\"";
+                                            }
+
+                                            if (package.seatcount >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " seatcount>=" + package.seatcount;
+                                            }
+
+                                        }
+                                        break;
+								}
+
+								DataSet result = GetSQLResult(command);
+								int forbid = 1;
+								int row = 0;
+								int col = 0;
+								if (result != null)
+                                {
+									forbid = 0;
+									if (result.Tables.Count > 0)
+									{
+										row = result.Tables[0].Rows.Count;
+										col = result.Tables[0].Columns.Count;
+									}
+                                }
+								var sendBackPackage = new TTS_Core.DataSetPackage("server", IPandPort, package.Sender, forbid, row, col, result);
+
+                                TcpClient tcpClient;
+                                StateObject stateObject;
+                                tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+                                stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+                                stateObject.tcpClient = tcpClient;
+                                stateObject.buffer = sendBackPackage.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+                                tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+                                    new AsyncCallback(SentCallBackF), stateObject);
+                            }
+                            break;
+
+						case TTS_Core.MESSAGETYPE.K_STATIONLINE_OPERATION_PACKAGE:
+                            {
+								var package = new TTS_Core.StationLineOperationPackage(receiveBytes);
+								string command = "";
+								switch (package.opType)
+                                {
+									case TTS_Core.Enum_OP.K_DELETE:
+                                        {
+											command = "DELETE FROM stationline WHERE stationid=" + package.stationid;
+                                        }
+                                        break;
+                                    case TTS_Core.Enum_OP.K_MODIFY:
+                                        {
+											command = "UPDATE stationline SET " +
+														   "lineid=" + package.lineid + ", " +
+														   "stationorder=" + package.stationorder + " " +
+														   "WHERE stationid=" + package.stationid;
+                                        }
+                                        break;
+                                    case TTS_Core.Enum_OP.K_QUERY:
+                                        {
+											command = "SELECT * FROM stationline";
+
+											bool first = false;
+                                            if (package.stationid >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+                                                command += " stationid=" + package.stationid;
+                                            }
+
+                                            if (package.lineid >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " lineid=" + package.lineid;
+                                            }
+
+                                            if (package.stationorder >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " stationorder=" + package.stationorder;
+                                            }
+
+                                        }
+                                        break;
+								}
+
+								DataSet result = GetSQLResult(command);
+								int forbid = 1;
+								int row = 0;
+								int col = 0;
+								if (result != null)
+                                {
+									forbid = 0;
+									if (result.Tables.Count > 0)
+									{
+										row = result.Tables[0].Rows.Count;
+										col = result.Tables[0].Columns.Count;
+									}
+                                }
+								var sendBackPackage = new TTS_Core.DataSetPackage("server", IPandPort, package.Sender, forbid, row, col, result);
+
+                                TcpClient tcpClient;
+                                StateObject stateObject;
+                                tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+                                stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+                                stateObject.tcpClient = tcpClient;
+                                stateObject.buffer = sendBackPackage.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+                                tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+                                    new AsyncCallback(SentCallBackF), stateObject);
+                            }
+                            break;
+
+						case TTS_Core.MESSAGETYPE.K_TRAINSTATION_OPERATION_PACKAGE:
+                            {
+								var package = new TTS_Core.TrainStationOperationPackage(receiveBytes);
+								string command = "";
+								switch (package.opType)
+                                {
+									case TTS_Core.Enum_OP.K_DELETE:
+                                        {
+											command = "DELETE FROM trainstation WHERE trainid=" + package.trainid + " AND stationid=" + package.stationid;
+                                        }
+                                        break;
+                                    case TTS_Core.Enum_OP.K_MODIFY:
+                                        {
+											command = "UPDATE trainstation SET " +
+														   "arrivetime=\"" + package.arrivetime + "\", " +
+														   "leavetime=\"" + package.leavetime + "\", " +
+														   "remainseat=" + package.remainseat + " " +
+														   "WHERE trainid=" + package.trainid + " AND " +
+														   "stationid=" + package.stationid;
+                                        }
+                                        break;
+                                    case TTS_Core.Enum_OP.K_QUERY:
+                                        {
+											command = "SELECT * FROM trainstation";
+
+											bool first = false;
+                                            if (package.trainid >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+                                                command += " trainid=" + package.trainid;
+                                            }
+
+                                            if (package.stationid >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " stationid=" + package.stationid;
+                                            }
+
+                                            if (package.arrivetime != "")
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " arrivetime>=\"" + package.arrivetime + "\"";
+                                            }
+
+                                            if (package.leavetime != "")
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " leavetime<=\"" + package.leavetime + "\"";
+                                            }
+
+
+                                            if (package.remainseat >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " remainseat>=" + package.remainseat;
+                                            }
+
+                                        }
+                                        break;
+								}
+
+								DataSet result = GetSQLResult(command);
+								int forbid = 1;
+								int row = 0;
+								int col = 0;
+								if (result != null)
+                                {
+									forbid = 0;
+									if (result.Tables.Count > 0)
+									{
+										row = result.Tables[0].Rows.Count;
+										col = result.Tables[0].Columns.Count;
+									}
+                                }
+								var sendBackPackage = new TTS_Core.DataSetPackage("server", IPandPort, package.Sender, forbid, row, col, result);
+
+                                TcpClient tcpClient;
+                                StateObject stateObject;
+                                tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+                                stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+                                stateObject.tcpClient = tcpClient;
+                                stateObject.buffer = sendBackPackage.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+                                tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+                                    new AsyncCallback(SentCallBackF), stateObject);
+                            }
+                            break;
+
+						case TTS_Core.MESSAGETYPE.K_TICKETPRICE_OPERATION_PACKAGE:
+                            {
+								var package = new TTS_Core.TicketPriceOperationPackage(receiveBytes);
+								string command = "";
+								switch (package.opType)
+                                {
+									case TTS_Core.Enum_OP.K_DELETE:
+                                        {
+											command = "DELETE FROM ticketprice WHERE enterstationid=" + package.enterstationid +
+													  " AND leavestationid=" + package.leavestationid + " AND lineid=" + package.lineid;
+                                        }
+                                        break;
+                                    case TTS_Core.Enum_OP.K_MODIFY:
+                                        {
+                                            command = "UPDATE ticketprice SET " +
+                                                      "ticketprice=" + package.ticketprice + " " +
+                                                      "WHERE enterstationid=" + package.enterstationid +
+													  " AND leavestationid=" + package.leavestationid + " AND lineid=" + package.lineid;
+                                        }
+                                        break;
+                                    case TTS_Core.Enum_OP.K_QUERY:
+                                        {
+											command = "SELECT * FROM ticketprice";
+
+											bool first = false;
+                                            if (package.enterstationid >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+                                                command += " enterstationid=" + package.enterstationid;
+                                            }
+
+                                            if (package.leavestationid >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " leavestationid=" + package.leavestationid;
+                                            }
+
+                                            if (package.lineid >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " lineid=\"" + package.lineid + "\"";
+                                            }
+
+                                            if (package.ticketprice >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " ticketprice<=" + package.ticketprice;
+                                            }
+
                                         }
                                         break;
 								}

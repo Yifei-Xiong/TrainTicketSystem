@@ -1120,6 +1120,36 @@ namespace TTS_Client {
 			activity.ShowDialog();
         }
 
+        private void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+			var activity = new ManagerWindow_station(UserID, myIPAddress, LoginPort, tcpListener, MyPort);
+			activity.ShowDialog();
+        }
+
+        private void Button_Click_6(object sender, RoutedEventArgs e)
+        {
+			var activity = new ManagerWindow_train(UserID, myIPAddress, LoginPort, tcpListener, MyPort);
+			activity.ShowDialog();
+        }
+
+        private void Button_Click_7(object sender, RoutedEventArgs e)
+        {
+			var activity = new ManagerWindow_stationline(UserID, myIPAddress, LoginPort, tcpListener, MyPort);
+			activity.ShowDialog();
+        }
+
+        private void Button_Click_8(object sender, RoutedEventArgs e)
+        {
+			var activity = new ManagerWindow_trainstation(UserID, myIPAddress, LoginPort, tcpListener, MyPort);
+			activity.ShowDialog();
+        }
+
+        private void Button_Click_9(object sender, RoutedEventArgs e)
+        {
+			var activity = new ManagerWindow_ticketprice(UserID, myIPAddress, LoginPort, tcpListener, MyPort);
+			activity.ShowDialog();
+        }
+    
 		private void button7_Click(object sender, RoutedEventArgs e) {
 			//申请取消所选订单
 			if (TicketListView.SelectedItems.Count == 0) {
