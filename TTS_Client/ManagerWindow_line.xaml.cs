@@ -48,6 +48,7 @@ namespace TTS_Client
             this.port = port;
             this.tcp_listener = tcp_listener;
             this.listen_port = listen_port;
+
         }
 
         private void balance_PreviewTextInput(object sender, TextCompositionEventArgs e)
