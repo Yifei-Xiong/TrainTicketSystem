@@ -73,6 +73,9 @@
     <Compile Include="LineSelect.xaml.cs">
       <DependentUpon>LineSelect.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ManagerWindow_line.xaml.cs">
+      <DependentUpon>ManagerWindow_line.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ManagerWindow_user.xaml.cs">
       <DependentUpon>ManagerWindow_user.xaml</DependentUpon>
     </Compile>
@@ -124,6 +127,10 @@
       <DependentUpon>LoginWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ManagerWindow_line.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ManagerWindow_user.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

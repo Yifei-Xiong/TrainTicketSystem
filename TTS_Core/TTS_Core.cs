@@ -19,7 +19,8 @@ namespace TTS_Core
         K_QUERY_DATA_PACKAGE,  //查询数据包类
         K_TICKETQUERY_DATA_PACKAGE,  //客户端向服务端发送的查询条件类
 		K_USER_INFO_CHANGE, //用户信息修改数据包类
-		K_USER_OPERATION_PACKAGE, //管理员查询用户信息包
+		K_USER_OPERATION_PACKAGE, //管理员操作用户信息包
+		K_LINE_OPERATION_PACKAGE, //管理员操作线路信息包
 		K_DATASET_PACKAGE, //表类型包
 	}
 
@@ -42,8 +43,16 @@ namespace TTS_Core
 		K_USER_INFO //用户详情信息
     }
 
-	//数据包类，Type=K_DATA_PACKAGE
-	[Serializable]
+	//在OPERATION里面的操作类型
+    public enum Enum_OP
+    {
+        K_QUERY,
+        K_MODIFY,
+        K_DELETE
+    }
+
+    //数据包类，Type=K_DATA_PACKAGE
+    [Serializable]
 	public class DataPackage {
 		public DataPackage() {
 			sendTime = DateTime.Now;
@@ -289,6 +298,47 @@ namespace TTS_Core
 		public float Balance { get; set; }
 	}
 
+
+	[Serializable]
+	public class LineOperationPackage : DataPackage
+	{
+		public LineOperationPackage(byte[] Bytes)
+		{
+			using (MemoryStream ms = new MemoryStream(Bytes))
+			{
+				IFormatter formatter = new BinaryFormatter();
+				LineOperationPackage package = formatter.Deserialize(ms) as LineOperationPackage;
+				if (package != null)
+				{
+					this.Sender = package.Sender;
+					this.Receiver = package.Receiver;
+					this.sendTime = package.sendTime;
+					this.MessageType = package.MessageType;
+					this.opType = package.opType;
+					this.lineid = package.lineid;
+					this.linename = package.linename;
+					this.IPandPort = package.IPandPort;
+				}
+			}
+		} //构造函数 字节数组转化为数据包
+
+		public LineOperationPackage(string sender, string IPandPort, string receiver,
+			Enum_OP opType,
+			int lineid, string username) : base(sender, IPandPort, receiver)
+		{
+			MessageType = MESSAGETYPE.K_LINE_OPERATION_PACKAGE;
+			this.opType = opType;
+			this.lineid = lineid;
+			this.linename = username;
+		} //构造函数 接受发送者,接收者字符串,注册用户名与注册密码
+
+
+		public Enum_OP opType { get; set; }
+
+		public int lineid { get; set; }
+
+		public string linename { get; set; }
+	}
 
 	[Serializable]
 	public class DataSetPackage : DataPackage

@@ -447,6 +447,80 @@ namespace TTS_Server {
                                     new AsyncCallback(SentCallBackF), stateObject);
                             }
                             break;
+
+						case TTS_Core.MESSAGETYPE.K_LINE_OPERATION_PACKAGE:
+                            {
+								var package = new TTS_Core.LineOperationPackage(receiveBytes);
+								string command = "";
+								switch (package.opType)
+                                {
+									case TTS_Core.Enum_OP.K_DELETE:
+                                        {
+											command = "DELETE FROM line WHERE line=" + package.lineid;
+                                        }
+                                        break;
+                                    case TTS_Core.Enum_OP.K_MODIFY:
+                                        {
+											command = "UPDATE line SET " +
+														   "linename=\"" + package.linename + "\" " + 
+														   "WHERE lineid=" + package.lineid;
+                                        }
+                                        break;
+                                    case TTS_Core.Enum_OP.K_QUERY:
+                                        {
+											command = "SELECT * FROM line";
+
+											bool first = false;
+                                            if (package.lineid >= 0)
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+                                                command += " lineid=" + package.lineid;
+                                            }
+
+                                            if (package.linename != "")
+                                            {
+												if (!first)
+												{
+													command += " WHERE";
+													first = true;
+												}
+												else
+													command += " AND";
+                                                command += " linename=\"" + package.linename + "\"";
+                                            }
+                                        }
+                                        break;
+								}
+
+								DataSet result = GetSQLResult(command);
+								int forbid = 1;
+								int row = 0;
+								int col = 0;
+								if (result != null)
+                                {
+									forbid = 0;
+									if (result.Tables.Count > 0)
+									{
+										row = result.Tables[0].Rows.Count;
+										col = result.Tables[0].Columns.Count;
+									}
+                                }
+								var sendBackPackage = new TTS_Core.DataSetPackage("server", IPandPort, package.Sender, forbid, row, col, result);
+
+                                TcpClient tcpClient;
+                                StateObject stateObject;
+                                tcpClient = new TcpClient(); //每次发送建立一个TcpClient类对象
+                                stateObject = new StateObject(); //每次发送建立一个StateObject类对象
+                                stateObject.tcpClient = tcpClient;
+                                stateObject.buffer = sendBackPackage.DataPackageToBytes(); //buffer为发送的数据包的字节数组
+                                tcpClient.BeginConnect(package.IPandPort.Split(':')[0], int.Parse(package.IPandPort.Split(':')[1]),
+                                    new AsyncCallback(SentCallBackF), stateObject);
+                            }
+                            break;
 					}
 				}
 				catch {

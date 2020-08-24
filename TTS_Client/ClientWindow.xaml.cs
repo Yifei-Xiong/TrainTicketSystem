@@ -1099,5 +1099,11 @@ namespace TTS_Client {
 			ManagerWindow_user activity = new ManagerWindow_user(UserID, myIPAddress, LoginPort, tcpListener, MyPort);
 			activity.ShowDialog();
         }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+			var activity = new ManagerWindow_line(UserID, myIPAddress, LoginPort, tcpListener, MyPort);
+			activity.ShowDialog();
+        }
     }
 }
