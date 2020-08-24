@@ -111,8 +111,8 @@
                     <TextBlock x:Name="textBlock1_Copy9" HorizontalAlignment="Left" Margin="583,18,0,0" TextWrapping="Wrap" Text="线路编号" VerticalAlignment="Top"/>
                     <TextBlock x:Name="textBlock1_Copy10" HorizontalAlignment="Left" Margin="881,18,0,0" TextWrapping="Wrap" Text="票价" VerticalAlignment="Top"/>
                     <TextBlock x:Name="textBlock1_Copy11" HorizontalAlignment="Left" Margin="929,18,0,0" TextWrapping="Wrap" Text="订单状态" VerticalAlignment="Top"/>
-                    <Button x:Name="button12" Content="将该订单置于已支付状态" HorizontalAlignment="Left" Margin="515,66,0,0" VerticalAlignment="Top" Width="155" Click="button12_Click"/>
-                    <Button x:Name="button13" Content="将该订单置于失效状态" HorizontalAlignment="Left" Margin="675,66,0,0" VerticalAlignment="Top" Width="137" Click="button13_Click"/>
+                    <Button x:Name="button12" Content="拒绝退票申请" HorizontalAlignment="Left" Margin="633,66,0,0" VerticalAlignment="Top" Width="87" Click="button12_Click"/>
+                    <Button x:Name="button13" Content="同意退票申请" HorizontalAlignment="Left" Margin="725,66,0,0" VerticalAlignment="Top" Width="87" Click="button13_Click"/>
                     <Button x:Name="button2_Copy2" Content="刷新" HorizontalAlignment="Left" Margin="419,66,0,0" VerticalAlignment="Top" Width="63" Click="button2_Copy2_Click"/>
                     <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="12,68,0,0" TextWrapping="Wrap" Text="总订单数:" VerticalAlignment="Top"/>
                     <TextBlock x:Name="textBlock4" HorizontalAlignment="Left" Margin="68,68,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top"/>

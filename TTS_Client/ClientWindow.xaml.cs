@@ -1257,15 +1257,15 @@ namespace TTS_Client {
 		private void button13_Click(object sender, RoutedEventArgs e) {
 			//将该订单置于失效状态
 			if (TicketListView.SelectedItems.Count == 0) {
-				MessageBox.Show("未选择需要置于失效的订单");
+				MessageBox.Show("未选择同意退票申请的订单");
 				return;
 			}
 			TicketInfo[] infos = new TicketInfo[TicketListView.SelectedItems.Count];
 			string ExtraMsg = "3" + "\r";
 			for (int i = 0; i < infos.Length; i++) {
 				infos[i] = (TicketInfo)TicketListView.SelectedItems[i];
-				if (infos[i]._state == 3) {
-					MessageBox.Show("只有未失效的订单才可以置于失效！");
+				if (infos[i]._state != 2) {
+					MessageBox.Show("只有用户已申请取消的订单才可以执行此操作！");
 					return;
 				}
 				ExtraMsg = ExtraMsg + infos[i].TicketNumber.ToString() + "\n";
@@ -1276,15 +1276,15 @@ namespace TTS_Client {
 		private void button12_Click(object sender, RoutedEventArgs e) {
 			//将该订单置于生效状态
 			if (TicketListView.SelectedItems.Count == 0) {
-				MessageBox.Show("未选择需要置于已支付状态的订单");
+				MessageBox.Show("未选择拒绝退票申请的订单");
 				return;
 			}
 			TicketInfo[] infos = new TicketInfo[TicketListView.SelectedItems.Count];
 			string ExtraMsg = "1" + "\r";
 			for (int i = 0; i < infos.Length; i++) {
 				infos[i] = (TicketInfo)TicketListView.SelectedItems[i];
-				if (infos[i]._state == 1) {
-					MessageBox.Show("只有未生效的订单才可以置于已支付状态！");
+				if (infos[i]._state != 2) {
+					MessageBox.Show("只有用户已申请取消的订单才可以执行此操作！");
 					return;
 				}
 				ExtraMsg = ExtraMsg + infos[i].TicketNumber.ToString() + "\n";
