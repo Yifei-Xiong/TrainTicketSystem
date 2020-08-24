@@ -83,7 +83,7 @@
                     <TextBlock x:Name="textBlock1_Copy" HorizontalAlignment="Left" Margin="106,18,0,0" TextWrapping="Wrap" Text="出发站号" VerticalAlignment="Top"/>
                     <TextBox x:Name="textBox_tic1" HorizontalAlignment="Left" Height="23" Margin="12,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="44"/>
                     <TextBox x:Name="textBox_tic3" HorizontalAlignment="Left" Height="23" Margin="103,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="53"/>
-                    <Button x:Name="button2_Copy" Content="筛选" HorizontalAlignment="Left" Margin="239,66,0,0" VerticalAlignment="Top" Width="63" Click="button2_Copy_Click_1"/>
+                    <Button x:Name="button2_Copy" Content="筛选" HorizontalAlignment="Left" Margin="242,66,0,0" VerticalAlignment="Top" Width="63" Click="button2_Copy_Click_1"/>
                     <Button x:Name="button2_Copy1" Content="清空" HorizontalAlignment="Left" Margin="162,66,0,0" VerticalAlignment="Top" Width="63" Click="Button2_Copy_Click" />
                     <TextBox x:Name="textBox_tic4" HorizontalAlignment="Left" Height="23" Margin="159,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="61"/>
                     <TextBlock x:Name="textBlock1_Copy1" HorizontalAlignment="Left" Margin="258,18,0,0" TextWrapping="Wrap" Text="出发时间" VerticalAlignment="Top"/>
@@ -113,6 +113,7 @@
                     <TextBlock x:Name="textBlock1_Copy11" HorizontalAlignment="Left" Margin="929,18,0,0" TextWrapping="Wrap" Text="订单状态" VerticalAlignment="Top"/>
                     <Button x:Name="button12" Content="将该订单置于已支付状态" HorizontalAlignment="Left" Margin="515,66,0,0" VerticalAlignment="Top" Width="155" Click="button12_Click"/>
                     <Button x:Name="button13" Content="将该订单置于失效状态" HorizontalAlignment="Left" Margin="675,66,0,0" VerticalAlignment="Top" Width="137" Click="button13_Click"/>
+                    <Button x:Name="button2_Copy2" Content="刷新" HorizontalAlignment="Left" Margin="322,66,0,0" VerticalAlignment="Top" Width="63" Click="button2_Copy2_Click"/>
                 </Grid>
             </TabItem>
             <TabItem Header="用户信息" x:Name="UserItem">

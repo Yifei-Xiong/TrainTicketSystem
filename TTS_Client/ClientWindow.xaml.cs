@@ -1205,5 +1205,9 @@ namespace TTS_Client {
 			loginWindow.Show();
 			this.Close();
 		} //退出登录
+
+		private void button2_Copy2_Click(object sender, RoutedEventArgs e) {
+			OrderItem_Selected();
+		} //订单表的刷新
 	}
 }
