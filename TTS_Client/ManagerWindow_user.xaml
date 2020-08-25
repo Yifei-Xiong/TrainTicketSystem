@@ -5,17 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TTS_Client"
         mc:Ignorable="d"
-        Title="ManagerWindow_user" Height="450" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="用户管理窗口" Height="450" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
         <ListView x:Name="DataView" HorizontalAlignment="Left" Height="217" Margin="35,96,0,0" VerticalAlignment="Top" Width="703" SelectionChanged="DataView_SelectionChanged">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="userid" Width="50" DisplayMemberBinding="{Binding userid}"/>
-                    <GridViewColumn Header="password" Width="150" DisplayMemberBinding="{Binding password}"/>
-                    <GridViewColumn Header="accounttype" Width="90" DisplayMemberBinding="{Binding acccounttype}"/>
-                    <GridViewColumn Header="phone" Width="120" DisplayMemberBinding="{Binding phone}"/>
-                    <GridViewColumn Header="username" Width="120" DisplayMemberBinding="{Binding username}"/>
-                    <GridViewColumn Header="balance" Width="170" DisplayMemberBinding="{Binding balance}"/>
+                    <GridViewColumn Header="用户ID" Width="50" DisplayMemberBinding="{Binding userid}"/>
+                    <GridViewColumn Header="密码" Width="150" DisplayMemberBinding="{Binding password}"/>
+                    <GridViewColumn Header="账号类别" Width="90" DisplayMemberBinding="{Binding acccounttype}"/>
+                    <GridViewColumn Header="手机号码" Width="120" DisplayMemberBinding="{Binding phone}"/>
+                    <GridViewColumn Header="用户名" Width="120" DisplayMemberBinding="{Binding username}"/>
+                    <GridViewColumn Header="余额" Width="170" DisplayMemberBinding="{Binding balance}"/>
                 </GridView>
             </ListView.View>
         </ListView>
@@ -24,11 +24,11 @@
         <TextBox x:Name="Text_phone" HorizontalAlignment="Left" Height="23" Margin="330,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" PreviewTextInput="balance_PreviewTextInput"/>
         <TextBox x:Name="Text_username" HorizontalAlignment="Left" Height="23" Margin="455,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="Text_balance" HorizontalAlignment="Left" Height="23" Margin="587,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" PreviewTextInput="balance_PreviewTextInput"/>
-        <TextBlock HorizontalAlignment="Left" Margin="35,24,0,0" TextWrapping="Wrap" Text="userId" VerticalAlignment="Top" Height="16" Width="50" TextAlignment="Center"/>
-        <TextBlock HorizontalAlignment="Left" Margin="364,24,0,0" TextWrapping="Wrap" Text="phone" VerticalAlignment="Top" Height="16" Width="50" TextAlignment="Center"/>
-        <TextBlock HorizontalAlignment="Left" Margin="241,24,0,0" TextWrapping="Wrap" Text="accounttype" VerticalAlignment="Top" Height="16" Width="84" TextAlignment="Center"/>
-        <TextBlock HorizontalAlignment="Left" Margin="628,24,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="16" Width="68"><Run Text="balance"/><LineBreak/><Run/></TextBlock>
-        <TextBlock HorizontalAlignment="Left" Margin="477,24,0,0" TextWrapping="Wrap" Text="username" VerticalAlignment="Top" Height="16" Width="69" TextAlignment="Center"/>
+        <TextBlock HorizontalAlignment="Left" Margin="35,24,0,0" TextWrapping="Wrap" Text="用户ID" VerticalAlignment="Top" Height="16" Width="50" TextAlignment="Center"/>
+        <TextBlock HorizontalAlignment="Left" Margin="364,24,0,0" TextWrapping="Wrap" Text="手机号码" VerticalAlignment="Top" Height="16" Width="50" TextAlignment="Center"/>
+        <TextBlock HorizontalAlignment="Left" Margin="241,24,0,0" TextWrapping="Wrap" Text="账号类别" VerticalAlignment="Top" Height="16" Width="84" TextAlignment="Center"/>
+        <TextBlock HorizontalAlignment="Left" Margin="628,24,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="16" Width="68"><Run Text="余额"/><LineBreak/><Run/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" Margin="477,24,0,0" TextWrapping="Wrap" Text="用户名" VerticalAlignment="Top" Height="16" Width="69" TextAlignment="Center"/>
         <Button x:Name="Button_query" Content="查询" HorizontalAlignment="Left" Margin="720,45,0,0" VerticalAlignment="Top" Width="64" Height="23" Click="Button_query_Click"/>
         <TextBox x:Name="Text_accounttype_Copy" HorizontalAlignment="Left" Height="23" Margin="241,341,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="84"/>
         <TextBox x:Name="Text_phone_Copy" HorizontalAlignment="Left" Height="23" Margin="330,341,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" PreviewTextInput="balance_PreviewTextInput"/>
