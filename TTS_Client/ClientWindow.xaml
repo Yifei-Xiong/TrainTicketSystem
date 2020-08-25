@@ -126,9 +126,9 @@
                     <TextBlock x:Name="textBlock_Copy15" HorizontalAlignment="Left" Margin="29,45,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113"><Run Text="当前登录账号类别"/><Run Text="："/></TextBlock>
                     <TextBlock x:Name="textBlock_Copy16" HorizontalAlignment="Left" Margin="142,45,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="76" Text="普通用户"/>
                     <TextBlock x:Name="textBlock_Copy17" HorizontalAlignment="Left" Margin="29,70,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113"><Run Text="手机号码"/><Run Text="："/></TextBlock>
-                    <TextBlock x:Name="textBlock_Copy18" HorizontalAlignment="Left" Margin="142,70,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="128" Text="ID"/>
+                    <TextBlock x:Name="textBlock_Copy18" HorizontalAlignment="Left" Margin="142,70,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="128" Text="0"/>
                     <TextBlock x:Name="textBlock_Copy19" HorizontalAlignment="Left" Margin="29,95,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="113"><Run Text="用户"/><Run Text="昵称"/><Run Text="："/></TextBlock>
-                    <TextBlock x:Name="textBlock_Copy22" HorizontalAlignment="Left" Margin="142,95,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="128" Text="ID"/>
+                    <TextBlock x:Name="textBlock_Copy22" HorizontalAlignment="Left" Margin="142,95,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.183,-0.662" Width="128" Text="0"/>
                     <Button Content="更改手机号码" HorizontalAlignment="Left" Margin="278,68,0,0" VerticalAlignment="Top" Width="95" Click="Button_Click_1"/>
                     <Button Content="更改用户昵称" HorizontalAlignment="Left" Margin="278,93,0,0" VerticalAlignment="Top" Width="95" Click="Button_Click_2"/>
                     <Button x:Name="button11" Content="刷新用户信息" HorizontalAlignment="Left" Margin="41,150,0,0" VerticalAlignment="Top" Width="125" Click="button11_Click"/>
