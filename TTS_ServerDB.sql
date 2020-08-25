@@ -3,10 +3,7 @@
 -- Host: localhost    Database: tts_serverdb
 -- ------------------------------------------------------
 -- Server version	8.0.19
-/*
-11
-+触发器：ticket.state 2->3 相应用户余额加一
-*/
+
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -158,7 +155,7 @@ CREATE TABLE `ticket` (
   `userid` varchar(45) NOT NULL,
   `buytime` datetime NOT NULL,
   `ticketprice` float NOT NULL,
-  `state` int DEFAULT '1',
+  `state` int NOT NULL DEFAULT '1',
   PRIMARY KEY (`ticketid`),
   KEY `fk_enterstationid_station_idx` (`enterstationid`),
   KEY `fk_leavesstationid_station_idx` (`leavestationid`),
@@ -220,21 +217,10 @@ DELIMITER ;;
     WHERE trainstation.trainid=new.trainid AND
     trainstation.leavetime>= new.enterstationtime AND
     trainstation.arrivetime< new.leavestationtime;
-    end if;
-    IF(new.state=1 AND old.state=3)
-    then
-	update trainstation
-	set trainstation.remainseat = trainstation.remainseat-1
-    WHERE trainstation.trainid=new.trainid AND
-    trainstation.leavetime>= new.enterstationtime AND
-    trainstation.arrivetime< new.leavestationtime;
-    end if;
-	IF(new.state=3 AND old.state=2)
-    then
-    update alluser
+	update alluser
 	set balance = balance+new.ticketprice
     where userid = new.userid;
-    END IF;
+    end if;
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -282,9 +268,9 @@ DROP TABLE IF EXISTS `train`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `train` (
   `trainid` int NOT NULL,
-  `lineid` int NOT NULL DEFAULT '3',
-  `traintype` varchar(30) NOT NULL DEFAULT 'G',
-  `seatcount` int NOT NULL DEFAULT '280',
+  `lineid` int NOT NULL,
+  `traintype` varchar(30) NOT NULL,
+  `seatcount` int NOT NULL,
   PRIMARY KEY (`trainid`),
   KEY `fk_train_line_idx` (`lineid`),
   CONSTRAINT `fk_train_line` FOREIGN KEY (`lineid`) REFERENCES `line` (`lineid`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -359,4 +345,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-08-24 20:12:59
+-- Dump completed on 2020-08-25 10:51:44
