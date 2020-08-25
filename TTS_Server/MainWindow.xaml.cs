@@ -1636,16 +1636,26 @@ namespace TTS_Server {
 				} //用户余额不足
 				
 				for (int j=0; j < BuyNumber; j++) {
-					var query = new MySqlCommand("INSERT INTO ticket(enterstationid, enterstationname, leavestationid, leavestationname, enterstationtime, " +
-						"leavestationtime, linename, lineid, trainid, userid, buytime, ticketprice) VALUES (" + EnterID.ToString() + ", \"" + EnterName + "\", " + LeaveID.ToString() +
-						", \"" + LeaveName + "\", \"" + EnterTime + "\", \"" + LeaveTime + "\", \"" + LineName + "\", " + LineID.ToString() + ", " + sep2[0]
-						+ ", \"" + sep2[3] + "\", \"" + BuyTime + "\", " + price.ToString() + ")", connection);
-					var query2 = new MySqlCommand("update alluser set balance=balance-"+ (price * BuyNumber).ToString() + " where userid = \"" + UserID + "\"", connection);
+					var trans1 = new MySqlCommand("BEGIN;", connection);
+					trans1.ExecuteNonQuery();
+					var trans2 = new MySqlCommand("START TRANSACTION;", connection);
+					trans2.ExecuteNonQuery();
 					try {
+						var query = new MySqlCommand("INSERT INTO ticket(enterstationid, enterstationname, leavestationid, leavestationname, enterstationtime, " +
+							"leavestationtime, linename, lineid, trainid, userid, buytime, ticketprice) VALUES (" + EnterID.ToString() + ", \"" + EnterName + "\", " + LeaveID.ToString() +
+							", \"" + LeaveName + "\", \"" + EnterTime + "\", \"" + LeaveTime + "\", \"" + LineName + "\", " + LineID.ToString() + ", " + sep2[0]
+							+ ", \"" + sep2[3] + "\", \"" + BuyTime + "\", " + price.ToString() + ")", connection);
+						var query2 = new MySqlCommand("update alluser set balance=balance-" + (price).ToString() + " where userid = \"" + UserID + "\"", connection);
+						var trans3 = new MySqlCommand("commit;", connection);
 						query.ExecuteNonQuery();
 						query2.ExecuteNonQuery();
+						trans3.ExecuteNonQuery();
 					}
-					catch { return 4; }
+					catch {
+						var trans4 = new MySqlCommand("ROLLBACK;", connection);
+						trans4.ExecuteNonQuery();
+						return 4;
+					}
 				}
 
 

@@ -980,7 +980,7 @@ namespace TTS_Client {
 		private void SendBuyTicketToServer (BuyTicket[] buyTickets) {
 			double totalCost = 0;
 			for (int i = 0; i < buyTickets.Length; i++) {
-				totalCost += buyTickets[i].TicketPrice;
+				totalCost += buyTickets[i].TicketPrice * buyTickets[i].BuyNumber;
 			}
 			if (totalCost > RemainMoney) {
 				MessageBox.Show("余额不足，总共需要" + totalCost.ToString() + "元，当前用于余额为" + 
@@ -1027,6 +1027,7 @@ namespace TTS_Client {
 				}
 				tcpClient.Close();
 			}
+			Refresh_Data(0);
 		}
 
 		private void Button_Click_1(object sender, RoutedEventArgs e) {
@@ -1072,8 +1073,8 @@ namespace TTS_Client {
 			if (changeUserInfo.value == string.Empty) {
 				return;
 			}
-			if (System.Text.RegularExpressions.Regex.IsMatch(changeUserInfo.value, @"^[A-Za-z_0-9]{4,12}$") == false) {
-				MessageBox.Show("用户名无法通过正则表达式验证！");
+			if (System.Text.RegularExpressions.Regex.IsMatch(changeUserInfo.value, @"^[A-Za-z_0-9]{4,18}$") == false) {
+				MessageBox.Show("用户名无法通过正则表达式验证！只能由4-18位字母、数字和下划线构成！");
 				return;
 			}
 			TcpClient tcpClient = null;
