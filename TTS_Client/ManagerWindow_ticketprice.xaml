@@ -22,7 +22,7 @@
         <TextBox x:Name="Text_lineid" HorizontalAlignment="Left" Height="23" Margin="360,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="168"/>
         <TextBox x:Name="Text_ticketprice" HorizontalAlignment="Left" Height="23" Margin="533,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="180"/>
 
-        <TextBlock HorizontalAlignment="Left" Margin="72,24,0,0" TextWrapping="Wrap" Text="enterstationid" VerticalAlignment="Top" Height="16" Width="50"/>
+        <TextBlock HorizontalAlignment="Left" Margin="51,24,0,0" TextWrapping="Wrap" Text="enterstationid" VerticalAlignment="Top" Height="16" Width="87"/>
         <TextBlock HorizontalAlignment="Left" Margin="209,24,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="16" Width="84"><Run Text="leavestationid"/><LineBreak/><Run/></TextBlock>
         <TextBlock HorizontalAlignment="Left" Margin="419,24,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="16" Width="84" Text="lineid"/>
         <TextBlock HorizontalAlignment="Left" Margin="587,24,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="16" Width="109" Text="ticketprice(&lt;=)(&lt;=)"/>
